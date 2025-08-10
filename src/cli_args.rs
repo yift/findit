@@ -29,9 +29,21 @@ pub(crate) struct CliArgs {
     #[arg(short, long)]
     pub(crate) limit: Option<usize>,
 
-    /// What to execute on each file (live empty to just display the files)
+    /// What to execute on each file
     #[arg(short, long)]
     pub(crate) execute: Option<String>,
+
+    /// What to display on each file (default will display the path)
+    #[arg(short, long)]
+    pub(crate) display: Option<String>,
+
+    /// Start of string interpolation in the display or execute
+    #[arg(long, default_value = "`")]
+    pub(crate) interpolation_start: String,
+
+    /// End of string interpolation in the display or execute
+    #[arg(long, default_value = "`")]
+    pub(crate) interpolation_end: String,
 
     /// Consider nodes before their parent
     #[arg(long, default_value_t = false)]
