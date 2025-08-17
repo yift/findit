@@ -227,9 +227,9 @@ fn new_is_null(expr: &Expr, negate: bool) -> Result<Box<dyn Evaluator>, FindItEr
 impl Evaluator for IsNull {
     fn eval(&self, file: &FileWrapper) -> Value {
         if self.evaluator.eval(file) == Value::Empty {
-            Value::Bool(self.negate)
-        } else {
             Value::Bool(!self.negate)
+        } else {
+            Value::Bool(self.negate)
         }
     }
 

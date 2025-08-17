@@ -1,0 +1,39 @@
+[files]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_file']
+order = false
+
+[dirs]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir']
+order = false
+
+[execs]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'executable AND is_file']
+order = false
+
+[is_true]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS TRUE']
+order = false
+
+[is_not_true]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS NOT TRUE']
+order = false
+
+[is_false]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS FALSE']
+order = false
+
+[is_not_false]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS NOT FALSE']
+order = false
+
+[is_null]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NULL']
+order = false
+
+[is_not_null]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NULL']
+order = false
+
+[between]
+arguments = ["tests/test_cases/filter/test_files", "-d", '`name` -> `size`', "-w", "size BETWEEN 40 AND 80"]
+order = false
