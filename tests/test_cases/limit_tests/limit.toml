@@ -1,0 +1,11 @@
+[limit_node_first]
+run_before = ["rm -rf /tmp/findit/tests/limits/node-first", "mkdir -p /tmp/findit/tests/limits/node-first/a/1/b/c/2/3/e/f/4/5/6/7"]
+arguments = ["/tmp/findit/tests/limits/node-first", "--node-first", "--limit", "3"]
+order = true
+run_after = ["rm -rf tmp/findit/tests/limits/node-first"]
+
+[limit_node_last]
+run_before = ["rm -rf /tmp/findit/tests/limits/node-last", "mkdir -p /tmp/findit/tests/limits/node-last/a/1/b/c/2/3/e/f/4/5/6/7"]
+arguments = ["/tmp/findit/tests/limits/node-last", "--limit", "3"]
+order = true
+run_after = ["rm -rf tmp/findit/tests/limits/node-last"]

@@ -36,7 +36,7 @@ impl Walker {
             }
         }
 
-        if self.node_first {
+        if self.node_first && !stepper.enough() {
             stepper.step(&FileWrapper::new(self.root.clone(), self.depth));
         }
 

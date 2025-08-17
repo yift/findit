@@ -301,3 +301,174 @@ impl Evaluator for HiddenExtractor {
         ValueType::Bool
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::env;
+
+    use super::*;
+
+    #[test]
+    fn test_file_creation() -> Result<(), FindItError> {
+        let file = env::current_dir()?;
+        let creation = file.metadata()?.created()?;
+        let ident = Ident::new("created");
+        let exe = get_extractor(&ident)?;
+        let wrapper = FileWrapper::new(file, 1);
+
+        let value = exe.eval(&wrapper);
+
+        assert_eq!(value, creation.into());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_file() -> Result<(), FindItError> {
+        let ident = Ident::new("");
+        let err = get_extractor(&ident).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_name() -> Result<(), FindItError> {
+        let ident = Ident::new("#");
+        let err = get_extractor(&ident).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_unknown_filed() -> Result<(), FindItError> {
+        let ident = Ident::new("foo");
+        let err = get_extractor(&ident).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    fn test_expected_type(name: &str, expected: ValueType) -> Result<(), FindItError> {
+        let ident = Ident::new(name);
+        let tp = get_extractor(&ident)?.expected_type();
+
+        assert_eq!(tp, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_file_expected_type() -> Result<(), FindItError> {
+        test_expected_type("#foo", ValueType::Path)
+    }
+
+    #[test]
+    fn test_path_expected_type() -> Result<(), FindItError> {
+        test_expected_type("path", ValueType::String)
+    }
+
+    #[test]
+    fn test_extension_expected_type() -> Result<(), FindItError> {
+        test_expected_type("extension", ValueType::String)
+    }
+
+    #[test]
+    fn test_name_expected_type() -> Result<(), FindItError> {
+        test_expected_type("name", ValueType::String)
+    }
+
+    #[test]
+    fn test_absolute_expected_type() -> Result<(), FindItError> {
+        test_expected_type("absolute", ValueType::Path)
+    }
+
+    #[test]
+    fn test_content_expected_type() -> Result<(), FindItError> {
+        test_expected_type("content", ValueType::String)
+    }
+
+    #[test]
+    fn test_depth_expected_type() -> Result<(), FindItError> {
+        test_expected_type("depth", ValueType::Number)
+    }
+
+    #[test]
+    fn test_size_expected_type() -> Result<(), FindItError> {
+        test_expected_type("size", ValueType::Number)
+    }
+
+    #[test]
+    fn test_count_expected_type() -> Result<(), FindItError> {
+        test_expected_type("count", ValueType::Number)
+    }
+
+    #[test]
+    fn test_length_expected_type() -> Result<(), FindItError> {
+        test_expected_type("length", ValueType::Number)
+    }
+
+    #[test]
+    fn test_created_expected_type() -> Result<(), FindItError> {
+        test_expected_type("created", ValueType::Date)
+    }
+
+    #[test]
+    fn test_modified_expected_type() -> Result<(), FindItError> {
+        test_expected_type("modified", ValueType::Date)
+    }
+
+    #[test]
+    fn test_exists_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is_exists", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_is_dir_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is_dir", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_is_file_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is_file", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_is_link_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is_link", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_owner_expected_type() -> Result<(), FindItError> {
+        test_expected_type("owner", ValueType::String)
+    }
+
+    #[test]
+    fn test_group_expected_type() -> Result<(), FindItError> {
+        test_expected_type("group", ValueType::String)
+    }
+
+    #[test]
+    fn test_readable_expected_type() -> Result<(), FindItError> {
+        test_expected_type("readable", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_writeable_expected_type() -> Result<(), FindItError> {
+        test_expected_type("writeable", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_hidden_expected_type() -> Result<(), FindItError> {
+        test_expected_type("hidden", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_executable_expected_type() -> Result<(), FindItError> {
+        test_expected_type("executable", ValueType::Bool)
+    }
+}
