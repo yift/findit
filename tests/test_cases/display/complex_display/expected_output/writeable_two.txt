@@ -1,0 +1,3 @@
+writeable_two; true
+file2; true
+file1; false

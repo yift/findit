@@ -283,7 +283,7 @@ impl Evaluator for WriteableExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path()
             .metadata()
-            .map(|m| m.permissions().mode() & 0o222 != 0)
+            .map(|m| !m.permissions().readonly())
             .into()
     }
     fn expected_type(&self) -> ValueType {

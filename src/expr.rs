@@ -36,7 +36,7 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
         } => new_between(expr, low, high, *negated),
         Expr::BinaryOp { left, op, right } => new_binary_operator(left, op, right),
         Expr::Value(val) => new_literal_value(&val.value),
-        _ => Err(FindItError::BadExpression("QQQ".into())),
+        _ => Err(FindItError::BadExpression(format!("{expr}"))),
     }
     /*
 
