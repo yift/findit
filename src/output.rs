@@ -143,3 +143,46 @@ fn parse_display(
 
     Ok(fields)
 }
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+
+    use super::*;
+
+    #[test]
+    fn empty_display_string() {
+        let args = CliArgs::parse_from(vec!["-", "-d", ""]);
+
+        let err = build_output(&args, vec![]).err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn empty_interpolation_start() {
+        let args = CliArgs::parse_from(vec!["-", "-d", "test", "--interpolation-start", ""]);
+
+        let err = build_output(&args, vec![]).err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn empty_interpolation_end() {
+        let args = CliArgs::parse_from(vec!["-", "-d", "test", "--interpolation-end", ""]);
+
+        let err = build_output(&args, vec![]).err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn bad_syntax() {
+        let args = CliArgs::parse_from(vec!["-", "-d", "te`st"]);
+
+        let err = build_output(&args, vec![]).err();
+
+        assert!(err.is_some())
+    }
+}

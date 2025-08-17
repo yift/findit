@@ -1,0 +1,4 @@
+/tmp/findit/tests/min_max_test/a/1/b/c/2/3
+/tmp/findit/tests/min_max_test/a/1/b/c/2
+/tmp/findit/tests/min_max_test/a/1/b/c
+/tmp/findit/tests/min_max_test/a/1/b
