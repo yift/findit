@@ -19,7 +19,7 @@ impl Walker {
             return Ok(());
         }
         if !self.node_first {
-            stepper.step(&FileWrapper::new(self.root.clone(), self.depth))
+            stepper.step(&FileWrapper::new(self.root.clone(), self.depth));
         }
 
         if self.depth < self.max_depth.unwrap_or(usize::MAX) && self.root.is_dir() {
@@ -37,7 +37,7 @@ impl Walker {
         }
 
         if self.node_first {
-            stepper.step(&FileWrapper::new(self.root.clone(), self.depth))
+            stepper.step(&FileWrapper::new(self.root.clone(), self.depth));
         }
 
         Ok(())
@@ -50,15 +50,15 @@ impl TryFrom<&CliArgs> for Walker {
             Some(path) => path.clone(),
             None => env::current_dir()?,
         };
-        if !root.exists() {
-            Err(FindItError::NoSuchFile(root))
-        } else {
+        if root.exists() {
             Ok(Walker {
                 root,
                 depth: 0,
                 node_first: value.node_first,
                 max_depth: value.max_depth,
             })
+        } else {
+            Err(FindItError::NoSuchFile(root))
         }
     }
 }

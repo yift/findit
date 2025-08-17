@@ -5,7 +5,7 @@ use clap::Parser;
 /// Find files
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-pub(crate) struct CliArgs {
+pub struct CliArgs {
     /// Root to find from, default to current directory
     pub(crate) root: Option<PathBuf>,
 

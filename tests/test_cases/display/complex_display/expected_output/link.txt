@@ -1,0 +1,15 @@
+thing,  link: false
+number,  link: false
+link-1.txt, 1176 link: true
+isabella-236.txt, 655 link: false
+way-386.txt, 165 link: false
+logan-234.txt, 584 link: false
+liam-217.txt, 731 link: false
+group,  link: false
+first-473.txt, 1019 link: false
+public-555.txt, 353 link: false
+young-501.txt, 522 link: false
+mason-421.txt, 264 link: false
+jackson-325.txt, 226 link: false
+early,  link: false
+good-581.txt, 1175 link: false

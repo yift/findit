@@ -1,24 +1,14 @@
-//#![deny(warnings)]
+#![deny(warnings)]
 
-mod cli_args;
-mod errors;
-mod expr;
-mod extract;
-mod file_wrapper;
-mod filter;
-mod limit;
-mod min_depth;
-mod output;
-mod value;
-mod walker;
+use std::io::stdout;
 
-use crate::{cli_args::CliArgs, errors::FindItError, filter::make_filters, walker::Walker};
 use clap::Parser;
+use findit::{cli_args::CliArgs, run_func::run};
 
-fn main() -> Result<(), FindItError> {
+fn main() {
     let args = CliArgs::parse();
-    let walker = Walker::try_from(&args)?;
-    let mut stepper = make_filters(&args)?;
-    walker.walk(&mut stepper)?;
-    Ok(())
+    if let Err(e) = run(&args, stdout()) {
+        eprintln!("{e}");
+        std::process::exit(1)
+    }
 }

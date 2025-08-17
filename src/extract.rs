@@ -4,7 +4,12 @@ use sqlparser::ast::Ident;
 use std::os::unix::fs::PermissionsExt;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
-use crate::{errors::FindItError, expr::Evaluator, file_wrapper::FileWrapper, value::Value};
+use crate::{
+    errors::FindItError,
+    expr::Evaluator,
+    file_wrapper::FileWrapper,
+    value::{Value, ValueType},
+};
 
 pub(crate) fn get_extractor(name: &Ident) -> Result<Box<dyn Evaluator>, FindItError> {
     let name = &name.value;
@@ -12,12 +17,11 @@ pub(crate) fn get_extractor(name: &Ident) -> Result<Box<dyn Evaluator>, FindItEr
         return Err(FindItError::BadExpression("Empty identifier".into()));
     }
     if let Some(name) = name.strip_prefix("#") {
-        let name = name[1..].to_string();
+        let name = name.to_string();
         if name.is_empty() {
             return Err(FindItError::BadExpression("Empty file name".into()));
-        } else {
-            return Ok(Box::new(FileExtractor { name }));
         }
+        return Ok(Box::new(FileExtractor { name }));
     }
     let name = name.to_lowercase();
     match name.as_str() {
@@ -49,8 +53,7 @@ pub(crate) fn get_extractor(name: &Ident) -> Result<Box<dyn Evaluator>, FindItEr
         "hidden" => Ok(Box::new(HiddenExtractor {})),
 
         _ => Err(FindItError::BadExpression(format!(
-            "Unknown identifier: {}",
-            name
+            "Unknown identifier: {name}",
         ))),
     }
 }
@@ -61,8 +64,10 @@ struct FileExtractor {
 
 impl Evaluator for FileExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        let path = file.path().join(&self.name);
-        Value::Path(path)
+        file.path().join(&self.name).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Path
     }
 }
 
@@ -71,12 +76,18 @@ impl Evaluator for ParentExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().parent().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Path
+    }
 }
 
 struct NameExtractor {}
 impl Evaluator for NameExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().file_name().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
     }
 }
 
@@ -85,17 +96,26 @@ impl Evaluator for PathExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().as_os_str().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
 }
 struct ExtensionExtractor {}
 impl Evaluator for ExtensionExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().extension().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
 }
 struct AbsoluteExtractor {}
 impl Evaluator for AbsoluteExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         fs::canonicalize(file.path()).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Path
     }
 }
 
@@ -104,12 +124,18 @@ impl Evaluator for ContentExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.read().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
 }
 
 struct LengthExtractor {}
 impl Evaluator for LengthExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        file.read().map(|f| f.len()).into()
+        file.read().map(|f| f.chars().count()).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
     }
 }
 
@@ -118,12 +144,18 @@ impl Evaluator for DepthExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.dept().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
 }
 
 struct SizeExtractor {}
 impl Evaluator for SizeExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().metadata().map(|m| m.len()).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
     }
 }
 
@@ -132,11 +164,17 @@ impl Evaluator for CountExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.count().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
 }
 struct CreatedExtractor {}
 impl Evaluator for CreatedExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().metadata().and_then(|m| m.created()).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Date
     }
 }
 struct ModifiedExtractor {}
@@ -144,11 +182,17 @@ impl Evaluator for ModifiedExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().metadata().and_then(|m| m.modified()).into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Date
+    }
 }
 struct ExistsExtractor {}
 impl Evaluator for ExistsExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().exists().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
     }
 }
 struct IsDirExtractor {}
@@ -156,17 +200,26 @@ impl Evaluator for IsDirExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().is_dir().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
+    }
 }
 struct IsFileExtractor {}
 impl Evaluator for IsFileExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().is_file().into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
+    }
 }
 struct IsLinkExtractor {}
 impl Evaluator for IsLinkExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().is_symlink().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
     }
 }
 
@@ -181,6 +234,9 @@ impl Evaluator for OwnerExtractor {
             Some(u) => u.name().into(),
         }
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
 }
 struct GroupExtractor {}
 impl Evaluator for GroupExtractor {
@@ -193,6 +249,9 @@ impl Evaluator for GroupExtractor {
             Some(u) => u.name().into(),
         }
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
 }
 
 struct ExecutableExtractor {}
@@ -203,6 +262,9 @@ impl Evaluator for ExecutableExtractor {
             .map(|m| m.permissions().mode() & 0o111 != 0)
             .into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
+    }
 }
 struct ReadableExtractor {}
 impl Evaluator for ReadableExtractor {
@@ -211,6 +273,9 @@ impl Evaluator for ReadableExtractor {
             .metadata()
             .map(|m| m.permissions().mode() & 0o444 != 0)
             .into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
     }
 }
 struct WriteableExtractor {}
@@ -221,12 +286,18 @@ impl Evaluator for WriteableExtractor {
             .map(|m| m.permissions().mode() & 0o222 != 0)
             .into()
     }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
+    }
 }
 
 struct HiddenExtractor {}
 impl Evaluator for HiddenExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         let name: Value = file.path().file_name().into();
-        name.to_string().starts_with(".").into()
+        name.to_string().starts_with('.').into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
     }
 }

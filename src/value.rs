@@ -7,7 +7,7 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum Value {
     Empty,
     String(String),
@@ -92,11 +92,21 @@ impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Empty => Ok(()),
-            Value::Bool(b) => write!(f, "{}", b),
-            Value::Number(n) => write!(f, "{}", n),
+            Value::Bool(b) => write!(f, "{b}"),
+            Value::Number(n) => write!(f, "{n}"),
             Value::Path(p) => write!(f, "{}", p.as_os_str().to_str().unwrap_or_default()),
-            Value::String(s) => write!(f, "{}", s),
+            Value::String(s) => write!(f, "{s}"),
             Value::Date(dt) => write!(f, "{}", dt.format("%d/%b/%Y %H:%M:%S")),
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum ValueType {
+    Empty,
+    Bool,
+    Number,
+    Path,
+    String,
+    Date,
 }

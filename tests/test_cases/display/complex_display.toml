@@ -1,0 +1,35 @@
+[path_and_name_and_extension]
+arguments = ["tests/test_cases/display/test_files", "-d", "`path` - has name: `name` and extension: `extension`.", "--node-first"]
+order = false
+
+[content_and_length]
+arguments = ["tests/test_cases/display/single_line_test_files", "-d", "for: `name` we have: `content` (`length` characters and `size` bytes)"]
+order = false
+
+[depth]
+arguments = ["tests/test_cases/display/test_files", "-d", "`name` depth: `depth`"]
+order = false
+
+[link]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`, `length` link: `is_link`", "-x", "1"]
+order = false
+
+[attributes]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  exe: `executable`, dir: `is_dir`, file: `is_file`", "-x", "2"]
+order = false
+
+[exists]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  parent name: `parent.name`, good exists near me: `parent.\"#good-581.txt\".is_exists`"]
+order = false
+
+[dates]
+run_before = ["rm -rf /tmp/findit/tests/dates", "mkdir -p /tmp/findit/tests/dates", "touch /tmp/findit/tests/dates/file1 -t 202404241021.43"]
+arguments = ["/tmp/findit/tests/dates/file1", "-d", "`name` -> modified: `modified`"]
+run_after = ["rm -rf /tmp/findit/tests/dates"]
+
+[absolute]
+run_before = ["rm -rf /tmp/findit/tests/absolute", "mkdir -p /tmp/findit/tests/absolute", "touch /tmp/findit/tests/absolute/file1", "touch /tmp/findit/tests/absolute/file2"]
+root = "/tmp/findit/tests/absolute"
+arguments = [".", "-d", "`path` -> `absolute`"]
+order = false
+run_after = ["rm -rf /tmp/findit/tests/absolute"]

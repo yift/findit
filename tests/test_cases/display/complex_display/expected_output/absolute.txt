@@ -1,0 +1,3 @@
+. -> /tmp/findit/tests/absolute
+./file2 -> /tmp/findit/tests/absolute/file2
+./file1 -> /tmp/findit/tests/absolute/file1

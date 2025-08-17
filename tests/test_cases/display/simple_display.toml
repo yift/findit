@@ -1,0 +1,3 @@
+[simple_display]
+arguments = ["tests/test_cases/display/test_files"]
+order = false
