@@ -5,7 +5,7 @@ use std::{
     time::SystemTime,
 };
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum Value {
@@ -14,7 +14,7 @@ pub(crate) enum Value {
     Path(PathBuf),
     Number(u64),
     Bool(bool),
-    Date(DateTime<Utc>),
+    Date(DateTime<Local>),
 }
 
 impl From<&Path> for Value {
@@ -56,14 +56,14 @@ impl From<u64> for Value {
     }
 }
 
-impl From<DateTime<Utc>> for Value {
-    fn from(value: DateTime<Utc>) -> Self {
+impl From<DateTime<Local>> for Value {
+    fn from(value: DateTime<Local>) -> Self {
         Value::Date(value)
     }
 }
 impl From<SystemTime> for Value {
     fn from(value: SystemTime) -> Self {
-        let date: DateTime<Utc> = value.into();
+        let date: DateTime<Local> = value.into();
         date.into()
     }
 }

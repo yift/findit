@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use sqlparser::ast::Value as SqlValue;
 
 use crate::{
@@ -69,7 +69,7 @@ impl Evaluator for StringLiteral {
     }
 }
 struct DateLiteral {
-    val: DateTime<Utc>,
+    val: DateTime<Local>,
 }
 impl Evaluator for DateLiteral {
     fn eval(&self, _: &FileWrapper) -> Value {
