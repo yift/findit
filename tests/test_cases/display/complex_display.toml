@@ -7,7 +7,7 @@ arguments = ["tests/test_cases/display/single_line_test_files", "-d", "for: `nam
 order = false
 
 [depth]
-arguments = ["tests/test_cases/display/test_files", "-d", "`name` depth: `depth`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "`name` depth: `depth` - count: `count`"]
 order = false
 
 [link]

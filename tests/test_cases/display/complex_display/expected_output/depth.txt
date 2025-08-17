@@ -1,217 +1,217 @@
-test_files depth: 0
-other-247.txt depth: 1
-woman depth: 1
-harper-535.txt depth: 2
-able-19.bash depth: 2
-charlotte depth: 2
-jackson-10.bash depth: 3
-woman-258.txt depth: 3
-part-530.txt depth: 3
-young depth: 3
-group-206.txt depth: 4
-company-460.txt depth: 4
-sophia-342.txt depth: 4
-ethan-14.bash depth: 4
-isabella depth: 3
-thing-209.txt depth: 4
-mason-592.txt depth: 4
-charlotte-493.txt depth: 4
-important-150.txt depth: 2
-able-572.txt depth: 2
-part-278.txt depth: 2
-fact depth: 2
-point-24.bash depth: 3
-few depth: 3
-liam-382.txt depth: 4
-lucas-229.txt depth: 4
-child depth: 4
-own-211.txt depth: 5
-public-178.txt depth: 5
-different-496.txt depth: 5
-next-337.txt depth: 5
-mia-587.txt depth: 5
-noah-152.txt depth: 5
-number-536.txt depth: 4
-week-127.txt depth: 4
-olivia-562.txt depth: 4
-logan-422.txt depth: 4
-bad-280.txt depth: 3
-mason-411.txt depth: 3
-part-341.txt depth: 3
-sophia-269.txt depth: 3
-last-211.txt depth: 3
-logan depth: 3
-hand-451.txt depth: 4
-thing-248.txt depth: 4
-great-323.txt depth: 4
-oliver-427.txt depth: 4
-right-460.txt depth: 4
-year-261.txt depth: 4
-case-179.txt depth: 4
-time-116.txt depth: 4
-same-359.txt depth: 4
-public-464.txt depth: 4
-bad-239.txt depth: 4
-child-368.txt depth: 4
-week depth: 3
-small-148.txt depth: 4
-last-23.bash depth: 4
-oliver-165.txt depth: 4
-hand depth: 4
-government-246.txt depth: 5
-amelia-373.txt depth: 5
-large-142.txt depth: 5
-year-434.txt depth: 4
-place-330.txt depth: 4
-great-502.txt depth: 3
-man depth: 2
-government-401.txt depth: 3
-oliver depth: 3
-hand-451.txt depth: 4
-sophia-593.txt depth: 4
-bad-430.txt depth: 4
-company-592.txt depth: 4
-child depth: 4
-own-253.txt depth: 5
-lucas-553.txt depth: 5
-early-381.txt depth: 5
-person-128.txt depth: 5
-olivia-537.txt depth: 5
-little-129.txt depth: 5
-person-526.txt depth: 5
-fact-231.txt depth: 5
-hand-396.txt depth: 4
-emma-558.txt depth: 4
-woman-100.txt depth: 3
-own-563.txt depth: 3
-eye-234.txt depth: 3
-woman-406.txt depth: 3
-life-250.txt depth: 3
-olivia-317.txt depth: 3
-isabella-280.txt depth: 3
-different-389.txt depth: 2
-number-122.txt depth: 1
-long depth: 1
-last-563.txt depth: 2
-early-131.txt depth: 2
-child depth: 2
-public-12.bash depth: 3
-few-565.txt depth: 3
-person-17.bash depth: 3
-number-376.txt depth: 2
-sophia-373.txt depth: 2
-liam-504.txt depth: 2
-time-522.txt depth: 2
-week-362.txt depth: 1
-young-482.txt depth: 1
-thing depth: 1
-number depth: 2
-next-428.txt depth: 3
-few-15.bash depth: 3
-ava-365.txt depth: 3
-logan-461.txt depth: 3
-next-117.txt depth: 3
-james-301.txt depth: 3
-link-1.txt depth: 2
-isabella-236.txt depth: 2
-way-386.txt depth: 2
-logan-234.txt depth: 2
-liam-217.txt depth: 2
-group depth: 2
-ava-146.txt depth: 3
-person-11.bash depth: 3
-sophia-191.txt depth: 3
-own-25.bash depth: 3
-big-27.bash depth: 3
-first-473.txt depth: 2
-public-555.txt depth: 2
-young-501.txt depth: 2
-mason-421.txt depth: 2
-jackson-325.txt depth: 2
-early depth: 2
-life-325.txt depth: 3
-day depth: 3
-high-541.txt depth: 4
-aria-29.bash depth: 4
-other-433.txt depth: 4
-charlotte-376.txt depth: 4
-amelia-399.txt depth: 4
-oliver-538.txt depth: 4
-different-396.txt depth: 4
-oliver-570.txt depth: 4
-eye depth: 4
-thing-296.txt depth: 5
-good-234.txt depth: 5
-long-378.txt depth: 5
-problem-308.txt depth: 5
-charlotte-225.txt depth: 5
-way-324.txt depth: 5
-oliver-567.txt depth: 5
-child-188.txt depth: 5
-able-137.txt depth: 5
-old-15.bash depth: 5
-sophia-204.txt depth: 5
-eye-152.txt depth: 5
-harper-236.txt depth: 5
-emma-202.txt depth: 5
-big-463.txt depth: 4
-point-385.txt depth: 4
-noah depth: 3
-person-103.txt depth: 4
-case-263.txt depth: 4
-different-218.txt depth: 4
-aria-428.txt depth: 4
-next depth: 3
-same-11.bash depth: 4
-able depth: 4
-liam-400.txt depth: 5
-good-362.txt depth: 5
-mia-560.txt depth: 5
-long-250.txt depth: 5
-right-465.txt depth: 5
-next-473.txt depth: 5
-oliver-18.bash depth: 5
-james-390.txt depth: 5
-ethan-364.txt depth: 5
-government-167.txt depth: 4
-new-22.bash depth: 3
-year-376.txt depth: 3
-sophia depth: 3
-way depth: 4
-place-349.txt depth: 5
-part-26.bash depth: 5
-large-283.txt depth: 5
-bad-366.txt depth: 5
-life-293.txt depth: 4
-aria-244.txt depth: 4
-lucas-362.txt depth: 4
-noah-484.txt depth: 4
-life-162.txt depth: 4
-logan-25.bash depth: 4
-big-434.txt depth: 4
-right-269.txt depth: 3
-harper depth: 3
-liam-438.txt depth: 4
-last-364.txt depth: 4
-elijah-500.txt depth: 4
-eye-585.txt depth: 4
-james-219.txt depth: 4
-time-111.txt depth: 4
-liam-431.txt depth: 4
-thing-449.txt depth: 4
-place depth: 4
-able-355.txt depth: 5
-noah-402.txt depth: 5
-company-263.txt depth: 5
-other-447.txt depth: 5
-year-368.txt depth: 5
-large-249.txt depth: 5
-emma-375.txt depth: 5
-able-134.txt depth: 5
-company-246.txt depth: 5
-elijah-452.txt depth: 5
-james-547.txt depth: 3
-emma-313.txt depth: 3
-mason-227.txt depth: 3
-high-163.txt depth: 3
-good-581.txt depth: 2
+test_files depth: 0 - count: 7
+other-247.txt depth: 1 - count: 1
+woman depth: 1 - count: 9
+harper-535.txt depth: 2 - count: 1
+able-19.bash depth: 2 - count: 1
+charlotte depth: 2 - count: 5
+jackson-10.bash depth: 3 - count: 1
+woman-258.txt depth: 3 - count: 1
+part-530.txt depth: 3 - count: 1
+young depth: 3 - count: 4
+group-206.txt depth: 4 - count: 1
+company-460.txt depth: 4 - count: 1
+sophia-342.txt depth: 4 - count: 1
+ethan-14.bash depth: 4 - count: 1
+isabella depth: 3 - count: 3
+thing-209.txt depth: 4 - count: 1
+mason-592.txt depth: 4 - count: 1
+charlotte-493.txt depth: 4 - count: 1
+important-150.txt depth: 2 - count: 1
+able-572.txt depth: 2 - count: 1
+part-278.txt depth: 2 - count: 1
+fact depth: 2 - count: 10
+point-24.bash depth: 3 - count: 1
+few depth: 3 - count: 7
+liam-382.txt depth: 4 - count: 1
+lucas-229.txt depth: 4 - count: 1
+child depth: 4 - count: 6
+own-211.txt depth: 5 - count: 1
+public-178.txt depth: 5 - count: 1
+different-496.txt depth: 5 - count: 1
+next-337.txt depth: 5 - count: 1
+mia-587.txt depth: 5 - count: 1
+noah-152.txt depth: 5 - count: 1
+number-536.txt depth: 4 - count: 1
+week-127.txt depth: 4 - count: 1
+olivia-562.txt depth: 4 - count: 1
+logan-422.txt depth: 4 - count: 1
+bad-280.txt depth: 3 - count: 1
+mason-411.txt depth: 3 - count: 1
+part-341.txt depth: 3 - count: 1
+sophia-269.txt depth: 3 - count: 1
+last-211.txt depth: 3 - count: 1
+logan depth: 3 - count: 12
+hand-451.txt depth: 4 - count: 1
+thing-248.txt depth: 4 - count: 1
+great-323.txt depth: 4 - count: 1
+oliver-427.txt depth: 4 - count: 1
+right-460.txt depth: 4 - count: 1
+year-261.txt depth: 4 - count: 1
+case-179.txt depth: 4 - count: 1
+time-116.txt depth: 4 - count: 1
+same-359.txt depth: 4 - count: 1
+public-464.txt depth: 4 - count: 1
+bad-239.txt depth: 4 - count: 1
+child-368.txt depth: 4 - count: 1
+week depth: 3 - count: 6
+small-148.txt depth: 4 - count: 1
+last-23.bash depth: 4 - count: 1
+oliver-165.txt depth: 4 - count: 1
+hand depth: 4 - count: 3
+government-246.txt depth: 5 - count: 1
+amelia-373.txt depth: 5 - count: 1
+large-142.txt depth: 5 - count: 1
+year-434.txt depth: 4 - count: 1
+place-330.txt depth: 4 - count: 1
+great-502.txt depth: 3 - count: 1
+man depth: 2 - count: 9
+government-401.txt depth: 3 - count: 1
+oliver depth: 3 - count: 7
+hand-451.txt depth: 4 - count: 1
+sophia-593.txt depth: 4 - count: 1
+bad-430.txt depth: 4 - count: 1
+company-592.txt depth: 4 - count: 1
+child depth: 4 - count: 8
+own-253.txt depth: 5 - count: 1
+lucas-553.txt depth: 5 - count: 1
+early-381.txt depth: 5 - count: 1
+person-128.txt depth: 5 - count: 1
+olivia-537.txt depth: 5 - count: 1
+little-129.txt depth: 5 - count: 1
+person-526.txt depth: 5 - count: 1
+fact-231.txt depth: 5 - count: 1
+hand-396.txt depth: 4 - count: 1
+emma-558.txt depth: 4 - count: 1
+woman-100.txt depth: 3 - count: 1
+own-563.txt depth: 3 - count: 1
+eye-234.txt depth: 3 - count: 1
+woman-406.txt depth: 3 - count: 1
+life-250.txt depth: 3 - count: 1
+olivia-317.txt depth: 3 - count: 1
+isabella-280.txt depth: 3 - count: 1
+different-389.txt depth: 2 - count: 1
+number-122.txt depth: 1 - count: 1
+long depth: 1 - count: 7
+last-563.txt depth: 2 - count: 1
+early-131.txt depth: 2 - count: 1
+child depth: 2 - count: 3
+public-12.bash depth: 3 - count: 1
+few-565.txt depth: 3 - count: 1
+person-17.bash depth: 3 - count: 1
+number-376.txt depth: 2 - count: 1
+sophia-373.txt depth: 2 - count: 1
+liam-504.txt depth: 2 - count: 1
+time-522.txt depth: 2 - count: 1
+week-362.txt depth: 1 - count: 1
+young-482.txt depth: 1 - count: 1
+thing depth: 1 - count: 14
+number depth: 2 - count: 6
+next-428.txt depth: 3 - count: 1
+few-15.bash depth: 3 - count: 1
+ava-365.txt depth: 3 - count: 1
+logan-461.txt depth: 3 - count: 1
+next-117.txt depth: 3 - count: 1
+james-301.txt depth: 3 - count: 1
+link-1.txt depth: 2 - count: 1
+isabella-236.txt depth: 2 - count: 1
+way-386.txt depth: 2 - count: 1
+logan-234.txt depth: 2 - count: 1
+liam-217.txt depth: 2 - count: 1
+group depth: 2 - count: 5
+ava-146.txt depth: 3 - count: 1
+person-11.bash depth: 3 - count: 1
+sophia-191.txt depth: 3 - count: 1
+own-25.bash depth: 3 - count: 1
+big-27.bash depth: 3 - count: 1
+first-473.txt depth: 2 - count: 1
+public-555.txt depth: 2 - count: 1
+young-501.txt depth: 2 - count: 1
+mason-421.txt depth: 2 - count: 1
+jackson-325.txt depth: 2 - count: 1
+early depth: 2 - count: 13
+life-325.txt depth: 3 - count: 1
+day depth: 3 - count: 11
+high-541.txt depth: 4 - count: 1
+aria-29.bash depth: 4 - count: 1
+other-433.txt depth: 4 - count: 1
+charlotte-376.txt depth: 4 - count: 1
+amelia-399.txt depth: 4 - count: 1
+oliver-538.txt depth: 4 - count: 1
+different-396.txt depth: 4 - count: 1
+oliver-570.txt depth: 4 - count: 1
+eye depth: 4 - count: 14
+thing-296.txt depth: 5 - count: 1
+good-234.txt depth: 5 - count: 1
+long-378.txt depth: 5 - count: 1
+problem-308.txt depth: 5 - count: 1
+charlotte-225.txt depth: 5 - count: 1
+way-324.txt depth: 5 - count: 1
+oliver-567.txt depth: 5 - count: 1
+child-188.txt depth: 5 - count: 1
+able-137.txt depth: 5 - count: 1
+old-15.bash depth: 5 - count: 1
+sophia-204.txt depth: 5 - count: 1
+eye-152.txt depth: 5 - count: 1
+harper-236.txt depth: 5 - count: 1
+emma-202.txt depth: 5 - count: 1
+big-463.txt depth: 4 - count: 1
+point-385.txt depth: 4 - count: 1
+noah depth: 3 - count: 4
+person-103.txt depth: 4 - count: 1
+case-263.txt depth: 4 - count: 1
+different-218.txt depth: 4 - count: 1
+aria-428.txt depth: 4 - count: 1
+next depth: 3 - count: 3
+same-11.bash depth: 4 - count: 1
+able depth: 4 - count: 9
+liam-400.txt depth: 5 - count: 1
+good-362.txt depth: 5 - count: 1
+mia-560.txt depth: 5 - count: 1
+long-250.txt depth: 5 - count: 1
+right-465.txt depth: 5 - count: 1
+next-473.txt depth: 5 - count: 1
+oliver-18.bash depth: 5 - count: 1
+james-390.txt depth: 5 - count: 1
+ethan-364.txt depth: 5 - count: 1
+government-167.txt depth: 4 - count: 1
+new-22.bash depth: 3 - count: 1
+year-376.txt depth: 3 - count: 1
+sophia depth: 3 - count: 8
+way depth: 4 - count: 4
+place-349.txt depth: 5 - count: 1
+part-26.bash depth: 5 - count: 1
+large-283.txt depth: 5 - count: 1
+bad-366.txt depth: 5 - count: 1
+life-293.txt depth: 4 - count: 1
+aria-244.txt depth: 4 - count: 1
+lucas-362.txt depth: 4 - count: 1
+noah-484.txt depth: 4 - count: 1
+life-162.txt depth: 4 - count: 1
+logan-25.bash depth: 4 - count: 1
+big-434.txt depth: 4 - count: 1
+right-269.txt depth: 3 - count: 1
+harper depth: 3 - count: 9
+liam-438.txt depth: 4 - count: 1
+last-364.txt depth: 4 - count: 1
+elijah-500.txt depth: 4 - count: 1
+eye-585.txt depth: 4 - count: 1
+james-219.txt depth: 4 - count: 1
+time-111.txt depth: 4 - count: 1
+liam-431.txt depth: 4 - count: 1
+thing-449.txt depth: 4 - count: 1
+place depth: 4 - count: 10
+able-355.txt depth: 5 - count: 1
+noah-402.txt depth: 5 - count: 1
+company-263.txt depth: 5 - count: 1
+other-447.txt depth: 5 - count: 1
+year-368.txt depth: 5 - count: 1
+large-249.txt depth: 5 - count: 1
+emma-375.txt depth: 5 - count: 1
+able-134.txt depth: 5 - count: 1
+company-246.txt depth: 5 - count: 1
+elijah-452.txt depth: 5 - count: 1
+james-547.txt depth: 3 - count: 1
+emma-313.txt depth: 3 - count: 1
+mason-227.txt depth: 3 - count: 1
+high-163.txt depth: 3 - count: 1
+good-581.txt depth: 2 - count: 1
