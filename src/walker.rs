@@ -62,3 +62,19 @@ impl TryFrom<&CliArgs> for Walker {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+
+    use super::*;
+
+    #[test]
+    fn try_from_nop_such_file() {
+        let args = CliArgs::parse_from(vec!["-", "foo/bar/no/such/file"]);
+
+        let err = Walker::try_from(&args).err();
+
+        assert!(err.is_some())
+    }
+}

@@ -9,3 +9,9 @@ run_before = ["rm -rf /tmp/findit/tests/limits/node-last", "mkdir -p /tmp/findit
 arguments = ["/tmp/findit/tests/limits/node-last", "--limit", "3"]
 order = true
 run_after = ["rm -rf tmp/findit/tests/limits/node-last"]
+
+[limit_with_complex_output]
+run_before = ["rm -rf /tmp/findit/tests/limits/complex", "mkdir -p /tmp/findit/tests/limits/complex/a/1/b/c/2/3/e/f/4/5/6/7"]
+arguments = ["/tmp/findit/tests/limits/complex", "--limit", "3", "-d", "`name`"]
+order = true
+run_after = ["rm -rf tmp/findit/tests/limits/complex"]
