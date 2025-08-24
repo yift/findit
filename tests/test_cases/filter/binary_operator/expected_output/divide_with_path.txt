@@ -1,0 +1,5 @@
+tests/test_cases/filter/test_files/same/james-16.bash
+tests/test_cases/filter/test_files/same/mia-23.bash
+tests/test_cases/filter/test_files/same/child-376.txt
+tests/test_cases/filter/test_files/same/case
+tests/test_cases/filter/test_files/same/day-391.txt

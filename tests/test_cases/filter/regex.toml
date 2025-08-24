@@ -1,0 +1,19 @@
+[similar_to]
+arguments = ["tests/test_cases/filter/test_files", "-w", "name SIMILAR TO 'small-[0-9]+\\.bash'"]
+order = false
+
+[not_similar_to]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension = 'bash' AND name NOT SIMILAR TO 'small-[0-9]+\\.bash'"]
+order = false
+
+[rlike]
+arguments = ["tests/test_cases/filter/test_files", "-w", "name RLIKE 'isabella.*'"]
+order = false
+
+[not_rlike]
+arguments = ['tests/test_cases/filter/test_files/same/case/person', "-w", "name NOT RLIKE 'harper.*'"]
+order = false
+
+[regexp]
+arguments = ["tests/test_cases/filter/test_files", "-w", "name REGEXP '.*good.*' OR name REGEXP '.*long.*' OR extension NOT REGEXP 't.*'"]
+order = false

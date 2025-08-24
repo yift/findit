@@ -1,0 +1,6 @@
+tests/test_cases/filter/test_files/noah/next-26.bash
+tests/test_cases/filter/test_files/small/big-12.bash
+tests/test_cases/filter/test_files/small/small-28.bash
+tests/test_cases/filter/test_files/same/james-16.bash
+tests/test_cases/filter/test_files/same/mia-23.bash
+tests/test_cases/filter/test_files/same/case/way-14.bash

@@ -110,3 +110,16 @@ pub(crate) enum ValueType {
     String,
     Date,
 }
+
+impl Display for ValueType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ValueType::Empty => "empty".fmt(f),
+            ValueType::Bool => "boolean".fmt(f),
+            ValueType::Date => "date".fmt(f),
+            ValueType::Number => "number".fmt(f),
+            ValueType::Path => "path".fmt(f),
+            ValueType::String => "string".fmt(f),
+        }
+    }
+}

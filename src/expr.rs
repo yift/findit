@@ -1,5 +1,5 @@
 use sqlparser::{
-    ast::{Expr, Ident, SetExpr, Spanned, Statement},
+    ast::{AccessExpr, Expr, GroupByExpr, Ident, SetExpr, Statement},
     dialect::GenericDialect,
     parser::Parser,
 };
@@ -10,6 +10,8 @@ use crate::{
     extract::get_extractor,
     file_wrapper::FileWrapper,
     literal_value::new_literal_value,
+    string_functions::{new_position, new_regex, new_substring, new_trim},
+    unary_operators::new_unary_operator,
     value::{Value, ValueType},
 };
 
@@ -36,78 +38,59 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
         } => new_between(expr, low, high, *negated),
         Expr::BinaryOp { left, op, right } => new_binary_operator(left, op, right),
         Expr::Value(val) => new_literal_value(&val.value),
-        _ => Err(FindItError::BadExpression(format!("{expr}"))),
+        Expr::Nested(expr) => get_eval(expr),
+        Expr::CompoundFieldAccess { root, access_chain } => {
+            new_compound_field_access(root, access_chain)
+        }
+        Expr::SimilarTo {
+            negated,
+            expr,
+            pattern,
+            escape_char,
+        } => {
+            if escape_char.is_some() {
+                Err(FindItError::BadExpression(
+                    "SIMILAR TO with escape character".into(),
+                ))
+            } else {
+                new_regex(expr, pattern, *negated)
+            }
+        }
+        Expr::RLike {
+            negated,
+            expr,
+            pattern,
+            regexp: _,
+        } => new_regex(expr, pattern, *negated),
+        Expr::UnaryOp { op, expr } => new_unary_operator(expr, op),
+        Expr::Position { expr, r#in } => new_position(r#in, expr),
+        Expr::Substring {
+            expr,
+            substring_from,
+            substring_for,
+            special: _,
+            shorthand: _,
+        } => new_substring(expr, substring_from, substring_for),
+        Expr::Trim {
+            expr,
+            trim_where,
+            trim_what,
+            trim_characters,
+        } => {
+            if trim_characters.is_some() {
+                Err(FindItError::BadExpression(
+                    "TRIM with trim characters".into(),
+                ))
+            } else {
+                new_trim(expr, trim_where, trim_what)
+            }
+        }
+        _ => {
+            dbg!(expr);
+            Err(FindItError::BadExpression(format!("{expr}")))
+        }
     }
     /*
-
-    /// `[NOT] LIKE <pattern> [ESCAPE <escape_character>]`
-    Like {
-        negated: bool,
-        // Snowflake supports the ANY keyword to match against a list of patterns
-        // https://docs.snowflake.com/en/sql-reference/functions/like_any
-        any: bool,
-        expr: Box<Expr>,
-        pattern: Box<Expr>,
-        escape_char: Option<Value>,
-    },
-    /// `ILIKE` (case-insensitive `LIKE`)
-    ILike {
-        negated: bool,
-        // Snowflake supports the ANY keyword to match against a list of patterns
-        // https://docs.snowflake.com/en/sql-reference/functions/like_any
-        any: bool,
-        expr: Box<Expr>,
-        pattern: Box<Expr>,
-        escape_char: Option<Value>,
-    },
-    /// SIMILAR TO regex
-    SimilarTo {
-        negated: bool,
-        expr: Box<Expr>,
-        pattern: Box<Expr>,
-        escape_char: Option<Value>,
-    },
-    /// MySQL: RLIKE regex or REGEXP regex
-    RLike {
-        negated: bool,
-        expr: Box<Expr>,
-        pattern: Box<Expr>,
-        // true for REGEXP, false for RLIKE (no difference in semantics)
-        regexp: bool,
-    },
-    /// Unary operation e.g. `NOT foo`
-    UnaryOp {
-        op: UnaryOperator,
-        expr: Box<Expr>,
-    },
-    /// ```sql
-    /// POSITION(<expr> in <expr>)
-    /// ```
-    Position {
-        expr: Box<Expr>,
-        r#in: Box<Expr>,
-    },
-    /// ```sql
-    /// SUBSTRING(<expr> [FROM <expr>] [FOR <expr>])
-    /// ```
-    /// or
-    /// ```sql
-    /// SUBSTRING(<expr>, <expr>, <expr>)
-    /// ```
-    Substring {
-        expr: Box<Expr>,
-        substring_from: Option<Box<Expr>>,
-        substring_for: Option<Box<Expr>>,
-
-        /// false if the expression is represented using the `SUBSTRING(expr [FROM start] [FOR len])` syntax
-        /// true if the expression is represented using the `SUBSTRING(expr, start, len)` syntax
-        /// This flag is used for formatting.
-        special: bool,
-
-        /// true if the expression is represented using the `SUBSTR` shorthand
-        /// This flag is used for formatting.
-        shorthand: bool,
-    },
     /// ```sql
     /// TRIM([BOTH | LEADING | TRAILING] [<expr> FROM] <expr>)
     /// TRIM(<expr>)
@@ -120,10 +103,7 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
         trim_what: Option<Box<Expr>>,
         trim_characters: Option<Vec<Expr>>,
     },
-    /// Nested expression e.g. `(foo > bar)` or `(1)`
-    Nested(Box<Expr>),
     /// A literal value, such as string, number, date or NULL
-    Value(ValueWithSpan),
     /// Scalar function call e.g. `LEFT(foo, 5)`
     Function(Function),
     /// `CASE [<operand>] WHEN <condition> THEN <result> ... [ELSE <result>] END`
@@ -162,6 +142,25 @@ fn new_compound_eval(identifiers: &[Ident]) -> Result<Box<dyn Evaluator>, FindIt
     }
     let next = new_compound_eval(&identifiers[1..])?;
     Ok(Box::new(CompoundEval { evaluator, next }))
+}
+fn new_compound_field_access(
+    root: &Expr,
+    access_chain: &[AccessExpr],
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    let first = get_eval(root)?;
+    let Some(next) = access_chain.first() else {
+        return Ok(first);
+    };
+    let AccessExpr::Dot(next) = next else {
+        return Err(FindItError::BadExpression(
+            "Only dot compound access is allowed".into(),
+        ));
+    };
+    let next = new_compound_field_access(next, &access_chain[1..])?;
+    Ok(Box::new(CompoundEval {
+        evaluator: first,
+        next,
+    }))
 }
 
 impl Evaluator for CompoundEval {
@@ -314,16 +313,19 @@ pub(crate) fn read_expr(sql: &str) -> Result<Box<dyn Evaluator>, FindItError> {
     let SetExpr::Select(select) = &*select.body else {
         return Err(FindItError::BadFilter(sql.to_string()));
     };
+    let GroupByExpr::Expressions(exs, mods) = &select.group_by else {
+        return Err(FindItError::BadFilter(sql.to_string()));
+    };
+    if !exs.is_empty() && !mods.is_empty() {
+        return Err(FindItError::BadFilter(sql.to_string()));
+    }
+    if !select.sort_by.is_empty() {
+        return Err(FindItError::BadFilter(sql.to_string()));
+    }
 
     let Some(filter) = &select.selection else {
         return Err(FindItError::BadFilter(sql.to_string()));
     };
-    if filter.span().start.line != 2 || filter.span().start.column != 1 {
-        return Err(FindItError::BadFilter(sql.to_string()));
-    }
-    if filter.span().end != ast.span().end {
-        return Err(FindItError::BadFilter(sql.to_string()));
-    }
 
     get_eval(filter)
 }

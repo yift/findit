@@ -1,0 +1,56 @@
+[position]
+arguments = ["tests/test_cases/display/test_files", "-d", "`path` - position or txt `POSITION('txt' IN path)`"]
+order = false
+
+[sub_string_for]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FOR 7)` for path `path`"]
+order = false
+
+[sub_string_from]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FROM 7)` for path `path`"]
+order = false
+
+[sub_string_from_and_for]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FROM 7 FOR 10)` for path `path`"]
+order = false
+
+[sub_from_0_1_and_a_alot]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr_from_0: `SUBSTRING(name FROM 0)` substr_from_1: `SUBSTRING(name FROM 1)` substr_from_100: `SUBSTRING(name FROM 100)` for name `name`"]
+order = false
+
+
+[sub_for_0_1_and_a_alot]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr_for_0: `SUBSTRING(name FOR 0)` substr_for_1: `SUBSTRING(name FOR 1)` substr_for_100: `SUBSTRING(name FOR 100)` substr_for_5: `SUBSTRING(name FOR 5)` for name  `name`"]
+order = false
+
+[simple_trim]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM('  test  ')`|", '--limit', '1']
+order = false
+
+[trim_trailing]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(TRAILING '  test  ')`|", '--limit', '1']
+order = false
+
+[trim_leading]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(LEADING '  test  ')`|", '--limit', '1']
+order = false
+
+[trim_both]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(BOTH '  test  ')`|", '--limit', '1']
+order = false
+
+[trim_with_chars]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM('abcde' FROM 'aabbcdtestdededd')`|", '--limit', '1']
+order = false
+
+[trim_trailing_with_chars]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(TRAILING './;[]' FROM '..//test//..')`|", '--limit', '1']
+order = false
+
+[trim_leading_with_chars]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(LEADING '*()' FROM '*(test*)')`|", '--limit', '1']
+order = false
+
+[trim_both_with_chars]
+arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(BOTH '^$_ ' FROM '$$^^test__$$')`|", '--limit', '1']
+order = false

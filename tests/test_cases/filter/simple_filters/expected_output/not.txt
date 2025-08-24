@@ -1,12 +1,9 @@
 tests/test_cases/filter/test_files/noah/liam-448.txt
 tests/test_cases/filter/test_files/noah/first-229.txt
-tests/test_cases/filter/test_files/noah/next-26.bash
 tests/test_cases/filter/test_files/noah/amelia-550.txt
 tests/test_cases/filter/test_files/long-514.txt
 tests/test_cases/filter/test_files/lucas-115.txt
 tests/test_cases/filter/test_files/small/olivia-202.txt
-tests/test_cases/filter/test_files/small/big-12.bash
-tests/test_cases/filter/test_files/small/small-28.bash
 tests/test_cases/filter/test_files/small/big-446.txt
 tests/test_cases/filter/test_files/right-555.txt
 tests/test_cases/filter/test_files/case/good-516.txt
@@ -14,11 +11,8 @@ tests/test_cases/filter/test_files/case/james-274.txt
 tests/test_cases/filter/test_files/case/big-322.txt
 tests/test_cases/filter/test_files/case/day-169.txt
 tests/test_cases/filter/test_files/mason-257.txt
-tests/test_cases/filter/test_files/same/james-16.bash
-tests/test_cases/filter/test_files/same/mia-23.bash
 tests/test_cases/filter/test_files/same/child-376.txt
 tests/test_cases/filter/test_files/same/case/liam-124.txt
-tests/test_cases/filter/test_files/same/case/way-14.bash
 tests/test_cases/filter/test_files/same/case/important-589.txt
 tests/test_cases/filter/test_files/same/case/person/bad-182.txt
 tests/test_cases/filter/test_files/same/case/person/ethan-312.txt

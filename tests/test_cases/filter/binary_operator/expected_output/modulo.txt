@@ -1,0 +1,8 @@
+tests/test_cases/filter/test_files/long-514.txt
+tests/test_cases/filter/test_files/lucas-115.txt
+tests/test_cases/filter/test_files/small/small-28.bash
+tests/test_cases/filter/test_files/right-555.txt
+tests/test_cases/filter/test_files/same/case/liam-124.txt
+tests/test_cases/filter/test_files/same/case/person/bad-182.txt
+tests/test_cases/filter/test_files/same/case/person/ethan-312.txt
+tests/test_cases/filter/test_files/same/case/person/mason-183.txt

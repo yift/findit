@@ -1,5 +1,4 @@
 use chrono::TimeDelta;
-use regex::Regex;
 use sqlparser::ast::{BinaryOperator, Expr};
 
 use crate::{
@@ -18,7 +17,6 @@ enum ArithmeticOperator {
 }
 enum StringOperator {
     Concat,
-    Matches,
 }
 enum ComparisonOperator {
     Gt,
@@ -64,12 +62,9 @@ impl TryInto<SupportedOperators> for &BinaryOperator {
             BinaryOperator::Or => Ok(SupportedOperators::Logical(LogicalOperator::Or)),
             BinaryOperator::Xor => Ok(SupportedOperators::Logical(LogicalOperator::Xor)),
             BinaryOperator::StringConcat => Ok(SupportedOperators::String(StringOperator::Concat)),
-            BinaryOperator::Regexp | BinaryOperator::Match => {
-                Ok(SupportedOperators::String(StringOperator::Matches))
-            }
-            _ => Err(FindItError::BadExpression(
-                "Operator {operator} is not supported".into(),
-            )),
+            _ => Err(FindItError::BadExpression(format!(
+                "Operator {self} is not supported"
+            ))),
         }
     }
 }
@@ -144,7 +139,6 @@ fn new_string_operator(
         ));
     }
     match operator {
-        StringOperator::Matches => Ok(Box::new(Regexp { left, right })),
         StringOperator::Concat => Ok(Box::new(PlusString { left, right })),
     }
 }
@@ -155,9 +149,11 @@ fn new_comparison_operator(
     right: Box<dyn Evaluator>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     if left.expected_type() != right.expected_type() {
-        return Err(FindItError::BadExpression(
-            "Cannot compare two different value types".into(),
-        ));
+        return Err(FindItError::BadExpression(format!(
+            "Cannot compare two different value types, left type is: {} while right type is {}",
+            left.expected_type(),
+            right.expected_type()
+        )));
     }
     match operator {
         ComparisonOperator::Gt => Ok(Box::new(Gt { left, right })),
@@ -539,24 +535,316 @@ impl Evaluator for Xor {
     }
 }
 
-struct Regexp {
-    left: Box<dyn Evaluator>,
-    right: Box<dyn Evaluator>,
-}
-impl Evaluator for Regexp {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        let Value::String(left) = self.left.eval(file) else {
-            return Value::Empty;
-        };
-        let Value::String(right) = self.right.eval(file) else {
-            return Value::Empty;
-        };
-        let Ok(regexp) = Regex::new(&right) else {
-            return Value::Empty;
-        };
-        regexp.is_match(&left).into()
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::{
+        expr::read_expr,
+        file_wrapper::FileWrapper,
+        value::{Value, ValueType},
+    };
+
+    #[test]
+    fn unsupported_binary_operator() {
+        let err = read_expr("1  <=> 1").err();
+        assert!(err.is_some())
     }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Bool
+
+    #[test]
+    fn unsupported_plus_files() {
+        let err = read_expr("parent + parent").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_minus_files() {
+        let err = read_expr("parent - parent").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_multiply_string() {
+        let err = read_expr("'a' * 3").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_divide_string() {
+        let err = read_expr("'a' / 3").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_modulo_string() {
+        let err = read_expr("'a' % 3").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_concat_numbers() {
+        let err = read_expr("4 || 3").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_compare_different_type() {
+        let err = read_expr("4 > 'four'").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn unsupported_logical_numbers() {
+        let err = read_expr("4 AND TRUE").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn plus_return_empty_if_not_a_number() {
+        let eval = read_expr("parent.length + 200").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn plus_date_return_empty_if_not_a_number() {
+        let eval = read_expr("'2025-04-19 08:42:00' + parent.length").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn plus_date_return_empty_if_number_is_too_large() {
+        let eval = read_expr("'2025-04-19 08:42:00' + 18446744073709551613").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn minus_return_empty_if_not_a_number() {
+        let eval = read_expr("parent.length - 200").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn minus_date_return_empty_if_not_a_number() {
+        let eval = read_expr("'2025-04-19 08:42:00' - parent.length").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn minus_date_return_empty_if_number_is_too_large() {
+        let eval = read_expr("'2025-04-19 08:42:00' - 18446744073709551613").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn divide_path_return_nothing_if_no_such_file() {
+        let eval = read_expr("parent / parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn divide_path_expect_path() {
+        let eval = read_expr("parent / parent.name").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Path)
+    }
+
+    #[test]
+    fn gt_return_empty_for_empty_right() {
+        let eval = read_expr("'12' > parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn lt_return_empty_for_empty_right() {
+        let eval = read_expr("'12' < parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn lt_return_empty_for_empty_left() {
+        let eval = read_expr("parent.content < '44'").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn gte_return_empty_for_empty_right() {
+        let eval = read_expr("'12' >= parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn lte_return_empty_for_empty_right() {
+        let eval = read_expr("'12' <= parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn lte_return_empty_for_empty_left() {
+        let eval = read_expr("parent.content <= '44'").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn eq_return_empty_for_empty_right() {
+        let eval = read_expr("'12' = parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn neq_return_empty_for_empty_right() {
+        let eval = read_expr("'12' <> parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn gt_expect_bool() {
+        let eval = read_expr("1 > 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn lt_expect_bool() {
+        let eval = read_expr("1 < 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn gte_expect_bool() {
+        let eval = read_expr("1 >= 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn lte_expect_bool() {
+        let eval = read_expr("1 <= 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn eq_expect_bool() {
+        let eval = read_expr("1 = 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn neq_expect_bool() {
+        let eval = read_expr("1 <> 20").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn or_return_empty_for_empty_left() {
+        let eval = read_expr("'12' = parent.content OR TRUE").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn or_return_empty_for_empty_right() {
+        let eval = read_expr("FALSE OR '12' = parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn or_expect_bool() {
+        let eval = read_expr("TRUE OR FALSE").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn and_return_empty_for_empty_left() {
+        let eval = read_expr("'12' = parent.content AND TRUE").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn and_return_empty_for_empty_right() {
+        let eval = read_expr("TRUE AND '12' = parent.content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn and_expect_bool() {
+        let eval = read_expr("TRUE AND FALSE").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn xor_return_empty_for_empty_left() {
+        let eval = read_expr("('12' = parent.content) XOR TRUE").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn xor_return_empty_for_empty_right() {
+        let eval = read_expr("TRUE XOR ('12' = parent.content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn xor_expect_bool() {
+        let eval = read_expr("TRUE XOR FALSE").unwrap();
+        assert_eq!(eval.expected_type(), ValueType::Bool)
     }
 }

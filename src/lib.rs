@@ -12,5 +12,7 @@ mod literal_value;
 mod min_depth;
 mod output;
 pub mod run_func;
+mod string_functions;
+mod unary_operators;
 mod value;
 mod walker;

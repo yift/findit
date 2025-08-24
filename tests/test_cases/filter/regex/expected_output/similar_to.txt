@@ -1,0 +1,1 @@
+tests/test_cases/filter/test_files/small/small-28.bash

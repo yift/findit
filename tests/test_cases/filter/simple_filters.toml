@@ -31,9 +31,26 @@ arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NULL']
 order = false
 
 [is_not_null]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NULL']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NOT NULL']
 order = false
 
 [between]
 arguments = ["tests/test_cases/filter/test_files", "-d", '`name` -> `size`', "-w", "size BETWEEN 40 AND 80"]
+order = false
+
+[is_true_with_null]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = 'bash') IS TRUE"]
+order = false
+
+
+[is_not_false_with_null]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = 'bash') IS NOT FALSE"]
+order = false
+
+[count_between]
+arguments = ["tests/test_cases/filter/test_files", "-w", "parent.#small.count BETWEEN 2 AND 6"]
+order = false
+
+[not]
+arguments = ["tests/test_cases/filter/test_files", "-w", 'NOT executable AND NOT is_dir']
 order = false
