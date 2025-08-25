@@ -170,14 +170,10 @@ impl Evaluator for SubString {
         str.into()
     }
     fn expected_type(&self) -> ValueType {
-        ValueType::Number
+        ValueType::String
     }
 }
 
-/*
-       trim_where: Option<TrimWhereField>,
-       trim_what: Option<Box<Expr>>,
-*/
 pub(crate) fn new_trim(
     str: &Expr,
     trim_where: &Option<TrimWhereField>,
@@ -245,5 +241,194 @@ impl Evaluator for Trim {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::String
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use std::path::Path;
+
+    use crate::{
+        expr::read_expr,
+        file_wrapper::FileWrapper,
+        value::{Value, ValueType},
+    };
+
+    #[test]
+    fn regex_no_string_expr() {
+        let err = read_expr("1 RLIKE 'a'").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn regex_no_string_pattern() {
+        let err = read_expr("'a' RLIKE 1").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn regex_null_expr_return_empty() {
+        let eval = read_expr("content RLIKE 'abc'").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn regex_null_pattern_return_empty() {
+        let eval = read_expr("'abc' RLIKE content").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn regex_bad_pattern_return_empty() {
+        let eval = read_expr("'abc' RLIKE '['").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn position_no_string_expr() {
+        let err = read_expr("POSITION('txt' IN 12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn position_no_string_str() {
+        let err = read_expr("POSITION(12 IN path)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn position_expect_number() {
+        let expr = read_expr("POSITION('a' IN path)").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::Number);
+    }
+
+    #[test]
+    fn position_null_expr_return_empty() {
+        let eval = read_expr("POSITION(content IN 'abc')").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn position_null_str_return_empty() {
+        let eval = read_expr("POSITION('abc' IN content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn substring_no_from_not_for_return_error() {
+        let err = read_expr("SUBSTRING(content)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn substring_from_not_a_number() {
+        let err = read_expr("SUBSTRING(content FROM path)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn substring_for_not_a_number() {
+        let err = read_expr("SUBSTRING(content FOR path)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn substring_expr_not_a_string() {
+        let err = read_expr("SUBSTRING(12 for 12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn substring_expect_string() {
+        let expr = read_expr("SUBSTRING(content FROM 1 FOR 4)").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::String);
+    }
+
+    #[test]
+    fn substring_null_for_return_empty() {
+        let eval = read_expr("SUBSTRING('abc' FOR length)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn substring_null_from_return_empty() {
+        let eval = read_expr("SUBSTRING('abc' FROM length)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn substring_null_str_return_empty() {
+        let eval = read_expr("SUBSTRING(content FROM 2)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn trim_no_string_expr() {
+        let err = read_expr("TRIM(12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn trim_no_string_chars() {
+        let err = read_expr("TRIM(12 FROM 'text')").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn trim_null_str_return_empty() {
+        let eval = read_expr("TRIM(content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn trim_null_chars_return_empty() {
+        let eval = read_expr("TRIM(content FROM 'abc')").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn trim_empty_chars_return_text() {
+        let eval = read_expr("TRIM('' FROM 'abc')").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, "abc".into())
+    }
+
+    #[test]
+    fn trim_expect_string() {
+        let expr = read_expr("TRIM('')").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::String);
     }
 }

@@ -29,19 +29,15 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub(crate) limit: Option<usize>,
 
-    /// What to execute on each file
-    #[arg(short, long)]
-    pub(crate) execute: Option<String>,
-
     /// What to display on each file (default will display the path)
     #[arg(short, long)]
     pub(crate) display: Option<String>,
 
-    /// Start of string interpolation in the display or execute
+    /// Start of string interpolation in the display
     #[arg(long, default_value = "`")]
     pub(crate) interpolation_start: String,
 
-    /// End of string interpolation in the display or execute
+    /// End of string interpolation in the display
     #[arg(long, default_value = "`")]
     pub(crate) interpolation_end: String,
 
