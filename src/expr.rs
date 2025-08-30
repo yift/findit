@@ -336,7 +336,6 @@ pub(crate) fn read_order_by(sql: &str) -> Result<Vec<OrderItem>, FindItError> {
     let mut order = vec![];
     for item in order_by {
         if item.with_fill.is_some() {
-            dbg!(7);
             return Err(FindItError::BadOrderBy(sql.to_string()));
         }
         let evaluator = get_eval(&item.expr)?;
@@ -358,4 +357,144 @@ pub(crate) fn read_order_by(sql: &str) -> Result<Vec<OrderItem>, FindItError> {
     }
 
     Ok(order)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{env, path::Path};
+
+    use super::*;
+
+    #[test]
+    fn test_similar_to_with_escape_character() {
+        let sql = "name  SIMILAR TO 'val'  ESCAPE 'e'";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_trim_with_characters() {
+        let sql = "TRIM('a', 'b')";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn compound_not_for_a_file() {
+        let sql = "name.extension";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn compound_with_subscript() {
+        let sql = "name['extension']";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn compound_for_not_file_return_empty() -> Result<(), FindItError> {
+        let sql = "(parent / 'no_such_file.ext').name";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert!(value == Value::Empty);
+        Ok(())
+    }
+
+    #[test]
+    fn is_true_without_bool() {
+        let sql = "name IS TRUE";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn is_false_returns_bool() {
+        let sql = "is_link IS FALSE";
+        let expr = read_expr(sql).unwrap();
+
+        assert_eq!(expr.expected_type(), ValueType::Bool);
+    }
+
+    #[test]
+    fn is_null_returns_bool() {
+        let sql = "is_link IS NULL";
+        let expr = read_expr(sql).unwrap();
+
+        assert_eq!(expr.expected_type(), ValueType::Bool);
+    }
+
+    #[test]
+    fn between_expr_must_have_same_type_as_min() {
+        let sql = "count BETWEEN 'a' AND 10";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn between_expr_must_have_same_type_as_max() {
+        let sql = "count BETWEEN 1 AND 'b'";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn between_expr_must_have_a_value() -> Result<(), FindItError> {
+        let sql = "content BETWEEN 'a' AND 'b'";
+        let eval = read_expr(sql)?;
+        let file = env::current_dir()?;
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn between_min_must_have_a_value() -> Result<(), FindItError> {
+        let sql = "'a' BETWEEN content AND 'b'";
+        let eval = read_expr(sql)?;
+        let file = env::current_dir()?;
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn between_max_must_have_a_value() -> Result<(), FindItError> {
+        let sql = "'c' BETWEEN 'b' AND content";
+        let eval = read_expr(sql)?;
+        let file = env::current_dir()?;
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn between_expect_bool() -> Result<(), FindItError> {
+        let sql = "'a' BETWEEN 'b' AND 'c'";
+        let eval = read_expr(sql)?;
+
+        assert_eq!(eval.expected_type(), ValueType::Bool);
+
+        Ok(())
+    }
 }
