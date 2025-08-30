@@ -1,5 +1,5 @@
 use sqlparser::{
-    ast::{AccessExpr, Expr, GroupByExpr, Ident, SetExpr, Statement},
+    ast::{AccessExpr, Expr, Ident, OrderByKind, SetExpr, Statement},
     dialect::GenericDialect,
     parser::Parser,
 };
@@ -10,6 +10,7 @@ use crate::{
     extract::get_extractor,
     file_wrapper::FileWrapper,
     literal_value::new_literal_value,
+    order::{OrderDirection, OrderItem},
     string_functions::{new_position, new_regex, new_substring, new_trim},
     unary_operators::new_unary_operator,
     value::{Value, ValueType},
@@ -91,18 +92,6 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
         }
     }
     /*
-    /// ```sql
-    /// TRIM([BOTH | LEADING | TRAILING] [<expr> FROM] <expr>)
-    /// TRIM(<expr>)
-    /// TRIM(<expr>, [, characters]) -- only Snowflake or Bigquery
-    /// ```
-    Trim {
-        expr: Box<Expr>,
-        // ([BOTH | LEADING | TRAILING]
-        trim_where: Option<TrimWhereField>,
-        trim_what: Option<Box<Expr>>,
-        trim_characters: Option<Vec<Expr>>,
-    },
     /// A literal value, such as string, number, date or NULL
     /// Scalar function call e.g. `LEFT(foo, 5)`
     Function(Function),
@@ -300,7 +289,9 @@ impl Evaluator for Between {
 }
 
 pub(crate) fn read_expr(sql: &str) -> Result<Box<dyn Evaluator>, FindItError> {
-    let my_sql = format!("SELECT * FROM table_name WHERE \n{sql}\n;");
+    let my_sql = format!(
+        "SELECT * FROM table_name WHERE \n{sql}\n GROUP BY col HAVING col ORDER BY col LIMIT 20;"
+    );
     let dialect = GenericDialect {};
     let ast = Parser::parse_sql(&dialect, &my_sql)?;
     if ast.len() != 1 {
@@ -313,19 +304,58 @@ pub(crate) fn read_expr(sql: &str) -> Result<Box<dyn Evaluator>, FindItError> {
     let SetExpr::Select(select) = &*select.body else {
         return Err(FindItError::BadFilter(sql.to_string()));
     };
-    let GroupByExpr::Expressions(exs, mods) = &select.group_by else {
-        return Err(FindItError::BadFilter(sql.to_string()));
-    };
-    if !exs.is_empty() && !mods.is_empty() {
-        return Err(FindItError::BadFilter(sql.to_string()));
-    }
-    if !select.sort_by.is_empty() {
-        return Err(FindItError::BadFilter(sql.to_string()));
-    }
 
     let Some(filter) = &select.selection else {
         return Err(FindItError::BadFilter(sql.to_string()));
     };
 
     get_eval(filter)
+}
+
+pub(crate) fn read_order_by(sql: &str) -> Result<Vec<OrderItem>, FindItError> {
+    let my_sql = format!("SELECT * FROM table_name ORDER BY \n{sql}\nLIMIT 1;");
+    let dialect = GenericDialect {};
+    let ast = Parser::parse_sql(&dialect, &my_sql)?;
+    if ast.len() != 1 {
+        return Err(FindItError::BadOrderBy(sql.to_string()));
+    }
+    let ast = ast.first().unwrap();
+    let Statement::Query(select) = ast else {
+        return Err(FindItError::BadOrderBy(sql.to_string()));
+    };
+    let Some(order_by) = &select.order_by else {
+        return Err(FindItError::BadOrderBy(sql.to_string()));
+    };
+    if order_by.interpolate.is_some() {
+        return Err(FindItError::BadOrderBy(sql.to_string()));
+    }
+    let OrderByKind::Expressions(order_by) = &order_by.kind else {
+        return Err(FindItError::BadOrderBy(sql.to_string()));
+    };
+
+    let mut order = vec![];
+    for item in order_by {
+        if item.with_fill.is_some() {
+            dbg!(7);
+            return Err(FindItError::BadOrderBy(sql.to_string()));
+        }
+        let evaluator = get_eval(&item.expr)?;
+        let direction = match item.options.asc {
+            None => OrderDirection::Asc,
+            Some(true) => OrderDirection::Asc,
+            Some(false) => OrderDirection::Desc,
+        };
+        let nulls_first = match item.options.nulls_first {
+            None => false,
+            Some(true) => true,
+            Some(false) => false,
+        };
+        order.push(OrderItem {
+            direction,
+            evaluator,
+            nulls_first,
+        });
+    }
+
+    Ok(order)
 }

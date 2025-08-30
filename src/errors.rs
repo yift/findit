@@ -14,6 +14,8 @@ pub enum FindItError {
     NoSuchFile(PathBuf),
     #[error("Bad filter: `{0}`")]
     BadFilter(String),
+    #[error("Bad order by: `{0}`")]
+    BadOrderBy(String),
     #[error("Bad expression: `{0}`")]
     BadExpression(String),
     #[error("Could not parse `{0}` because : `{0}`")]

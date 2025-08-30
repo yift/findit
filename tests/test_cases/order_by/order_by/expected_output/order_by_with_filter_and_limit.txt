@@ -1,0 +1,10 @@
+problem-158.txt: length: 229
+person-276.txt: length: 207
+noah-408.txt: length: 200
+week-138.txt: length: 200
+way-411.txt: length: 190
+elijah-110.txt: length: 185
+harper-520.txt: length: 179
+thing-343.txt: length: 176
+big-427.txt: length: 175
+able-386.txt: length: 174

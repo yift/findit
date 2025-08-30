@@ -1,0 +1,6 @@
+amelia-462.txt: length: 36
+place-154.txt: length: 38
+week-14.bash: length: 39
+way-37.bash: length: 40
+emma-13.bash: length: 41
+old-28.bash: length: 42

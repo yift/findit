@@ -6,7 +6,7 @@ use std::{
 
 use crate::errors::FindItError;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct FileWrapper {
     path: PathBuf,
     depth: usize,

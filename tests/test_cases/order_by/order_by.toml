@@ -1,0 +1,67 @@
+[order_by_number]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "count, length, depth, name", "-d", "`name`: count: `count`, length: `length`, depth: `depth`"]
+order = true
+
+[order_by_number_desc]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length DESC, count, depth DESC, name", "-d", "`name`: count: `count`, length: `length`, depth: `depth`"]
+order = true
+
+[order_by_string]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "name", "-d", "`name`"]
+order = true
+
+[order_by_string_desc]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "name DESC", "-d", "`name`"]
+order = true
+
+[order_by_path]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "parent, name", "-d", "`name` -> `parent`"]
+order = true
+
+[order_by_path_desc]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "parent DESC, name", "-d", "`name` -> `parent`"]
+order = true
+
+[order_by_bool]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "executable, name", "-d", "`name` -> `executable`"]
+order = true
+
+[order_by_bool_desc]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "executable DESC, name", "-d", "`name` -> `executable`"]
+order = true
+
+[order_by_date]
+run_before = ["rm -rf /tmp/findit/tests/order_by_date", "mkdir -p /tmp/findit/tests/order_by_date", "touch /tmp/findit/tests/order_by_date/file1 -t 202501210810.43", "touch /tmp/findit/tests/order_by_date/file2 -t 202501210810.44", "touch /tmp/findit/tests/order_by_date/file3 -t 202501210811.21"]
+arguments = ["/tmp/findit/tests/order_by_date", "-d", "`name` -> modified: `modified`", "-o", "modified", "--min-depth", "1"]
+run_after = ["rm -rf /tmp/findit/tests/order_by_date"]
+
+
+[order_by_date_desc]
+run_before = ["rm -rf /tmp/findit/tests/order_by_date_desc", "mkdir -p /tmp/findit/tests/order_by_date_desc", "touch /tmp/findit/tests/order_by_date_desc/file1 -t 202501210810.43", "touch /tmp/findit/tests/order_by_date_desc/file2 -t 202501210810.44", "touch /tmp/findit/tests/order_by_date_desc/file3 -t 202501210811.21"]
+arguments = ["/tmp/findit/tests/order_by_date_desc", "-d", "`name` -> modified: `modified`", "-o", "modified DESC", "--min-depth", "1"]
+run_after = ["rm -rf /tmp/findit/tests/order_by_date_desc"]
+
+[order_by_null_last_implicit]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`"]
+order = true
+
+[order_by_null_last_explicit]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length NULLS LAST, name", "-d", "`name`: length: `length`"]
+order = true
+
+[order_by_null_first]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length NULLS FIRST, name", "-d", "`name`: length: `length`"]
+order = true
+
+[order_by_with_limit]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`", "--limit", "6"]
+order = true
+
+[order_by_with_filter]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`", "-w", "extension = 'txt'"]
+order = true
+
+
+[order_by_with_filter_and_limit]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length DESC, name", "-d", "`name`: length: `length`", "-w", "extension = 'txt'", "--limit", "10"]
+order = true

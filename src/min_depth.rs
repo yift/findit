@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::{
-    cli_args::CliArgs, errors::FindItError, file_wrapper::FileWrapper, output::build_output,
+    cli_args::CliArgs, errors::FindItError, file_wrapper::FileWrapper, order::build_order_by,
     walker::Walk,
 };
 
@@ -14,7 +14,7 @@ pub(crate) fn build_min<W: Write + 'static>(
     args: &CliArgs,
     writer: W,
 ) -> Result<Box<dyn Walk>, FindItError> {
-    let next = build_output(args, writer)?;
+    let next = build_order_by(args, writer)?;
     let Some(min) = args.min_depth else {
         return Ok(next);
     };

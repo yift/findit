@@ -1,0 +1,110 @@
+amelia: length: 
+aria: length: 
+ava: length: 
+big: length: 
+child: length: 
+company: length: 
+emma: length: 
+emma: length: 
+ethan: length: 
+first: length: 
+james: length: 
+liam: length: 
+life: length: 
+life: length: 
+logan: length: 
+logan: length: 
+mason: length: 
+mia: length: 
+next: length: 
+other: length: 
+own: length: 
+point: length: 
+problem: length: 
+right: length: 
+sophia: length: 
+test_files: length: 
+week: length: 
+amelia-462.txt: length: 36
+place-154.txt: length: 38
+week-14.bash: length: 39
+way-37.bash: length: 40
+emma-13.bash: length: 41
+old-28.bash: length: 42
+child-27.bash: length: 46
+mia-20.bash: length: 47
+james-351.txt: length: 52
+public-389.txt: length: 58
+person-29.bash: length: 59
+emma-230.txt: length: 60
+charlotte-15.bash: length: 61
+fact-527.txt: length: 61
+few-25.bash: length: 61
+person-15.bash: length: 64
+emma-247.txt: length: 66
+long-32.bash: length: 67
+different-17.bash: length: 68
+different-577.txt: length: 74
+james-469.txt: length: 74
+mia-383.txt: length: 77
+time-447.txt: length: 82
+company-304.txt: length: 83
+early-30.bash: length: 86
+person-334.txt: length: 87
+big-298.txt: length: 93
+child-504.txt: length: 98
+mason-170.txt: length: 102
+problem-479.txt: length: 103
+small-458.txt: length: 104
+thing-543.txt: length: 105
+bad-20.json: length: 109
+last-233.txt: length: 109
+noah-138.txt: length: 112
+noah-28.json: length: 112
+person-17.json: length: 113
+big-13.json: length: 114
+first-22.json: length: 114
+work-24.json: length: 114
+group-537.txt: length: 115
+same-29.json: length: 115
+small-21.json: length: 115
+amelia-19.json: length: 117
+elijah-18.json: length: 117
+hand-21.json: length: 117
+person-16.json: length: 117
+olivia-227.txt: length: 118
+sophia-27.json: length: 118
+life-21.json: length: 119
+life-513.txt: length: 120
+same-277.txt: length: 122
+small-514.txt: length: 122
+ethan-151.txt: length: 123
+life-13.json: length: 123
+small-229.txt: length: 126
+week-557.txt: length: 130
+elijah-581.txt: length: 133
+fact-567.txt: length: 135
+eye-307.txt: length: 136
+aria-280.txt: length: 137
+ethan-189.txt: length: 138
+young-343.txt: length: 140
+old-192.txt: length: 141
+point-270.txt: length: 142
+amelia-520.txt: length: 147
+elijah-313.txt: length: 149
+james-192.txt: length: 149
+time-582.txt: length: 150
+own-111.txt: length: 155
+eye-108.txt: length: 158
+emma-284.txt: length: 164
+day-594.txt: length: 170
+able-386.txt: length: 174
+big-427.txt: length: 175
+thing-343.txt: length: 176
+harper-520.txt: length: 179
+elijah-110.txt: length: 185
+way-411.txt: length: 190
+noah-408.txt: length: 200
+week-138.txt: length: 200
+person-276.txt: length: 207
+problem-158.txt: length: 229
