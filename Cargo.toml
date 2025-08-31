@@ -11,9 +11,11 @@ sqlparser = "0.58"
 itertools = "0.14"
 regex = "1.11"
 uzers  = "0.12"
+rand = "0.9"
 
 [dev-dependencies]
 toml = "0.9"
+tempfile = "3.21"
 
 [workspace.metadata.typos]
 files.extend-exclude = [

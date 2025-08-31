@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use sqlparser::ast::{
     Function, FunctionArg, FunctionArgExpr, FunctionArgumentList, FunctionArguments,
 };
@@ -5,7 +7,10 @@ use sqlparser::ast::{
 use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
-    functions::conditional::if_func::build_if,
+    functions::{
+        conditional::{if_func::build_if, random::build_rand},
+        spawn::fire::build_fire,
+    },
 };
 
 pub(crate) fn new_function(function: &Function) -> Result<Box<dyn Evaluator>, FindItError> {
@@ -28,7 +33,7 @@ pub(crate) fn new_function(function: &Function) -> Result<Box<dyn Evaluator>, Fi
     let name = function.name.to_string().to_uppercase();
     let args = match &function.args {
         FunctionArguments::List(lst) => build_args(lst)?,
-        FunctionArguments::None => vec![],
+        FunctionArguments::None => VecDeque::new(),
         FunctionArguments::Subquery(_) => {
             return Err(FindItError::BadExpression("function with sub query".into()));
         }
@@ -37,19 +42,19 @@ pub(crate) fn new_function(function: &Function) -> Result<Box<dyn Evaluator>, Fi
     build_function(&name, args)
 }
 
-fn build_args(lst: &FunctionArgumentList) -> Result<Vec<Box<dyn Evaluator>>, FindItError> {
+fn build_args(lst: &FunctionArgumentList) -> Result<VecDeque<Box<dyn Evaluator>>, FindItError> {
     if lst.duplicate_treatment.is_some() {
         return Err(FindItError::BadExpression("duplicate treatment".into()));
     }
     if !lst.clauses.is_empty() {
         return Err(FindItError::BadExpression("additional clauses".into()));
     }
-    let mut ret = vec![];
+    let mut ret = VecDeque::new();
     for arg in &lst.args {
         let FunctionArg::Unnamed(FunctionArgExpr::Expr(arg)) = arg else {
             return Err(FindItError::BadExpression("wildcard argument".into()));
         };
-        ret.push(get_eval(arg)?);
+        ret.push_back(get_eval(arg)?);
     }
 
     Ok(ret)
@@ -57,10 +62,13 @@ fn build_args(lst: &FunctionArgumentList) -> Result<Vec<Box<dyn Evaluator>>, Fin
 
 fn build_function(
     name: &str,
-    args: Vec<Box<dyn Evaluator>>,
+    args: VecDeque<Box<dyn Evaluator>>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     match name {
         "IF" => build_if(args),
+        "RAND" | "RANDOM" => build_rand(&args),
+        "FIRE" => build_fire(args, false),
+        "FIRE_INTO" => build_fire(args, true),
         _ => Err(FindItError::BadExpression(format!(
             "Function {name} is not supported."
         ))),

@@ -56,6 +56,12 @@ impl From<u64> for Value {
     }
 }
 
+impl From<u32> for Value {
+    fn from(value: u32) -> Self {
+        Value::Number(value as u64)
+    }
+}
+
 impl From<DateTime<Local>> for Value {
     fn from(value: DateTime<Local>) -> Self {
         Value::Date(value)

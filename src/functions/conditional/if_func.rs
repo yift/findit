@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::{
     errors::FindItError,
     expr::Evaluator,
@@ -23,16 +25,16 @@ impl Evaluator for If {
     }
 }
 pub(crate) fn build_if(
-    mut args: Vec<Box<dyn Evaluator>>,
+    mut args: VecDeque<Box<dyn Evaluator>>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     let negative = args
-        .pop()
+        .pop_back()
         .ok_or_else(|| FindItError::BadExpression("IF must have a negative result.".into()))?;
     let positive = args
-        .pop()
+        .pop_back()
         .ok_or_else(|| FindItError::BadExpression("IF must have a positive result.".into()))?;
     let condition = args
-        .pop()
+        .pop_back()
         .ok_or_else(|| FindItError::BadExpression("IF must have a condition.".into()))?;
     if !args.is_empty() {
         return Err(FindItError::BadExpression(

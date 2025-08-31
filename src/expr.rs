@@ -101,29 +101,8 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
             }
         }
         Expr::Function(func) => new_function(func),
-        _ => {
-            dbg!(expr);
-            Err(FindItError::BadExpression(format!("{expr}")))
-        }
+        _ => Err(FindItError::BadExpression(format!("Unsupported {expr}"))),
     }
-    /*
-    /// A literal value, such as string, number, date or NULL
-    /// Scalar function call e.g. `LEFT(foo, 5)`
-    Function(Function),
-    /// `CASE [<operand>] WHEN <condition> THEN <result> ... [ELSE <result>] END`
-    ///
-    /// Note we only recognize a complete single expression as `<condition>`,
-    /// not `< 0` nor `1, 2, 3` as allowed in a `<simple when clause>` per
-    /// <https://jakewheat.github.io/sql-overview/sql-2011-foundation-grammar.html#simple-when-clause>
-    Case {
-        case_token: AttachedToken,
-        end_token: AttachedToken,
-        operand: Option<Box<Expr>>,
-        conditions: Vec<CaseWhen>,
-        else_result: Option<Box<Expr>>,
-    },
-
-     */
 }
 struct CompoundEval {
     evaluator: Box<dyn Evaluator>,
