@@ -5,3 +5,11 @@ order = false
 [case_with_no_default]
 arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `CASE WHEN size < 50 THEN 'small file' WHEN size < 90 THEN 'medium size' WHEN is_dir THEN 'dir' END`"]
 order = false
+
+[if]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF(size > 70, 'large', 'small')`"]
+order = false
+
+[if_with_nulls]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF(length > 70, 'large', 'small')`"]
+order = false

@@ -1,0 +1,34 @@
+4096 - 
+204 - large
+4096 - 
+176 - large
+66 - small
+89 - large
+134 - large
+4096 - 
+164 - large
+126 - large
+29 - small
+92 - large
+4096 - 
+91 - large
+99 - large
+43 - small
+4096 - 
+100 - large
+50 - small
+65 - small
+192 - large
+133 - large
+42 - small
+4096 - 
+36 - small
+190 - large
+4096 - 
+88 - large
+67 - small
+98 - large
+127 - large
+121 - large
+140 - large
+81 - large

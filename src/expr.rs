@@ -9,7 +9,7 @@ use crate::{
     errors::FindItError,
     extract::get_extractor,
     file_wrapper::FileWrapper,
-    functions::conditional::case::new_case,
+    functions::{conditional::case::new_case, into::new_function},
     literal_value::new_literal_value,
     order::{OrderDirection, OrderItem},
     string_functions::{new_position, new_regex, new_substring, new_trim},
@@ -100,6 +100,7 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
                 new_case(conditions, else_result)
             }
         }
+        Expr::Function(func) => new_function(func),
         _ => {
             dbg!(expr);
             Err(FindItError::BadExpression(format!("{expr}")))
