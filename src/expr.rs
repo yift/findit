@@ -9,6 +9,7 @@ use crate::{
     errors::FindItError,
     extract::get_extractor,
     file_wrapper::FileWrapper,
+    functions::conditional::case::new_case,
     literal_value::new_literal_value,
     order::{OrderDirection, OrderItem},
     string_functions::{new_position, new_regex, new_substring, new_trim},
@@ -84,6 +85,19 @@ pub(crate) fn get_eval(expr: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
                 ))
             } else {
                 new_trim(expr, trim_where, trim_what)
+            }
+        }
+        Expr::Case {
+            case_token: _,
+            end_token: _,
+            operand,
+            conditions,
+            else_result,
+        } => {
+            if operand.is_some() {
+                Err(FindItError::BadExpression("CASE with operand".into()))
+            } else {
+                new_case(conditions, else_result)
             }
         }
         _ => {

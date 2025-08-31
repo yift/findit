@@ -7,6 +7,7 @@ mod expr;
 mod extract;
 mod file_wrapper;
 mod filter;
+mod functions;
 mod limit;
 mod literal_value;
 mod min_depth;

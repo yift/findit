@@ -101,7 +101,7 @@ impl Display for Value {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub(crate) enum ValueType {
     Empty,
     Bool,

@@ -1,0 +1,34 @@
+4096 - dir
+204 - 
+4096 - dir
+176 - 
+66 - medium size
+89 - medium size
+134 - 
+4096 - dir
+164 - 
+126 - 
+29 - small file
+92 - 
+4096 - dir
+91 - 
+99 - 
+43 - small file
+4096 - dir
+100 - 
+50 - medium size
+65 - medium size
+192 - 
+133 - 
+42 - small file
+4096 - dir
+36 - small file
+190 - 
+4096 - dir
+88 - medium size
+67 - medium size
+98 - 
+127 - 
+121 - 
+140 - 
+81 - medium size

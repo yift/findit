@@ -1,0 +1,34 @@
+test_files - DIRECTORY
+old-154.txt - TEXT FILE
+last - DIRECTORY
+noah-462.txt - TEXT FILE
+high-109.txt - TEXT FILE
+new-510.txt - TEXT FILE
+person-21.json - JSON FILE
+isabella - DIRECTORY
+number-109.txt - TEXT FILE
+right-487.txt - TEXT FILE
+company-372.txt - TEXT FILE
+thing-25.json - JSON FILE
+hand - DIRECTORY
+jackson-588.txt - TEXT FILE
+charlotte-470.txt - TEXT FILE
+company-15.bash - BASH FILE
+jackson - DIRECTORY
+jackson-17.json - JSON FILE
+ava-443.txt - TEXT FILE
+hand-381.txt - TEXT FILE
+case-492.txt - TEXT FILE
+jackson-22.json - JSON FILE
+next-16.bash - BASH FILE
+work - DIRECTORY
+small-390.txt - TEXT FILE
+few-438.txt - TEXT FILE
+life - DIRECTORY
+life-15.json - JSON FILE
+olivia-21.bash - BASH FILE
+case-24.json - JSON FILE
+high-25.json - JSON FILE
+noah-211.txt - TEXT FILE
+fact-249.txt - TEXT FILE
+elijah-159.txt - TEXT FILE

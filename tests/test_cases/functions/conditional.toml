@@ -1,0 +1,7 @@
+[simple_case]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`name` - `CASE WHEN extension = 'txt' THEN 'TEXT FILE' WHEN extension = 'json' THEN 'JSON FILE' WHEN extension = 'bash' THEN 'BASH FILE' ELSE 'DIRECTORY' END`"]
+order = false
+
+[case_with_no_default]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `CASE WHEN size < 50 THEN 'small file' WHEN size < 90 THEN 'medium size' WHEN is_dir THEN 'dir' END`"]
+order = false
