@@ -9,7 +9,10 @@ use crate::{
     expr::{Evaluator, get_eval},
     functions::{
         conditional::{if_func::build_if, random::build_rand},
-        spawn::fire::build_fire,
+        spawn::{
+            exec::{ExecType, build_exec},
+            fire::build_fire,
+        },
     },
 };
 
@@ -69,6 +72,9 @@ fn build_function(
         "RAND" | "RANDOM" => build_rand(&args),
         "FIRE" => build_fire(args, false),
         "FIRE_INTO" => build_fire(args, true),
+        "EXEC" => build_exec(args, ExecType::Status),
+        "EXEC_INTO" => build_exec(args, ExecType::IntoStatus),
+        "EXEC_OUT" => build_exec(args, ExecType::CaptureOutput),
         _ => Err(FindItError::BadExpression(format!(
             "Function {name} is not supported."
         ))),
