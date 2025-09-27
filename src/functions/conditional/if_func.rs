@@ -87,6 +87,14 @@ mod tests {
     }
 
     #[test]
+    fn test_if_no_else_expected_value() {
+        let sql = "IF TRUE THEN 1 END";
+        let expr = read_expr(sql).unwrap();
+
+        assert_eq!(expr.expected_type(), ValueType::Number);
+    }
+
+    #[test]
     fn test_if_with_numeric_condition() {
         let sql = "IF 200 THEN \"no\" ELSE \"one\" END";
         let err = read_expr(sql).err();

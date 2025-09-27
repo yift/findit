@@ -184,4 +184,29 @@ mod tests {
         assert_eq!(expected_text, txt);
         Ok(())
     }
+
+    #[test]
+    fn test_exec_out_with_no_arg() {
+        let sql = "execOut()";
+        let err = read_expr(sql).err();
+
+        assert!(err.is_some());
+    }
+
+
+    #[test]
+    fn test_exec_nothing_if_nothing_to_execute() -> Result<(), FindItError> {
+
+        let sql = "exec(content)";
+        let expr = read_expr(sql).unwrap();
+        let file =
+            Path::new("no/such/file/text.txt").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+        Ok(())
+    }
+
 }

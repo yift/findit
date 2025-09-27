@@ -111,7 +111,7 @@ mod tests {
             panic!("Path should exists now");
         }
 
-        let sql = "fire('rm', '-rf', path)";
+        let sql = "fire('rm', \"-rf\", path)";
         let expr = read_expr(sql)?;
         let wrapper = FileWrapper::new(path.to_path_buf(), 1);
 
@@ -202,7 +202,7 @@ mod tests {
         sleep(Duration::from_millis(100));
 
         let sql = format!(
-            "fire(/ \"test\" into '{}')",
+            "fire(/ \"test\" into \"{}\")",
             file_to_create.to_str().unwrap()
         );
         let expr = read_expr(&sql)?;
