@@ -21,7 +21,7 @@ impl Evaluator for Random {
 }
 
 pub(crate) fn build_rand(
-    args: &VecDeque<Box<dyn Evaluator>>,
+    args: VecDeque<Box<dyn Evaluator>>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     if !args.is_empty() {
         return Err(FindItError::BadExpression("RANDOM with arguments.".into()));

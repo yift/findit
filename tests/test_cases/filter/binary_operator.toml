@@ -15,7 +15,7 @@ arguments = ["tests/test_cases/filter/test_files", "-w", 'length / 5 = 9']
 order = false
 
 [divide_with_path]
-arguments = ["tests/test_cases/filter/test_files", "-w", "(parent / 'mia-23.bash').is_exists "]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(parent / \"mia-23.bash\").exists "]
 order = false
 
 [modulo]
@@ -39,39 +39,39 @@ arguments = ["tests/test_cases/filter/test_files", "-w", '73 <= length', '-d', '
 order = false
 
 [eq]
-arguments = ["tests/test_cases/filter/test_files", "-w", "name = 'big-322.txt'"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "name = \"big-322.txt\""]
 order = false
 
 [neq]
-arguments = ["tests/test_cases/filter/test_files", "-w", "extension <> 'txt' AND is_file"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension <> \"txt\" AND is file"]
 order = false
 
 [and]
-arguments = ["tests/test_cases/filter/test_files", "-w", "extension = 'txt' AND parent.name = 'noah'"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension = \"txt\" AND parent.name = \"noah\""]
 order = false
 
 [or]
-arguments = ["tests/test_cases/filter/test_files", "-w", "name = 'big-322.txt' OR parent.name = 'noah'"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "name = \"big-322.txt\" OR parent.name = \"noah\""]
 order = false
 
 [xor]
-arguments = ["tests/test_cases/filter/test_files", "-w", "(length = 57) XOR (parent.name = 'noah')"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(length = 57) XOR (parent.name = \"noah\")"]
 order = false
 
 [concat]
-arguments = ["tests/test_cases/filter/test_files", "-w", "('2' || extension || '1') = '2txt1'"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(\"2\" + extension + \"1\") = \"2txt1\""]
 order = false
 
 [concat_with_plus]
-arguments = ["tests/test_cases/filter/test_files", "-w", "extension + ' - ' + length = 'txt - 65'"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension + ' - ' + length = \"txt - 65\""]
 order = false
 
 [plus_with_date]
 run_before = ["rm -rf /tmp/findit/tests/concat_with_date", "mkdir -p /tmp/findit/tests/concat_with_date", "touch /tmp/findit/tests/concat_with_date/file1 -t 202406210810", "touch /tmp/findit/tests/concat_with_date/file2 -t 202406220810.32"]
-arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified + 120 = '2024-06-22 08:12:32'"]
+arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified + 120 = [2024-06-22 08:12:32]"]
 run_after = ["rm -rf /tmp/findit/tests/concat_with_date"]
 
 [minus_with_date]
 run_before = ["rm -rf /tmp/findit/tests/concat_with_date", "mkdir -p /tmp/findit/tests/concat_with_date", "touch /tmp/findit/tests/concat_with_date/file1 -t 202406210810", "touch /tmp/findit/tests/concat_with_date/file2 -t 202406220810.32"]
-arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified - 120 = '22/Jun/2024 08:08:32'"]
+arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified - 120 = [22/Jun/2024 08:08:32]"]
 run_after = ["rm -rf /tmp/findit/tests/concat_with_date"]

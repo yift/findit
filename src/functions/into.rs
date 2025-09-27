@@ -1,83 +1,52 @@
 use std::collections::VecDeque;
 
-use sqlparser::ast::{
-    Function, FunctionArg, FunctionArgExpr, FunctionArgumentList, FunctionArguments,
-};
-
 use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     functions::{
-        conditional::{if_func::build_if, random::build_rand},
-        spawn::{
-            exec::{ExecType, build_exec},
-            fire::build_fire,
-        },
+        conditional::{coalesce::build_coalesce, random::build_rand},
+        env::build_env,
+        spawn::exec::build_capture_output_exec,
     },
+    parser::{
+        function::Function,
+        function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+    },
+    string_functions::{TrimWhere, new_trim},
 };
 
 pub(crate) fn new_function(function: &Function) -> Result<Box<dyn Evaluator>, FindItError> {
-    if !function.within_group.is_empty() {
-        return Err(FindItError::BadExpression("WITHIN GROUP".into()));
-    }
-    if function.over.is_some() {
-        return Err(FindItError::BadExpression("OVER".into()));
-    }
-    if function.null_treatment.is_some() {
-        return Err(FindItError::BadExpression("IGNORE/RESPECT NULLS".into()));
-    }
-    if function.filter.is_some() {
-        return Err(FindItError::BadExpression("FILTER".into()));
-    }
-    if function.parameters != FunctionArguments::None {
-        return Err(FindItError::BadExpression("function parameters".into()));
-    }
+    let mut args = VecDeque::new();
 
-    let name = function.name.to_string().to_uppercase();
-    let args = match &function.args {
-        FunctionArguments::List(lst) => build_args(lst)?,
-        FunctionArguments::None => VecDeque::new(),
-        FunctionArguments::Subquery(_) => {
-            return Err(FindItError::BadExpression("function with sub query".into()));
-        }
-    };
-
-    build_function(&name, args)
+    for expr in &function.args {
+        let eval = get_eval(expr)?;
+        args.push_back(eval);
+    }
+    match &function.name {
+        FunctionName::Env(env) => new_env_function(env, args),
+        FunctionName::String(string) => new_string_function(string, args),
+    }
 }
 
-fn build_args(lst: &FunctionArgumentList) -> Result<VecDeque<Box<dyn Evaluator>>, FindItError> {
-    if lst.duplicate_treatment.is_some() {
-        return Err(FindItError::BadExpression("duplicate treatment".into()));
-    }
-    if !lst.clauses.is_empty() {
-        return Err(FindItError::BadExpression("additional clauses".into()));
-    }
-    let mut ret = VecDeque::new();
-    for arg in &lst.args {
-        let FunctionArg::Unnamed(FunctionArgExpr::Expr(arg)) = arg else {
-            return Err(FindItError::BadExpression("wildcard argument".into()));
-        };
-        ret.push_back(get_eval(arg)?);
-    }
-
-    Ok(ret)
-}
-
-fn build_function(
-    name: &str,
+fn new_env_function(
+    name: &EnvFunctionName,
     args: VecDeque<Box<dyn Evaluator>>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     match name {
-        "IF" => build_if(args),
-        "RAND" | "RANDOM" => build_rand(&args),
-        "FIRE" => build_fire(args, false),
-        "FIRE_INTO" => build_fire(args, true),
-        "EXEC" => build_exec(args, ExecType::Status),
-        "EXEC_INTO" => build_exec(args, ExecType::IntoStatus),
-        "EXEC_OUT" => build_exec(args, ExecType::CaptureOutput),
-        _ => Err(FindItError::BadExpression(format!(
-            "Function {name} is not supported."
-        ))),
+        EnvFunctionName::Rand => build_rand(args),
+        EnvFunctionName::Coalesce => build_coalesce(args),
+        EnvFunctionName::Env => build_env(args),
+        EnvFunctionName::ExecOut => build_capture_output_exec(args),
+    }
+}
+fn new_string_function(
+    name: &StringFunctionName,
+    args: VecDeque<Box<dyn Evaluator>>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    match name {
+        StringFunctionName::Trim => new_trim(args, TrimWhere::Both),
+        StringFunctionName::TrimHead => new_trim(args, TrimWhere::Head),
+        StringFunctionName::TrimTail => new_trim(args, TrimWhere::Tail),
     }
 }
 

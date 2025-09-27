@@ -1,37 +1,37 @@
 [files]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_file']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is file']
 order = false
 
 [dirs]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is dir']
 order = false
 
 [execs]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'executable AND is_file']
+arguments = ["tests/test_cases/filter/test_files", "-w", '(permissions & 0o111 != 0) AND is file']
 order = false
 
 [is_true]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS TRUE']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is dir IS TRUE']
 order = false
 
 [is_not_true]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS NOT TRUE']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is dir IS NOT TRUE']
 order = false
 
 [is_false]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS FALSE']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is dir IS FALSE']
 order = false
 
 [is_not_false]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'is_dir IS NOT FALSE']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'is dir IS NOT FALSE']
 order = false
 
 [is_null]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NULL']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS None']
 order = false
 
 [is_not_null]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NOT NULL']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'extension IS NOT None']
 order = false
 
 [between]
@@ -39,18 +39,18 @@ arguments = ["tests/test_cases/filter/test_files", "-d", '`name` -> `size`', "-w
 order = false
 
 [is_true_with_null]
-arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = 'bash') IS TRUE"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = \"bash\") IS TRUE"]
 order = false
 
 
 [is_not_false_with_null]
-arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = 'bash') IS NOT FALSE"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(extension = \"bash\") IS NOT FALSE"]
 order = false
 
 [count_between]
-arguments = ["tests/test_cases/filter/test_files", "-w", "parent.#small.count BETWEEN 2 AND 6"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(parent/\"small\").count BETWEEN 2 AND 6"]
 order = false
 
 [not]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'NOT executable AND NOT is_dir']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'NOT (permissions & 0o111 != 0) AND NOT is dir']
 order = false

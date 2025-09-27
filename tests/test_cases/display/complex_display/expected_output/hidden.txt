@@ -1,3 +1,0 @@
-hidden; false
-file2; false
-.file1; true

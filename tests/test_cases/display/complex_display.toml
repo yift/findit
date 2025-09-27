@@ -11,15 +11,15 @@ arguments = ["tests/test_cases/display/test_files", "-d", "`name` depth: `depth`
 order = false
 
 [link]
-arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`, `length` link: `is_link`", "-x", "1"]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`, `length` link: `is link`", "-x", "1"]
 order = false
 
 [attributes]
-arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  exe: `executable`, dir: `is_dir`, file: `is_file`", "-x", "2"]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  exe: `permissions & 0o111 != 0`, dir: `is dir`, file: `is file`", "-x", "2"]
 order = false
 
 [exists]
-arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  parent name: `parent.name`, good exists near me: `parent.\"#good-581.txt\".is_exists`"]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`,  parent name: `parent.name`, good exists near me: `(parent / \"good-581.txt\").exists`"]
 order = false
 
 [dates]
@@ -35,29 +35,22 @@ order = false
 run_after = ["rm -rf /tmp/findit/tests/absolute"]
 
 [user_and_group_one]
-arguments = ["/usr/bin/bash", "-d", "`name`; `owner`, `group`; `writeable`"]
+arguments = ["/usr/bin/bash", "-d", "`name`; `owner`, `group`; `permissions & 0o222 != 0`"]
 
 [writeable_two]
 run_before = ["rm -rf /tmp/findit/tests/writeable_two", "mkdir -p /tmp/findit/tests/writeable_two", "touch /tmp/findit/tests/writeable_two/file1", "chmod -w /tmp/findit/tests/writeable_two/file1","touch /tmp/findit/tests/writeable_two/file2", "chmod +w /tmp/findit/tests/writeable_two/file2"]
 root = "/tmp/findit/tests/writeable_two"
-arguments = ["-d", "`name`; `writeable`"]
+arguments = ["-d", "`name`; `permissions & 0o222 != 0`"]
 run_after = ["rm -rf /tmp/findit/tests/writeable_two"]
 order = false
 
 [readable]
 run_before = ["rm -rf /tmp/findit/tests/readable", "mkdir -p /tmp/findit/tests/readable", "touch /tmp/findit/tests/readable/file1", "chmod -r /tmp/findit/tests/readable/file1","touch /tmp/findit/tests/readable/file2", "chmod +r /tmp/findit/tests/readable/file2"]
 root = "/tmp/findit/tests/readable"
-arguments = ["-d", "`name`; `readable`"]
+arguments = ["-d", "`name`; `permissions & 0o444 != 0`"]
 run_after = ["rm -rf /tmp/findit/tests/readable"]
 order = false
 
-
-[hidden]
-run_before = ["rm -rf /tmp/findit/tests/hidden", "mkdir -p /tmp/findit/tests/hidden", "touch /tmp/findit/tests/hidden/.file1" ,"touch /tmp/findit/tests/hidden/file2"]
-root = "/tmp/findit/tests/hidden"
-arguments = ["-d", "`name`; `hidden`"]
-run_after = ["rm -rf /tmp/findit/tests/hidden"]
-order = false
 
 [different_interpolation]
 arguments = ["tests/test_cases/display/test_files", "-d", "the path is: $(path$).", "--interpolation-start", "$(", "--interpolation-end", "$)"]

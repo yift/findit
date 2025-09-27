@@ -1,62 +1,69 @@
-use std::collections::VecDeque;
-
 use crate::{
     errors::FindItError,
-    expr::Evaluator,
+    expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
+    parser::if_expression::If as IfExpression,
     value::{Value, ValueType},
 };
 
-struct If {
+struct NoElseIf {
     condition: Box<dyn Evaluator>,
-    positive: Box<dyn Evaluator>,
-    negative: Box<dyn Evaluator>,
+    then: Box<dyn Evaluator>,
 }
-impl Evaluator for If {
+struct IfWithElse {
+    condition: Box<dyn Evaluator>,
+    then: Box<dyn Evaluator>,
+    else_branch: Box<dyn Evaluator>,
+}
+
+impl Evaluator for NoElseIf {
     fn eval(&self, file: &FileWrapper) -> Value {
         match self.condition.eval(file) {
-            Value::Bool(true) => self.positive.eval(file),
-            Value::Bool(false) => self.negative.eval(file),
+            Value::Bool(true) => self.then.eval(file),
             _ => Value::Empty,
         }
     }
     fn expected_type(&self) -> ValueType {
-        self.positive.expected_type()
+        self.then.expected_type()
     }
 }
-pub(crate) fn build_if(
-    mut args: VecDeque<Box<dyn Evaluator>>,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    let negative = args
-        .pop_back()
-        .ok_or_else(|| FindItError::BadExpression("IF must have a negative result.".into()))?;
-    let positive = args
-        .pop_back()
-        .ok_or_else(|| FindItError::BadExpression("IF must have a positive result.".into()))?;
-    let condition = args
-        .pop_back()
-        .ok_or_else(|| FindItError::BadExpression("IF must have a condition.".into()))?;
-    if !args.is_empty() {
-        return Err(FindItError::BadExpression(
-            "IF must have 3 arguments.".into(),
-        ));
+
+impl Evaluator for IfWithElse {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        match self.condition.eval(file) {
+            Value::Bool(true) => self.then.eval(file),
+            Value::Bool(false) => self.else_branch.eval(file),
+            _ => Value::Empty,
+        }
     }
+    fn expected_type(&self) -> ValueType {
+        self.then.expected_type()
+    }
+}
+
+pub(crate) fn build_if(iff: &IfExpression) -> Result<Box<dyn Evaluator>, FindItError> {
+    let condition = get_eval(&iff.condition)?;
     if condition.expected_type() != ValueType::Bool {
         return Err(FindItError::BadExpression(
             "IF condition must be boolean.".into(),
         ));
     }
-    if negative.expected_type() != positive.expected_type() {
-        return Err(FindItError::BadExpression(
-            "IF results must be the same.".into(),
-        ));
+    let then = get_eval(&iff.then_branch)?;
+    if let Some(else_branch) = &iff.else_branch {
+        let else_branch = get_eval(else_branch)?;
+        if else_branch.expected_type() != then.expected_type() {
+            return Err(FindItError::BadExpression(
+                "IF results must be the same.".into(),
+            ));
+        }
+        Ok(Box::new(IfWithElse {
+            condition,
+            then,
+            else_branch,
+        }))
+    } else {
+        Ok(Box::new(NoElseIf { condition, then }))
     }
-
-    Ok(Box::new(If {
-        condition,
-        negative,
-        positive,
-    }))
 }
 
 #[cfg(test)]
@@ -64,40 +71,8 @@ mod tests {
     use crate::{expr::read_expr, value::ValueType};
 
     #[test]
-    fn test_if_with_a_lot_or_args() {
-        let sql = "IF(true, 1, 2, 3, 4, 5, 6)";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
-    fn test_if_with_two_args() {
-        let sql = "IF(true, 1 )";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
-    fn test_if_with_one_args() {
-        let sql = "IF(true)";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
-    fn test_if_with_no_args() {
-        let sql = "IF()";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
     fn test_if_with_different_type() {
-        let sql = "IF(TRUE, 1, 'one')";
+        let sql = "IF TRUE THEN 1 ELSE \"one\" END";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -105,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_if_expected_value() {
-        let sql = "IF(TRUE, 1, 10)";
+        let sql = "IF TRUE THEN 1 ELSE 10  END";
         let expr = read_expr(sql).unwrap();
 
         assert_eq!(expr.expected_type(), ValueType::Number);
@@ -113,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_if_with_numeric_condition() {
-        let sql = "IF(200, 'no', 'one')";
+        let sql = "IF 200 THEN \"no\" ELSE \"one\" END";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());

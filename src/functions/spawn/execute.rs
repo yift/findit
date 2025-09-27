@@ -1,5 +1,4 @@
 use std::{
-    collections::VecDeque,
     fs::{self, OpenOptions},
     path::Path,
     process::Command,
@@ -9,14 +8,14 @@ use crate::{expr::Evaluator, file_wrapper::FileWrapper, value::Value};
 
 pub(crate) struct Executor {
     exec: Box<dyn Evaluator>,
-    args: VecDeque<Box<dyn Evaluator>>,
+    args: Vec<Box<dyn Evaluator>>,
     into: Option<Box<dyn Evaluator>>,
 }
 
 impl Executor {
     pub(crate) fn new(
         exec: Box<dyn Evaluator>,
-        args: VecDeque<Box<dyn Evaluator>>,
+        args: Vec<Box<dyn Evaluator>>,
         into: Option<Box<dyn Evaluator>>,
     ) -> Self {
         Self { exec, args, into }

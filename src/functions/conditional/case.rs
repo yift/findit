@@ -1,9 +1,9 @@
-use sqlparser::ast::{CaseWhen, Expr};
-
 use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
+    parser::case::Case as CaseExpression,
+    parser::case::CaseBranch,
     value::{Value, ValueType},
 };
 
@@ -12,11 +12,11 @@ struct Condition {
     result: Box<dyn Evaluator>,
 }
 
-impl TryFrom<&CaseWhen> for Condition {
+impl TryFrom<&CaseBranch> for Condition {
     type Error = FindItError;
-    fn try_from(value: &CaseWhen) -> Result<Self, Self::Error> {
+    fn try_from(value: &CaseBranch) -> Result<Self, Self::Error> {
         let condition = get_eval(&value.condition)?;
-        let result = get_eval(&value.result)?;
+        let result = get_eval(&value.outcome)?;
         Ok(Self { condition, result })
     }
 }
@@ -44,13 +44,10 @@ impl Evaluator for Case {
     }
 }
 
-pub(crate) fn new_case(
-    conditions: &[CaseWhen],
-    else_result: &Option<Box<Expr>>,
-) -> Result<Box<dyn Evaluator>, FindItError> {
+pub(crate) fn new_case(case: &CaseExpression) -> Result<Box<dyn Evaluator>, FindItError> {
     let mut value_type = ValueType::Empty;
     let mut branches = vec![];
-    for b in conditions {
+    for b in &case.branches {
         let b: Condition = b.try_into()?;
         let expected_type = b.result.expected_type();
         if expected_type != ValueType::Empty && value_type == ValueType::Empty {
@@ -63,7 +60,7 @@ pub(crate) fn new_case(
 
         branches.push(b);
     }
-    let default = match else_result {
+    let default = match &case.default_outcome {
         None => None,
         Some(d) => {
             let d = get_eval(d)?;
@@ -91,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_case_with_different_result_type() {
-        let sql = "CASE WHEN extension = 'txt' THEN 'a' WHEN extension = 'b' THEN 'c' WHEN extension = 'bash' THEN 4 ELSE 'DIRECTORY' END";
+        let sql = "CASE WHEN extension = \"txt\" THEN \"a\" WHEN extension = \"b\" THEN \"c\" WHEN extension = \"bash\" THEN 4 ELSE \"DIRECTORY\" END";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -99,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_case_with_different_default_type() {
-        let sql = "CASE WHEN extension = 'txt' THEN 'a' WHEN extension = 'b' THEN 'c' WHEN extension = 'bash' THEN 'd' ELSE 4 END";
+        let sql = "CASE WHEN extension = \"txt\" THEN \"a\" WHEN extension = \"b\" THEN \"c\" WHEN extension = \"bash\" THEN \"d\" ELSE 4 END";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -107,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_case_expected_type() {
-        let sql = "CASE WHEN extension = 'txt' THEN 'a' WHEN extension = 'b' THEN 'c' END";
+        let sql = "CASE WHEN extension = \"txt\" THEN \"a\" WHEN extension = \"b\" THEN \"c\" END";
         let expr = read_expr(sql).unwrap();
 
         assert_eq!(expr.expected_type(), ValueType::String);
@@ -115,7 +112,8 @@ mod tests {
 
     #[test]
     fn test_case_with_operand() {
-        let sql = "CASE parent WHEN extension = 'txt' THEN 'a' WHEN extension = 'b' THEN 'c' END";
+        let sql =
+            "CASE parent WHEN extension = \"txt\" THEN \"a\" WHEN extension = \"b\" THEN \"c\" END";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());

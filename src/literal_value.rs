@@ -1,135 +1,27 @@
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, offset::LocalResult};
-use sqlparser::ast::Value as SqlValue;
-
 use crate::{
-    errors::FindItError,
     expr::Evaluator,
     file_wrapper::FileWrapper,
     value::{Value, ValueType},
 };
 
-pub(crate) fn new_literal_value(value: &SqlValue) -> Result<Box<dyn Evaluator>, FindItError> {
-    match value {
-        SqlValue::Number(num, _) => Ok(Box::new(NumberLiteral::new(num)?)),
-        SqlValue::Boolean(b) => Ok(Box::new(BooleanLiteral { val: *b })),
-        SqlValue::Null => Ok(Box::new(EmptyLiteral {})),
-        SqlValue::SingleQuotedString(str) => Ok(parse_date_or_string(str)),
-        _ => Err(FindItError::BadExpression(format!(
-            "Unsupported literal value: {value}"
-        ))),
-    }
+pub(crate) fn new_literal_value(value: &Value) -> Box<dyn Evaluator> {
+    Box::new(value.clone())
 }
 
-struct NumberLiteral {
-    num: u64,
-}
-impl Evaluator for NumberLiteral {
+impl Evaluator for Value {
     fn eval(&self, _: &FileWrapper) -> Value {
-        Value::Number(self.num)
+        self.clone()
     }
     fn expected_type(&self) -> ValueType {
-        ValueType::Number
-    }
-}
-impl NumberLiteral {
-    fn new(num: &str) -> Result<Self, FindItError> {
-        let num = num.parse::<u64>()?;
-        Ok(Self { num })
-    }
-}
-struct BooleanLiteral {
-    val: bool,
-}
-impl Evaluator for BooleanLiteral {
-    fn eval(&self, _: &FileWrapper) -> Value {
-        Value::Bool(self.val)
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Bool
-    }
-}
-struct EmptyLiteral {}
-impl Evaluator for EmptyLiteral {
-    fn eval(&self, _: &FileWrapper) -> Value {
-        Value::Empty
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Empty
-    }
-}
-struct StringLiteral {
-    val: String,
-}
-impl Evaluator for StringLiteral {
-    fn eval(&self, _: &FileWrapper) -> Value {
-        Value::String(self.val.clone())
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::String
-    }
-}
-struct DateLiteral {
-    val: DateTime<Local>,
-}
-impl Evaluator for DateLiteral {
-    fn eval(&self, _: &FileWrapper) -> Value {
-        Value::Date(self.val)
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Date
-    }
-}
-
-fn parse_date_or_string(val: &str) -> Box<dyn Evaluator> {
-    if let Ok(date) = DateTime::parse_from_rfc3339(val) {
-        return Box::new(DateLiteral { val: date.into() });
-    }
-
-    let naive_date_formats = ["%d/%b/%Y", "%Y-%m-%d"];
-    for format in naive_date_formats {
-        if let Ok(date) = NaiveDate::parse_from_str(val, format)
-            && let LocalResult::Single(date) =
-                date.and_hms_opt(0, 0, 0).unwrap().and_local_timezone(Local)
-        {
-            return Box::new(DateLiteral { val: date });
+        match self {
+            Value::Bool(_) => ValueType::Bool,
+            Value::Empty => ValueType::Empty,
+            Value::Date(_) => ValueType::Date,
+            Value::Number(_) => ValueType::Number,
+            Value::String(_) => ValueType::String,
+            Value::Path(_) => ValueType::Path,
         }
     }
-
-    let naive_date_formats = [
-        "%d/%b/%Y %H:%M",
-        "%d/%b/%Y %H:%M:%S",
-        "%d/%b/%Y %H:%M:%S%.f",
-        "%Y-%m-%d %H:%M",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d %H:%M:%S%.f",
-    ];
-
-    for format in naive_date_formats {
-        if let Ok(date) = NaiveDateTime::parse_from_str(val, format)
-            && let LocalResult::Single(date) = date.and_local_timezone(Local)
-        {
-            return Box::new(DateLiteral { val: date });
-        }
-    }
-
-    let naive_date_formats_with_tz = [
-        "%d/%b/%Y %H:%M %z",
-        "%d/%b/%Y %H:%M:%S %z",
-        "%d/%b/%Y %H:%M:%S%.f %z",
-        "%Y-%m-%d %H:%M %z",
-        "%Y-%m-%d %H:%M:%S %z",
-        "%Y-%m-%d %H:%M:%S%.f %z",
-    ];
-
-    for format in naive_date_formats_with_tz {
-        if let Ok(date) = DateTime::parse_from_str(val, format) {
-            return Box::new(DateLiteral { val: date.into() });
-        }
-    }
-
-    Box::new(StringLiteral {
-        val: val.to_string(),
-    })
 }
 
 #[cfg(test)]
@@ -139,17 +31,7 @@ mod tests {
 
     use chrono::{FixedOffset, Local, MappedLocalTime, NaiveDate, NaiveTime, TimeZone, Utc};
 
-    use crate::{
-        expr::read_expr,
-        file_wrapper::FileWrapper,
-        value::{Value, ValueType},
-    };
-
-    #[test]
-    fn unsupported_literal() {
-        let err = read_expr("0x432").err();
-        assert!(err.is_some())
-    }
+    use crate::{expr::read_expr, file_wrapper::FileWrapper, value::Value};
 
     #[test]
     fn numeric_literal() {
@@ -158,12 +40,6 @@ mod tests {
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
         assert_eq!(value, Value::Number(432))
-    }
-
-    #[test]
-    fn unsupported_numeric_literal() {
-        let err = read_expr("432.443").err();
-        assert!(err.is_some())
     }
 
     #[test]
@@ -176,22 +52,8 @@ mod tests {
     }
 
     #[test]
-    fn null_literal() {
-        let eval = read_expr("null").unwrap();
-        let path = Path::new(".");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-    #[test]
-    fn null_literal_type() {
-        let eval = read_expr("null").unwrap();
-        assert_eq!(eval.expected_type(), ValueType::Empty);
-    }
-
-    #[test]
     fn string_literal() {
-        let eval = read_expr("'hello'").unwrap();
+        let eval = read_expr("\"hello\"").unwrap();
         let path = Path::new(".");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -211,7 +73,7 @@ mod tests {
             panic!("Invalid date");
         };
         let expected_date = expected_date.with_timezone(&Local);
-        let eval = read_expr(&format!("'{date_as_text}'")).unwrap();
+        let eval = read_expr(&format!("[{date_as_text}]")).unwrap();
         let path = Path::new(".");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

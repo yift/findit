@@ -1,11 +1,10 @@
-use sqlparser::parser::ParserError;
 use std::{io::Error as IoError, num::ParseIntError, path::PathBuf};
 use thiserror::Error;
 
+use crate::parser::expression::ParserError;
+
 #[derive(Error, Debug)]
 pub enum FindItError {
-    #[error("SQL Parse error: `{0}`")]
-    SqlParserError(#[from] ParserError),
     #[error("Number Parse error: `{0}`")]
     IntParserError(#[from] ParseIntError),
     #[error("IO Error: `{0}`")]
@@ -20,4 +19,6 @@ pub enum FindItError {
     BadExpression(String),
     #[error("Could not parse `{0}` because : `{0}`")]
     DisplayParserError(String, String),
+    #[error("Expression parse error: `{0}`")]
+    ParserError(#[from] ParserError),
 }

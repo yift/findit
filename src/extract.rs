@@ -1,73 +1,44 @@
 use std::{fs, os::unix::fs::MetadataExt};
 
-use sqlparser::ast::Ident;
 use std::os::unix::fs::PermissionsExt;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
 use crate::{
-    errors::FindItError,
     expr::Evaluator,
     file_wrapper::FileWrapper,
+    parser::access::Access,
     value::{Value, ValueType},
 };
 
-pub(crate) fn get_extractor(name: &Ident) -> Result<Box<dyn Evaluator>, FindItError> {
-    let name = &name.value;
-    if name.is_empty() {
-        return Err(FindItError::BadExpression("Empty identifier".into()));
-    }
-    if let Some(name) = name.strip_prefix("#") {
-        let name = name.to_string();
-        if name.is_empty() {
-            return Err(FindItError::BadExpression("Empty file name".into()));
-        }
-        return Ok(Box::new(FileExtractor { name }));
-    }
-    let name = name.to_lowercase();
-    match name.as_str() {
-        "parent" => Ok(Box::new(ParentExtractor {})),
+pub(crate) fn get_extractor(access: &Access) -> Box<dyn Evaluator> {
+    match access {
+        Access::Parent => Box::new(ParentExtractor {}),
 
-        "name" => Ok(Box::new(NameExtractor {})),
-        "path" => Ok(Box::new(PathExtractor {})),
-        "extension" => Ok(Box::new(ExtensionExtractor {})),
-        "absolute" => Ok(Box::new(AbsoluteExtractor {})),
+        Access::Name => Box::new(NameExtractor {}),
+        Access::Path => Box::new(PathExtractor {}),
+        Access::Extension => Box::new(ExtensionExtractor {}),
+        Access::Absolute => Box::new(AbsoluteExtractor {}),
+        Access::Me => Box::new(MeExtractor {}),
 
-        "content" => Ok(Box::new(ContentExtractor {})),
-        "length" => Ok(Box::new(LengthExtractor {})),
-        "depth" => Ok(Box::new(DepthExtractor {})),
+        Access::Content => Box::new(ContentExtractor {}),
+        Access::Length => Box::new(LengthExtractor {}),
+        Access::Depth => Box::new(DepthExtractor {}),
 
-        "size" => Ok(Box::new(SizeExtractor {})),
-        "count" => Ok(Box::new(CountExtractor {})),
-        "created" => Ok(Box::new(CreatedExtractor {})),
-        "modified" => Ok(Box::new(ModifiedExtractor {})),
-        "is_exists" => Ok(Box::new(ExistsExtractor {})),
-        "is_dir" => Ok(Box::new(IsDirExtractor {})),
-        "is_file" => Ok(Box::new(IsFileExtractor {})),
-        "is_link" => Ok(Box::new(IsLinkExtractor {})),
+        Access::Size => Box::new(SizeExtractor {}),
+        Access::Count => Box::new(CountExtractor {}),
+        Access::Created => Box::new(CreatedExtractor {}),
+        Access::Modified => Box::new(ModifiedExtractor {}),
+        Access::Exists => Box::new(ExistsExtractor {}),
+        Access::IsDir => Box::new(IsDirExtractor { negate: false }),
+        Access::IsFile => Box::new(IsFileExtractor { negate: false }),
+        Access::IsLink => Box::new(IsLinkExtractor { negate: false }),
+        Access::IsNotDir => Box::new(IsDirExtractor { negate: true }),
+        Access::IsNotFile => Box::new(IsFileExtractor { negate: true }),
+        Access::IsNotLink => Box::new(IsLinkExtractor { negate: true }),
 
-        "owner" => Ok(Box::new(OwnerExtractor {})),
-        "group" => Ok(Box::new(GroupExtractor {})),
-        "readable" => Ok(Box::new(ReadableExtractor {})),
-        "executable" => Ok(Box::new(ExecutableExtractor {})),
-        "writeable" => Ok(Box::new(WriteableExtractor {})),
-        "hidden" => Ok(Box::new(HiddenExtractor {})),
-
-        _ => Err(FindItError::BadExpression(format!(
-            "Unknown identifier: {name}",
-        ))),
-    }
-}
-
-struct FileExtractor {
-    name: String,
-}
-
-impl Evaluator for FileExtractor {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        file.path().join(&self.name).into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Path
+        Access::Owner => Box::new(OwnerExtractor {}),
+        Access::Group => Box::new(GroupExtractor {}),
+        Access::Permissions => Box::new(PermissionsExtractor {}),
     }
 }
 
@@ -113,6 +84,15 @@ struct AbsoluteExtractor {}
 impl Evaluator for AbsoluteExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         fs::canonicalize(file.path()).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Path
+    }
+}
+struct MeExtractor {}
+impl Evaluator for MeExtractor {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        file.path().as_path().into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Path
@@ -195,28 +175,34 @@ impl Evaluator for ExistsExtractor {
         ValueType::Bool
     }
 }
-struct IsDirExtractor {}
+struct IsDirExtractor {
+    negate: bool,
+}
 impl Evaluator for IsDirExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        file.path().is_dir().into()
+        (self.negate ^ file.path().is_dir()).into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Bool
     }
 }
-struct IsFileExtractor {}
+struct IsFileExtractor {
+    negate: bool,
+}
 impl Evaluator for IsFileExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        file.path().is_file().into()
+        (self.negate ^ file.path().is_file()).into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Bool
     }
 }
-struct IsLinkExtractor {}
+struct IsLinkExtractor {
+    negate: bool,
+}
 impl Evaluator for IsLinkExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        file.path().is_symlink().into()
+        (self.negate ^ file.path().is_symlink()).into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Bool
@@ -254,51 +240,16 @@ impl Evaluator for GroupExtractor {
     }
 }
 
-struct ExecutableExtractor {}
-impl Evaluator for ExecutableExtractor {
+struct PermissionsExtractor {}
+impl Evaluator for PermissionsExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path()
             .metadata()
-            .map(|m| m.permissions().mode() & 0o111 != 0)
+            .map(|m| m.permissions().mode())
             .into()
     }
     fn expected_type(&self) -> ValueType {
-        ValueType::Bool
-    }
-}
-struct ReadableExtractor {}
-impl Evaluator for ReadableExtractor {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        file.path()
-            .metadata()
-            .map(|m| m.permissions().mode() & 0o444 != 0)
-            .into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Bool
-    }
-}
-struct WriteableExtractor {}
-impl Evaluator for WriteableExtractor {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        file.path()
-            .metadata()
-            .map(|m| !m.permissions().readonly())
-            .into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Bool
-    }
-}
-
-struct HiddenExtractor {}
-impl Evaluator for HiddenExtractor {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        let name: Value = file.path().file_name().into();
-        name.to_string().starts_with('.').into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Bool
+        ValueType::Number
     }
 }
 
@@ -306,14 +257,15 @@ impl Evaluator for HiddenExtractor {
 mod tests {
     use std::env;
 
+    use crate::{errors::FindItError, expr::read_expr};
+
     use super::*;
 
     #[test]
     fn test_file_creation() -> Result<(), FindItError> {
         let file = env::current_dir()?;
         let creation = file.metadata()?.created()?;
-        let ident = Ident::new("created");
-        let exe = get_extractor(&ident)?;
+        let exe = get_extractor(&Access::Created);
         let wrapper = FileWrapper::new(file, 1);
 
         let value = exe.eval(&wrapper);
@@ -323,48 +275,17 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_empty_file() -> Result<(), FindItError> {
-        let ident = Ident::new("");
-        let err = get_extractor(&ident).err();
-
-        assert!(err.is_some());
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_empty_name() -> Result<(), FindItError> {
-        let ident = Ident::new("#");
-        let err = get_extractor(&ident).err();
-
-        assert!(err.is_some());
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_unknown_filed() -> Result<(), FindItError> {
-        let ident = Ident::new("foo");
-        let err = get_extractor(&ident).err();
-
-        assert!(err.is_some());
-
-        Ok(())
-    }
-
     fn test_expected_type(name: &str, expected: ValueType) -> Result<(), FindItError> {
-        let ident = Ident::new(name);
-        let tp = get_extractor(&ident)?.expected_type();
+        let expr = read_expr(name)?;
+        let tp = expr.expected_type();
 
         assert_eq!(tp, expected);
 
         Ok(())
     }
-
     #[test]
-    fn test_file_expected_type() -> Result<(), FindItError> {
-        test_expected_type("#foo", ValueType::Path)
+    fn test_self_expected_type() -> Result<(), FindItError> {
+        test_expected_type("self", ValueType::Path)
     }
 
     #[test]
@@ -424,22 +345,22 @@ mod tests {
 
     #[test]
     fn test_exists_expected_type() -> Result<(), FindItError> {
-        test_expected_type("is_exists", ValueType::Bool)
+        test_expected_type("exists", ValueType::Bool)
     }
 
     #[test]
     fn test_is_dir_expected_type() -> Result<(), FindItError> {
-        test_expected_type("is_dir", ValueType::Bool)
+        test_expected_type("is dir", ValueType::Bool)
     }
 
     #[test]
     fn test_is_file_expected_type() -> Result<(), FindItError> {
-        test_expected_type("is_file", ValueType::Bool)
+        test_expected_type("is file", ValueType::Bool)
     }
 
     #[test]
     fn test_is_link_expected_type() -> Result<(), FindItError> {
-        test_expected_type("is_link", ValueType::Bool)
+        test_expected_type("is link", ValueType::Bool)
     }
 
     #[test]
@@ -453,22 +374,7 @@ mod tests {
     }
 
     #[test]
-    fn test_readable_expected_type() -> Result<(), FindItError> {
-        test_expected_type("readable", ValueType::Bool)
-    }
-
-    #[test]
-    fn test_writeable_expected_type() -> Result<(), FindItError> {
-        test_expected_type("writeable", ValueType::Bool)
-    }
-
-    #[test]
-    fn test_hidden_expected_type() -> Result<(), FindItError> {
-        test_expected_type("hidden", ValueType::Bool)
-    }
-
-    #[test]
-    fn test_executable_expected_type() -> Result<(), FindItError> {
-        test_expected_type("executable", ValueType::Bool)
+    fn test_permissions_expected_type() -> Result<(), FindItError> {
+        test_expected_type("permissions", ValueType::Number)
     }
 }

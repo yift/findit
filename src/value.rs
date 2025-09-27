@@ -9,12 +9,12 @@ use chrono::{DateTime, Local};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum Value {
-    Empty,
     String(String),
     Path(PathBuf),
     Number(u64),
     Bool(bool),
     Date(DateTime<Local>),
+    Empty,
 }
 
 impl From<&Path> for Value {
@@ -109,12 +109,12 @@ impl Display for Value {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub(crate) enum ValueType {
-    Empty,
     Bool,
     Number,
     Path,
     String,
     Date,
+    Empty,
 }
 
 impl Display for ValueType {

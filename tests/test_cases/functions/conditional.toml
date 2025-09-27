@@ -1,15 +1,19 @@
 [simple_case]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`name` - `CASE WHEN extension = 'txt' THEN 'TEXT FILE' WHEN extension = 'json' THEN 'JSON FILE' WHEN extension = 'bash' THEN 'BASH FILE' ELSE 'DIRECTORY' END`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`name` - `CASE WHEN extension = \"txt\" THEN \"TEXT FILE\" WHEN extension = \"json\" THEN \"JSON FILE\" WHEN extension = \"bash\" THEN \"BASH FILE\" ELSE \"DIRECTORY\" END`"]
 order = false
 
 [case_with_no_default]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `CASE WHEN size < 50 THEN 'small file' WHEN size < 90 THEN 'medium size' WHEN is_dir THEN 'dir' END`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `CASE WHEN size < 50 THEN \"small file\" WHEN size < 90 THEN \"medium size\" WHEN is dir THEN \"dir\" END`"]
 order = false
 
 [if]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF(size > 70, 'large', 'small')`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF size > 70 then \"large\" else \"small\" end`"]
 order = false
 
 [if_with_nulls]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF(length > 70, 'large', 'small')`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF length > 70 then \"large\" else \"small\" end`"]
+order = false
+
+[if_without_else]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF length > 70 then \"large\" end`"]
 order = false

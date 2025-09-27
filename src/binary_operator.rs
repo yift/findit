@@ -1,89 +1,40 @@
 use chrono::TimeDelta;
-use sqlparser::ast::{BinaryOperator, Expr};
 
 use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
+    parser::{
+        binary_expression::BinaryExpression,
+        operator::{
+            ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
+            LogicalOperator,
+        },
+    },
+    string_functions::new_regex,
     value::{Value, ValueType},
 };
 
-enum ArithmeticOperator {
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-    Modulo,
-}
-enum StringOperator {
-    Concat,
-}
-enum ComparisonOperator {
-    Gt,
-    Lt,
-    Eq,
-    NEq,
-    GtEq,
-    LtEq,
-}
-enum LogicalOperator {
-    And,
-    Or,
-    Xor,
-}
-enum SupportedOperators {
-    Arithmetic(ArithmeticOperator),
-    String(StringOperator),
-    Comparison(ComparisonOperator),
-    Logical(LogicalOperator),
-}
-impl TryInto<SupportedOperators> for &BinaryOperator {
+impl TryFrom<&BinaryExpression> for Box<dyn Evaluator> {
     type Error = FindItError;
-    fn try_into(self) -> Result<SupportedOperators, Self::Error> {
-        match self {
-            BinaryOperator::Plus => Ok(SupportedOperators::Arithmetic(ArithmeticOperator::Plus)),
-            BinaryOperator::Minus => Ok(SupportedOperators::Arithmetic(ArithmeticOperator::Minus)),
-            BinaryOperator::Multiply => {
-                Ok(SupportedOperators::Arithmetic(ArithmeticOperator::Multiply))
+    fn try_from(operator: &BinaryExpression) -> Result<Self, Self::Error> {
+        let left = get_eval(&operator.left)?;
+        let right = get_eval(&operator.right)?;
+
+        match operator.operator {
+            BinaryOperator::Arithmetic(operator) => new_arithmetic_operator(left, &operator, right),
+            BinaryOperator::Logical(operator) => new_logical_operator(left, &operator, right),
+            BinaryOperator::Comparison(operator) => new_comparison_operator(left, &operator, right),
+            BinaryOperator::Matches => new_regex(left, right),
+            BinaryOperator::Of => new_of(left, right),
+            BinaryOperator::Dot => new_of(right, left),
+            BinaryOperator::BitwiseOperator(operator) => {
+                new_bitwise_operator(left, &operator, right)
             }
-            BinaryOperator::Divide => {
-                Ok(SupportedOperators::Arithmetic(ArithmeticOperator::Divide))
-            }
-            BinaryOperator::Modulo => {
-                Ok(SupportedOperators::Arithmetic(ArithmeticOperator::Modulo))
-            }
-            BinaryOperator::Gt => Ok(SupportedOperators::Comparison(ComparisonOperator::Gt)),
-            BinaryOperator::Lt => Ok(SupportedOperators::Comparison(ComparisonOperator::Lt)),
-            BinaryOperator::GtEq => Ok(SupportedOperators::Comparison(ComparisonOperator::GtEq)),
-            BinaryOperator::LtEq => Ok(SupportedOperators::Comparison(ComparisonOperator::LtEq)),
-            BinaryOperator::Eq => Ok(SupportedOperators::Comparison(ComparisonOperator::Eq)),
-            BinaryOperator::NotEq => Ok(SupportedOperators::Comparison(ComparisonOperator::NEq)),
-            BinaryOperator::And => Ok(SupportedOperators::Logical(LogicalOperator::And)),
-            BinaryOperator::Or => Ok(SupportedOperators::Logical(LogicalOperator::Or)),
-            BinaryOperator::Xor => Ok(SupportedOperators::Logical(LogicalOperator::Xor)),
-            BinaryOperator::StringConcat => Ok(SupportedOperators::String(StringOperator::Concat)),
-            _ => Err(FindItError::BadExpression(format!(
-                "Operator {self} is not supported"
-            ))),
         }
     }
 }
 
-pub(crate) fn new_binary_operator(
-    left: &Expr,
-    operator: &BinaryOperator,
-    right: &Expr,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    let left = get_eval(left)?;
-    let right = get_eval(right)?;
-    let operator: SupportedOperators = operator.try_into()?;
-    match operator {
-        SupportedOperators::Arithmetic(operator) => new_arithmetic_operator(left, &operator, right),
-        SupportedOperators::String(operator) => new_string_operator(left, &operator, right),
-        SupportedOperators::Comparison(operator) => new_comparison_operator(left, &operator, right),
-        SupportedOperators::Logical(operator) => new_logical_operator(left, &operator, right),
-    }
-}
 fn new_arithmetic_operator(
     left: Box<dyn Evaluator>,
     operator: &ArithmeticOperator,
@@ -119,27 +70,12 @@ fn new_arithmetic_operator(
                 "Operator / only support two numbers or path and string".into(),
             )),
         },
-        ArithmeticOperator::Modulo => match (left.expected_type(), right.expected_type()) {
+        ArithmeticOperator::Module => match (left.expected_type(), right.expected_type()) {
             (ValueType::Number, ValueType::Number) => Ok(Box::new(ModuloNumbers { left, right })),
             _ => Err(FindItError::BadExpression(
                 "Operator % only support two numbers".into(),
             )),
         },
-    }
-}
-
-fn new_string_operator(
-    left: Box<dyn Evaluator>,
-    operator: &StringOperator,
-    right: Box<dyn Evaluator>,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    if (left.expected_type(), right.expected_type()) != (ValueType::String, ValueType::String) {
-        return Err(FindItError::BadExpression(
-            "Operator only support two string".into(),
-        ));
-    }
-    match operator {
-        StringOperator::Concat => Ok(Box::new(PlusString { left, right })),
     }
 }
 
@@ -156,12 +92,12 @@ fn new_comparison_operator(
         )));
     }
     match operator {
-        ComparisonOperator::Gt => Ok(Box::new(Gt { left, right })),
-        ComparisonOperator::Lt => Ok(Box::new(Lt { left, right })),
-        ComparisonOperator::GtEq => Ok(Box::new(GtEq { left, right })),
-        ComparisonOperator::LtEq => Ok(Box::new(LtEq { left, right })),
+        ComparisonOperator::LargerThen => Ok(Box::new(Gt { left, right })),
+        ComparisonOperator::SmallerThen => Ok(Box::new(Lt { left, right })),
+        ComparisonOperator::LargerThenEq => Ok(Box::new(GtEq { left, right })),
+        ComparisonOperator::SmallerThenEq => Ok(Box::new(LtEq { left, right })),
         ComparisonOperator::Eq => Ok(Box::new(Eq { left, right })),
-        ComparisonOperator::NEq => Ok(Box::new(NEq { left, right })),
+        ComparisonOperator::Neq => Ok(Box::new(NEq { left, right })),
     }
 }
 
@@ -179,6 +115,23 @@ fn new_logical_operator(
         LogicalOperator::And => Ok(Box::new(And { left, right })),
         LogicalOperator::Or => Ok(Box::new(Or { left, right })),
         LogicalOperator::Xor => Ok(Box::new(Xor { left, right })),
+    }
+}
+
+fn new_bitwise_operator(
+    left: Box<dyn Evaluator>,
+    operator: &BitwiseOperator,
+    right: Box<dyn Evaluator>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    if (left.expected_type(), right.expected_type()) != (ValueType::Number, ValueType::Number) {
+        return Err(FindItError::BadExpression(
+            "Cannot use bitwise operation on non numeric values".into(),
+        ));
+    }
+    match operator {
+        BitwiseOperator::And => Ok(Box::new(BitwiseAnd { left, right })),
+        BitwiseOperator::Or => Ok(Box::new(BitwiseOr { left, right })),
+        BitwiseOperator::Xor => Ok(Box::new(BitwiseXor { left, right })),
     }
 }
 
@@ -345,6 +298,60 @@ impl Evaluator for DividePath {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Path
+    }
+}
+
+struct BitwiseOr {
+    left: Box<dyn Evaluator>,
+    right: Box<dyn Evaluator>,
+}
+impl Evaluator for BitwiseOr {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::Number(left), Value::Number(right)) =
+            (self.left.eval(file), self.right.eval(file))
+        else {
+            return Value::Empty;
+        };
+        Value::Number(left | right)
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
+}
+
+struct BitwiseAnd {
+    left: Box<dyn Evaluator>,
+    right: Box<dyn Evaluator>,
+}
+impl Evaluator for BitwiseAnd {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::Number(left), Value::Number(right)) =
+            (self.left.eval(file), self.right.eval(file))
+        else {
+            return Value::Empty;
+        };
+        Value::Number(left & right)
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
+}
+
+struct BitwiseXor {
+    left: Box<dyn Evaluator>,
+    right: Box<dyn Evaluator>,
+}
+impl Evaluator for BitwiseXor {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::Number(left), Value::Number(right)) =
+            (self.left.eval(file), self.right.eval(file))
+        else {
+            return Value::Empty;
+        };
+        Value::Number(left ^ right)
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
     }
 }
 
@@ -535,6 +542,33 @@ impl Evaluator for Xor {
     }
 }
 
+struct Of {
+    access: Box<dyn Evaluator>,
+    of: Box<dyn Evaluator>,
+}
+fn new_of(
+    access: Box<dyn Evaluator>,
+    of: Box<dyn Evaluator>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    if of.expected_type() != ValueType::Path {
+        return Err(FindItError::BadExpression("of must refer to a path".into()));
+    }
+    Ok(Box::new(Of { access, of }))
+}
+
+impl Evaluator for Of {
+    fn expected_type(&self) -> ValueType {
+        self.access.expected_type()
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::Path(path) = self.of.eval(file) else {
+            return Value::Empty;
+        };
+        let wrapper = FileWrapper::new(path, file.dept() + 1);
+        self.access.eval(&wrapper)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::Path;
@@ -565,19 +599,19 @@ mod tests {
 
     #[test]
     fn unsupported_multiply_string() {
-        let err = read_expr("'a' * 3").err();
+        let err = read_expr("\"a\" * 3").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn unsupported_divide_string() {
-        let err = read_expr("'a' / 3").err();
+        let err = read_expr("\"a\" / 3").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn unsupported_modulo_string() {
-        let err = read_expr("'a' % 3").err();
+        let err = read_expr("\"a\" % 3").err();
         assert!(err.is_some())
     }
 
@@ -589,7 +623,7 @@ mod tests {
 
     #[test]
     fn unsupported_compare_different_type() {
-        let err = read_expr("4 > 'four'").err();
+        let err = read_expr("4 > \"four\"").err();
         assert!(err.is_some())
     }
 
@@ -610,7 +644,7 @@ mod tests {
 
     #[test]
     fn plus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("'2025-04-19 08:42:00' + parent.length").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] + parent.length").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -619,7 +653,7 @@ mod tests {
 
     #[test]
     fn plus_date_return_empty_if_number_is_too_large() {
-        let eval = read_expr("'2025-04-19 08:42:00' + 18446744073709551613").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] + 18446744073709551613").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -637,7 +671,7 @@ mod tests {
 
     #[test]
     fn minus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("'2025-04-19 08:42:00' - parent.length").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] - parent.length").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -646,7 +680,7 @@ mod tests {
 
     #[test]
     fn minus_date_return_empty_if_number_is_too_large() {
-        let eval = read_expr("'2025-04-19 08:42:00' - 18446744073709551613").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] - 18446744073709551613").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -670,7 +704,7 @@ mod tests {
 
     #[test]
     fn gt_return_empty_for_empty_right() {
-        let eval = read_expr("'12' > parent.content").unwrap();
+        let eval = read_expr("\"12\" > parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -679,7 +713,7 @@ mod tests {
 
     #[test]
     fn lt_return_empty_for_empty_right() {
-        let eval = read_expr("'12' < parent.content").unwrap();
+        let eval = read_expr("\"12\" < parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -688,7 +722,7 @@ mod tests {
 
     #[test]
     fn lt_return_empty_for_empty_left() {
-        let eval = read_expr("parent.content < '44'").unwrap();
+        let eval = read_expr("parent.content < \"44\"").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -697,7 +731,7 @@ mod tests {
 
     #[test]
     fn gte_return_empty_for_empty_right() {
-        let eval = read_expr("'12' >= parent.content").unwrap();
+        let eval = read_expr("\"12\" >= parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -706,7 +740,7 @@ mod tests {
 
     #[test]
     fn lte_return_empty_for_empty_right() {
-        let eval = read_expr("'12' <= parent.content").unwrap();
+        let eval = read_expr("\"12\" <= parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -715,7 +749,7 @@ mod tests {
 
     #[test]
     fn lte_return_empty_for_empty_left() {
-        let eval = read_expr("parent.content <= '44'").unwrap();
+        let eval = read_expr("parent.content <= \"44\"").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -724,7 +758,7 @@ mod tests {
 
     #[test]
     fn eq_return_empty_for_empty_right() {
-        let eval = read_expr("'12' = parent.content").unwrap();
+        let eval = read_expr("\"12\" = parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -733,7 +767,7 @@ mod tests {
 
     #[test]
     fn neq_return_empty_for_empty_right() {
-        let eval = read_expr("'12' <> parent.content").unwrap();
+        let eval = read_expr("\"12\" <> parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -778,7 +812,7 @@ mod tests {
 
     #[test]
     fn or_return_empty_for_empty_left() {
-        let eval = read_expr("'12' = parent.content OR TRUE").unwrap();
+        let eval = read_expr("\"12\" = parent.content OR TRUE").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -787,7 +821,7 @@ mod tests {
 
     #[test]
     fn or_return_empty_for_empty_right() {
-        let eval = read_expr("FALSE OR '12' = parent.content").unwrap();
+        let eval = read_expr("FALSE OR \"12\" = parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -802,7 +836,7 @@ mod tests {
 
     #[test]
     fn and_return_empty_for_empty_left() {
-        let eval = read_expr("'12' = parent.content AND TRUE").unwrap();
+        let eval = read_expr("(\"12\" = content OF parent) AND TRUE").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -811,7 +845,7 @@ mod tests {
 
     #[test]
     fn and_return_empty_for_empty_right() {
-        let eval = read_expr("TRUE AND '12' = parent.content").unwrap();
+        let eval = read_expr("TRUE AND \"12\" = parent.content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -826,7 +860,7 @@ mod tests {
 
     #[test]
     fn xor_return_empty_for_empty_left() {
-        let eval = read_expr("('12' = parent.content) XOR TRUE").unwrap();
+        let eval = read_expr("(\"12\" = parent.content) XOR TRUE").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -835,7 +869,7 @@ mod tests {
 
     #[test]
     fn xor_return_empty_for_empty_right() {
-        let eval = read_expr("TRUE XOR ('12' = parent.content)").unwrap();
+        let eval = read_expr("TRUE XOR (\"12\" = parent.content)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

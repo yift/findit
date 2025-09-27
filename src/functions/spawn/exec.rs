@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub(crate) enum ExecType {
+pub(super) enum ExecType {
     Status,
     IntoStatus,
     CaptureOutput,
@@ -44,9 +44,9 @@ impl Evaluator for Execute {
         }
     }
 }
-pub(crate) fn build_exec(
+
+pub(crate) fn build_capture_output_exec(
     mut args: VecDeque<Box<dyn Evaluator>>,
-    exec_type: ExecType,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     let Some(exec) = args.pop_front() else {
         return Err(FindItError::BadExpression(
@@ -58,27 +58,16 @@ pub(crate) fn build_exec(
             "Can only execute string or files.".into(),
         ));
     }
-    let into = if exec_type == ExecType::IntoStatus {
-        let Some(into) = args.pop_back() else {
-            return Err(FindItError::BadExpression(
-                "EXEC_INTO last argument must be present.".into(),
-            ));
-        };
-        if into.expected_type() != ValueType::String && into.expected_type() != ValueType::Path {
-            return Err(FindItError::BadExpression(
-                "Can only execute into string or file.".into(),
-            ));
-        }
+    let into = None;
+    let executor = Executor::new(exec, args.into(), into);
+    Ok(build_exec(executor, ExecType::CaptureOutput))
+}
 
-        Some(into)
-    } else {
-        None
-    };
-    let executor = Executor::new(exec, args, into);
-    Ok(Box::new(Execute {
+pub(super) fn build_exec(executor: Executor, exec_type: ExecType) -> Box<dyn Evaluator> {
+    Box::new(Execute {
         executor,
         exec_type,
-    }))
+    })
 }
 
 #[cfg(test)]
@@ -104,16 +93,8 @@ mod tests {
     }
 
     #[test]
-    fn test_exec_into_no_into() {
-        let sql = "exec_into('rm')";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
     fn test_exec_into_number() {
-        let sql = "exec_into('rm', 4000)";
+        let sql = "exec('rm' into 4000)";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -121,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_exec_out_with_numeric_arg() {
-        let sql = "exec_out(32)";
+        let sql = "execOut(32)";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -137,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_exec_out_expected_return() {
-        let sql = "exec_out('echo')";
+        let sql = "execOut('echo')";
         let expr = read_expr(sql).unwrap();
 
         assert_eq!(expr.expected_type(), ValueType::String);
@@ -189,7 +170,7 @@ mod tests {
         let dir = tempdir()?;
         let out_file = dir.path().join("out.txt");
 
-        let sql = format!("exec_into('cat', path, '{}')", out_file.to_str().unwrap());
+        let sql = format!("exec('cat', path into '{}')", out_file.to_str().unwrap());
         let expr = read_expr(&sql).unwrap();
         let file =
             Path::new("tests/test_cases/display/test_files/thing/good-581.txt").to_path_buf();

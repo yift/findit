@@ -1,7 +1,4 @@
-use std::collections::VecDeque;
-
 use crate::{
-    errors::FindItError,
     expr::Evaluator,
     file_wrapper::FileWrapper,
     functions::spawn::execute::Executor,
@@ -20,45 +17,16 @@ impl Evaluator for Fire {
         let Some(mut command) = self.executor.execute(file) else {
             return Value::Empty;
         };
-        let Ok(result) = command.spawn() else {
+        let res = command.spawn();
+        let Ok(result) = res else {
             return Value::Empty;
         };
 
         result.id().into()
     }
 }
-pub(crate) fn build_fire(
-    mut args: VecDeque<Box<dyn Evaluator>>,
-    into: bool,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    let Some(exec) = args.pop_front() else {
-        return Err(FindItError::BadExpression(
-            "FIRE must have at least one argument.".into(),
-        ));
-    };
-    if exec.expected_type() != ValueType::String && exec.expected_type() != ValueType::Path {
-        return Err(FindItError::BadExpression(
-            "Can only execute string or files.".into(),
-        ));
-    }
-    let into = if into {
-        let Some(into) = args.pop_back() else {
-            return Err(FindItError::BadExpression(
-                "Fire into last argument must be present.".into(),
-            ));
-        };
-        if into.expected_type() != ValueType::String && into.expected_type() != ValueType::Path {
-            return Err(FindItError::BadExpression(
-                "Can only fire into string or file.".into(),
-            ));
-        }
-
-        Some(into)
-    } else {
-        None
-    };
-    let executor = Executor::new(exec, args, into);
-    Ok(Box::new(Fire { executor }))
+pub(super) fn build_fire(executor: Executor) -> Box<dyn Evaluator> {
+    Box::new(Fire { executor })
 }
 
 #[cfg(test)]
@@ -84,16 +52,8 @@ mod tests {
     }
 
     #[test]
-    fn test_fire_into_no_into() {
-        let sql = "fire_into('rm')";
-        let err = read_expr(sql).err();
-
-        assert!(err.is_some());
-    }
-
-    #[test]
     fn test_fire_into_into_bool() {
-        let sql = "fire_into('rm', FALSE)";
+        let sql = "fire('rm' into FALSE)";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -196,8 +156,9 @@ mod tests {
             file_to_create.to_str().unwrap_or_default()
         )?;
         drop(file);
+        sleep(Duration::from_millis(100));
 
-        let sql = "fire(#test)";
+        let sql = "fire(/\"test\")";
         let expr = read_expr(sql)?;
         let wrapper = FileWrapper::new(bash_dir.to_path_buf(), 1);
 
@@ -238,8 +199,12 @@ mod tests {
         writeln!(&mut file)?;
         writeln!(&mut file, "echo 'text'")?;
         drop(file);
+        sleep(Duration::from_millis(100));
 
-        let sql = format!("fire_into(#test, '{}')", file_to_create.to_str().unwrap());
+        let sql = format!(
+            "fire(/ \"test\" into '{}')",
+            file_to_create.to_str().unwrap()
+        );
         let expr = read_expr(&sql)?;
         let wrapper = FileWrapper::new(bash_dir.to_path_buf(), 1);
 
@@ -291,8 +256,9 @@ mod tests {
         writeln!(&mut file)?;
         writeln!(&mut file, "echo 'line 2'")?;
         drop(file);
+        sleep(Duration::from_millis(100));
 
-        let sql = "fire_into(#test, parent / 'dir' / 'file')";
+        let sql = "spawn(/ \"test\" into parent / \"dir\" / \"file\")";
         let expr = read_expr(sql)?;
         let wrapper = FileWrapper::new(bash_dir.to_path_buf(), 1);
 
@@ -318,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_fire_into_non_into_returns_empty() -> Result<(), FindItError> {
-        let sql = "fire_into('echo', parent)";
+        let sql = "fire('echo' into parent)";
         let expr = read_expr(sql)?;
         let file = Path::new("/");
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);
@@ -332,7 +298,7 @@ mod tests {
 
     #[test]
     fn test_fire_into_bad_location_returns_empty() -> Result<(), FindItError> {
-        let sql = "fire_into('echo', '/bin/not/a/valid/location/a.txt')";
+        let sql = "fire('echo' into '/bin/not/a/valid/location/a.txt')";
         let expr = read_expr(sql)?;
         let file = Path::new("/");
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);

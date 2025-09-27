@@ -1,43 +1,36 @@
-use std::collections::HashSet;
+use std::collections::VecDeque;
 
 use regex::Regex;
-use sqlparser::ast::{Expr, TrimWhereField};
 
 use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
+    parser::position::Position as PositionExpression,
+    parser::substr::Substring,
     value::{Value, ValueType},
 };
 
 pub(crate) fn new_regex(
-    expr: &Expr,
-    pattern: &Expr,
-    negate: bool,
+    expr: Box<dyn Evaluator>,
+    pattern: Box<dyn Evaluator>,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
-    let expr = get_eval(expr)?;
     if expr.expected_type() != ValueType::String {
         return Err(FindItError::BadExpression(
             "REGULAR expressions can only work with strings".into(),
         ));
     }
-    let pattern = get_eval(pattern)?;
     if pattern.expected_type() != ValueType::String {
         return Err(FindItError::BadExpression(
             "REGULAR expressions pattern can only be strings".into(),
         ));
     }
-    Ok(Box::new(Regexp {
-        expr,
-        pattern,
-        negate,
-    }))
+    Ok(Box::new(Regexp { expr, pattern }))
 }
 
 struct Regexp {
     expr: Box<dyn Evaluator>,
     pattern: Box<dyn Evaluator>,
-    negate: bool,
 }
 impl Evaluator for Regexp {
     fn eval(&self, file: &FileWrapper) -> Value {
@@ -50,16 +43,18 @@ impl Evaluator for Regexp {
         let Ok(regexp) = Regex::new(&pattern) else {
             return Value::Empty;
         };
-        (self.negate ^ regexp.is_match(&expr)).into()
+        regexp.is_match(&expr).into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Bool
     }
 }
 
-pub(crate) fn new_position(str: &Expr, sub_str: &Expr) -> Result<Box<dyn Evaluator>, FindItError> {
-    let str = get_eval(str)?;
-    let sub_str = get_eval(sub_str)?;
+pub(crate) fn new_position(
+    position: &PositionExpression,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    let str = get_eval(&position.super_string)?;
+    let sub_str = get_eval(&position.sub_string)?;
 
     if (str.expected_type(), sub_str.expected_type()) != (ValueType::String, ValueType::String) {
         return Err(FindItError::BadExpression(
@@ -88,18 +83,14 @@ impl Evaluator for Position {
     }
 }
 
-pub(crate) fn new_substring(
-    str: &Expr,
-    from: &Option<Box<Expr>>,
-    length: &Option<Box<Expr>>,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    let str = get_eval(str)?;
+pub(crate) fn new_substring(substr: &Substring) -> Result<Box<dyn Evaluator>, FindItError> {
+    let str = get_eval(&substr.super_string)?;
     if str.expected_type() != ValueType::String {
         return Err(FindItError::BadExpression(
             "SUBSTRING can only work with strings".into(),
         ));
     }
-    let from = if let Some(from) = from {
+    let from = if let Some(from) = &substr.substring_from {
         let from = get_eval(from)?;
         if from.expected_type() != ValueType::Number {
             return Err(FindItError::BadExpression(
@@ -110,7 +101,7 @@ pub(crate) fn new_substring(
     } else {
         None
     };
-    let length = if let Some(length) = length {
+    let length = if let Some(length) = &substr.substring_for {
         let length = get_eval(length)?;
         if length.expected_type() != ValueType::Number {
             return Err(FindItError::BadExpression(
@@ -145,14 +136,13 @@ impl Evaluator for SubString {
             let Value::Number(from) = from.eval(file) else {
                 return Value::Empty;
             };
-            let Ok(from) = from.try_into() else {
+            let Ok(from) = usize::try_from(from) else {
                 return Value::Empty;
             };
             if from > str.len() {
                 return "".into();
             }
-            let from = if from == 0 { 1 } else { from };
-            str = &str[from - 1..];
+            str = &str[from..];
         }
         if let Some(length) = &self.length {
             let Value::Number(length) = length.eval(file) else {
@@ -174,68 +164,46 @@ impl Evaluator for SubString {
     }
 }
 
+pub(crate) enum TrimWhere {
+    Head,
+    Tail,
+    Both,
+}
 pub(crate) fn new_trim(
-    str: &Expr,
-    trim_where: &Option<TrimWhereField>,
-    what: &Option<Box<Expr>>,
+    mut args: VecDeque<Box<dyn Evaluator>>,
+    trim_where: TrimWhere,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
-    let str = get_eval(str)?;
+    if args.len() > 1 {
+        return Err(FindItError::BadExpression(
+            "TRIM mut have only one argument".into(),
+        ));
+    }
+    let Some(str) = args.pop_front() else {
+        return Err(FindItError::BadExpression(
+            "TRIM mut have one argument".into(),
+        ));
+    };
     if str.expected_type() != ValueType::String {
         return Err(FindItError::BadExpression(
             "TRIM can only work with strings".into(),
         ));
     }
-    let trim_where = trim_where.unwrap_or(TrimWhereField::Both);
-    let what = if let Some(what) = what {
-        let what = get_eval(what)?;
-        if what.expected_type() != ValueType::String {
-            return Err(FindItError::BadExpression(
-                "TRIM can only trim strings".into(),
-            ));
-        }
-        Some(what)
-    } else {
-        None
-    };
-    Ok(Box::new(Trim {
-        str,
-        trim_where,
-        what,
-    }))
+    Ok(Box::new(Trim { str, trim_where }))
 }
 
 struct Trim {
     str: Box<dyn Evaluator>,
-    trim_where: TrimWhereField,
-    what: Option<Box<dyn Evaluator>>,
+    trim_where: TrimWhere,
 }
 impl Evaluator for Trim {
     fn eval(&self, file: &FileWrapper) -> Value {
         let Value::String(str) = self.str.eval(file) else {
             return Value::Empty;
         };
-        if let Some(what) = &self.what {
-            let Value::String(what) = what.eval(file) else {
-                return Value::Empty;
-            };
-            if what.is_empty() {
-                return str.into();
-            }
-            let mut chars = HashSet::new();
-            for c in what.chars() {
-                chars.insert(c);
-            }
-            match self.trim_where {
-                TrimWhereField::Leading => str.trim_start_matches(|c| chars.contains(&c)),
-                TrimWhereField::Trailing => str.trim_end_matches(|c| chars.contains(&c)),
-                TrimWhereField::Both => str.trim_matches(|c| chars.contains(&c)),
-            }
-        } else {
-            match self.trim_where {
-                TrimWhereField::Leading => str.trim_start(),
-                TrimWhereField::Trailing => str.trim_end(),
-                TrimWhereField::Both => str.trim(),
-            }
+        match self.trim_where {
+            TrimWhere::Head => str.trim_start(),
+            TrimWhere::Tail => str.trim_end(),
+            TrimWhere::Both => str.trim(),
         }
         .into()
     }
@@ -257,19 +225,19 @@ mod tests {
 
     #[test]
     fn regex_no_string_expr() {
-        let err = read_expr("1 RLIKE 'a'").err();
+        let err = read_expr("1 MATCHES \"a\"").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn regex_no_string_pattern() {
-        let err = read_expr("'a' RLIKE 1").err();
+        let err = read_expr("\"a\" matches 1").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn regex_null_expr_return_empty() {
-        let eval = read_expr("content RLIKE 'abc'").unwrap();
+        let eval = read_expr("content MATCHES \"abc\"").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -278,7 +246,7 @@ mod tests {
 
     #[test]
     fn regex_null_pattern_return_empty() {
-        let eval = read_expr("'abc' RLIKE content").unwrap();
+        let eval = read_expr("\"abc\" MATCHES content").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -287,7 +255,7 @@ mod tests {
 
     #[test]
     fn regex_bad_pattern_return_empty() {
-        let eval = read_expr("'abc' RLIKE '['").unwrap();
+        let eval = read_expr("\"abc\" MATCHES \"[\"").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -296,7 +264,7 @@ mod tests {
 
     #[test]
     fn position_no_string_expr() {
-        let err = read_expr("POSITION('txt' IN 12)").err();
+        let err = read_expr("POSITION(\"txt\" IN 12)").err();
         assert!(err.is_some())
     }
 
@@ -308,13 +276,13 @@ mod tests {
 
     #[test]
     fn position_expect_number() {
-        let expr = read_expr("POSITION('a' IN path)").unwrap();
+        let expr = read_expr("POSITION(\"a\" IN path)").unwrap();
         assert_eq!(expr.expected_type(), ValueType::Number);
     }
 
     #[test]
     fn position_null_expr_return_empty() {
-        let eval = read_expr("POSITION(content IN 'abc')").unwrap();
+        let eval = read_expr("POSITION(content IN \"abc\")").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -323,7 +291,7 @@ mod tests {
 
     #[test]
     fn position_null_str_return_empty() {
-        let eval = read_expr("POSITION('abc' IN content)").unwrap();
+        let eval = read_expr("POSITION(\"abc\" IN content)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -362,7 +330,7 @@ mod tests {
 
     #[test]
     fn substring_null_for_return_empty() {
-        let eval = read_expr("SUBSTRING('abc' FOR length)").unwrap();
+        let eval = read_expr("SUBSTRING(\"abc\" FOR length)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -371,7 +339,7 @@ mod tests {
 
     #[test]
     fn substring_null_from_return_empty() {
-        let eval = read_expr("SUBSTRING('abc' FROM length)").unwrap();
+        let eval = read_expr("SUBSTRING(\"abc\" FROM length)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -394,12 +362,6 @@ mod tests {
     }
 
     #[test]
-    fn trim_no_string_chars() {
-        let err = read_expr("TRIM(12 FROM 'text')").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
     fn trim_null_str_return_empty() {
         let eval = read_expr("TRIM(content)").unwrap();
         let path = Path::new("no/such/file");
@@ -409,26 +371,8 @@ mod tests {
     }
 
     #[test]
-    fn trim_null_chars_return_empty() {
-        let eval = read_expr("TRIM(content FROM 'abc')").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn trim_empty_chars_return_text() {
-        let eval = read_expr("TRIM('' FROM 'abc')").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, "abc".into())
-    }
-
-    #[test]
     fn trim_expect_string() {
-        let expr = read_expr("TRIM('')").unwrap();
+        let expr = read_expr("TRIM(\"\")").unwrap();
         assert_eq!(expr.expected_type(), ValueType::String);
     }
 }
