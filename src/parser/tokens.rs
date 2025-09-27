@@ -1111,4 +1111,55 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn bw_and() -> Result<(), TokenError> {
+        let str = "&";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::BinaryOperator(BinaryOperator::BitwiseOperator(
+                BitwiseOperator::And
+            )))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn bw_or() -> Result<(), TokenError> {
+        let str = "|";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::BinaryOperator(BinaryOperator::BitwiseOperator(
+                BitwiseOperator::Or
+            )))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn bw_xor() -> Result<(), TokenError> {
+        let str = "^";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::BinaryOperator(BinaryOperator::BitwiseOperator(
+                BitwiseOperator::Xor
+            )))
+        );
+
+        Ok(())
+    }
 }

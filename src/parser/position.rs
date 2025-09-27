@@ -40,3 +40,23 @@ pub(super) fn build_position(
         super_string,
     )))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::expression::parse_expression;
+
+    #[test]
+    fn test_position_just_name() {
+        let source = "position";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+    #[test]
+    fn test_position_with_no_open_brackets() {
+        let source = "position +";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+}

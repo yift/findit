@@ -100,4 +100,12 @@ mod tests {
 
         assert_eq!(span, Some(Span { start: 4, end: 5 }));
     }
+
+    #[test]
+    fn new_with_err_display() {
+        let err = lex("10 + { 20 }").err().unwrap();
+        let str = err.to_string();
+
+        assert_eq!(str, "Error: Unknown character: { at: At 4 - 5");
+    }
 }

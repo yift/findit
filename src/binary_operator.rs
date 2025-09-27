@@ -574,6 +574,7 @@ mod tests {
     use std::path::Path;
 
     use crate::{
+        errors::FindItError,
         expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
@@ -880,5 +881,158 @@ mod tests {
     fn xor_expect_bool() {
         let eval = read_expr("TRUE XOR FALSE").unwrap();
         assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn non_numeric_bitwise_left_operator() {
+        let err = read_expr("parent & 10").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn non_numeric_bitwise_right_operator() {
+        let err = read_expr("10 ^ parent").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn or_bitwise_expected_type() -> Result<(), FindItError> {
+        let expr = read_expr("10 | 20")?;
+
+        assert_eq!(expr.expected_type(), ValueType::Number);
+
+        Ok(())
+    }
+
+    #[test]
+    fn and_bitwise_expected_type() -> Result<(), FindItError> {
+        let expr = read_expr("10 & 20")?;
+
+        assert_eq!(expr.expected_type(), ValueType::Number);
+
+        Ok(())
+    }
+
+    #[test]
+    fn xor_bitwise_expected_type() -> Result<(), FindItError> {
+        let expr = read_expr("10 ^ 20")?;
+
+        assert_eq!(expr.expected_type(), ValueType::Number);
+
+        Ok(())
+    }
+
+    #[test]
+    fn or_bitwise() -> Result<(), FindItError> {
+        let expr = read_expr("0x10 | 0x20")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Number(0x30));
+
+        Ok(())
+    }
+
+    #[test]
+    fn and_bitwise() -> Result<(), FindItError> {
+        let expr = read_expr("0x30 & 0x23")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Number(0x20));
+
+        Ok(())
+    }
+
+    #[test]
+    fn xor_bitwise() -> Result<(), FindItError> {
+        let expr = read_expr("0x3 ^ 0x5")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Number(0x6));
+
+        Ok(())
+    }
+
+    #[test]
+    fn or_bitwise_no_left() -> Result<(), FindItError> {
+        let expr = read_expr("length | 0x20")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn or_bitwise_no_right() -> Result<(), FindItError> {
+        let expr = read_expr("0x20 | length")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn and_bitwise_no_left() -> Result<(), FindItError> {
+        let expr = read_expr("length & 0x20")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn and_bitwise_no_right() -> Result<(), FindItError> {
+        let expr = read_expr("0x20 & length")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn xor_bitwise_no_left() -> Result<(), FindItError> {
+        let expr = read_expr("length ^ 0x20")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn xor_bitwise_no_right() -> Result<(), FindItError> {
+        let expr = read_expr("0x20 ^ length")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn of_of_number() {
+        let err = read_expr("parent of 10").err();
+        assert!(err.is_some())
     }
 }

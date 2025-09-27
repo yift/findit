@@ -193,14 +193,11 @@ mod tests {
         assert!(err.is_some());
     }
 
-
     #[test]
     fn test_exec_nothing_if_nothing_to_execute() -> Result<(), FindItError> {
-
         let sql = "exec(content)";
         let expr = read_expr(sql).unwrap();
-        let file =
-            Path::new("no/such/file/text.txt").to_path_buf();
+        let file = Path::new("no/such/file/text.txt").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
 
         let value = expr.eval(&wrapper);
@@ -208,5 +205,4 @@ mod tests {
         assert_eq!(value, Value::Empty);
         Ok(())
     }
-
 }

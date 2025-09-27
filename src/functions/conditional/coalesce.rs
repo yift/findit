@@ -45,14 +45,16 @@ pub(crate) fn build_coalesce(
     Ok(Box::new(Coalesce { args, value_type }))
 }
 
-
 #[cfg(test)]
 mod tests {
 
     use std::{fs, path::Path};
 
     use crate::{
-        errors::FindItError, expr::read_expr, file_wrapper::FileWrapper, value::{Value, ValueType}
+        errors::FindItError,
+        expr::read_expr,
+        file_wrapper::FileWrapper,
+        value::{Value, ValueType},
     };
 
     #[test]
@@ -63,7 +65,6 @@ mod tests {
         assert!(err.is_some());
     }
 
-
     #[test]
     fn coalesce_with_args_with_different_type() {
         let sql = "Coalesce(1, true)";
@@ -72,9 +73,8 @@ mod tests {
         assert!(err.is_some());
     }
 
-
     #[test]
-    fn coalesce_return_value()-> Result<(), FindItError> {
+    fn coalesce_return_value() -> Result<(), FindItError> {
         let sql = "Coalesce(1)";
         let eval = read_expr(sql)?;
 
@@ -84,14 +84,12 @@ mod tests {
     }
 
     #[test]
-    fn coalesce_return_first_non_empty_value()-> Result<(), FindItError> {
+    fn coalesce_return_first_non_empty_value() -> Result<(), FindItError> {
         let sql = "Coalesce(parent.content, parent.parent.content, content, \"text\")";
         let eval = read_expr(sql)?;
         let file = Path::new("tests/test_cases/display/test_files/week-362.txt");
-        let expected = fs::read_to_string(&file)?;
+        let expected = fs::read_to_string(file)?;
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);
-
-
 
         assert_eq!(eval.eval(&wrapper), Value::String(expected));
 
@@ -99,17 +97,14 @@ mod tests {
     }
 
     #[test]
-    fn coalesce_return_empty_for_empty_value()-> Result<(), FindItError> {
+    fn coalesce_return_empty_for_empty_value() -> Result<(), FindItError> {
         let sql = "Coalesce(parent.content, parent.parent.content, content)";
         let eval = read_expr(sql)?;
         let file = Path::new("no/such/file.txt");
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);
 
-
-
         assert_eq!(eval.eval(&wrapper), Value::Empty);
 
         Ok(())
     }
-
 }

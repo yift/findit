@@ -77,3 +77,23 @@ pub(super) fn build_spawn_or_exec(
         spawn, bin, args, into,
     )))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::expression::parse_expression;
+
+    #[test]
+    fn test_spawn_just_spawn() {
+        let source = "spawn";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+    #[test]
+    fn test_spawn_with_no_open_brackets() {
+        let source = "spawn 3";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+}

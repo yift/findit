@@ -90,3 +90,64 @@ pub(super) fn build_substring(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::expression::parse_expression;
+
+    #[test]
+    fn test_substr_just_name() {
+        let source = "substr";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_no_open_brackets() {
+        let source = "subString +";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_no_for_no_from() {
+        let source = "subString(name)";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_nothing_after_name() {
+        let source = "subString(name";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_nothing_after_from() {
+        let source = "subString(name from 1";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_nothing_after_for() {
+        let source = "subString(name for 10";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_substr_with_nothing_after_from_with_from() {
+        let source = "subString(name from 1 for";
+        let err = parse_expression(source).err();
+
+        assert!(err.is_some());
+    }
+}
