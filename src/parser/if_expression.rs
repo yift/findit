@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -24,16 +24,6 @@ impl If {
             then_branch: Box::new(then_branch),
             else_branch: else_branch.map(Box::new),
         }
-    }
-}
-
-impl Display for If {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "IF {} THEN {}", self.condition, self.then_branch)?;
-        if let Some(e) = &self.else_branch {
-            write!(f, " ELSE {}", e)?;
-        }
-        write!(f, " END")
     }
 }
 

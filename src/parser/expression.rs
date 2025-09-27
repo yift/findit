@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 use thiserror::Error;
 
 use crate::{
@@ -39,27 +39,6 @@ pub(crate) enum Expression {
     Function(Function),
     SpawnOrExecute(SpawnOrExecute),
     SelfDivide(SelfDivide),
-}
-
-impl Display for Expression {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Expression::Literal(l) => l.fmt(f),
-            Expression::Binary(e) => write!(f, "{}", e),
-            Expression::Brackets(e) => write!(f, "({})", e),
-            Expression::Negate(n) => write!(f, "{}", n),
-            Expression::Access(a) => write!(f, "{}", a),
-            Expression::IsCheck(c) => write!(f, "{}", c),
-            Expression::If(c) => write!(f, "{}", c),
-            Expression::Case(c) => write!(f, "{}", c),
-            Expression::Between(c) => write!(f, "{}", c),
-            Expression::Position(p) => write!(f, "{}", p),
-            Expression::Substring(s) => write!(f, "{}", s),
-            Expression::Function(s) => write!(f, "{}", s),
-            Expression::SpawnOrExecute(e) => write!(f, "{}", e),
-            Expression::SelfDivide(e) => write!(f, "{}", e),
-        }
-    }
 }
 
 #[derive(Error, Debug)]

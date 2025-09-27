@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::parser::{expression::Expression, operator::BinaryOperator};
 
 #[derive(Debug, PartialEq)]
@@ -16,10 +14,5 @@ impl BinaryExpression {
             operator,
             right: Box::new(right),
         }
-    }
-}
-impl Display for BinaryExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{} {} {}]", self.left, self.operator, self.right)
     }
 }

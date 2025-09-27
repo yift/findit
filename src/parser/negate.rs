@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::parser::expression::Expression;
 
 #[derive(Debug, PartialEq)]
@@ -11,10 +9,5 @@ impl Negate {
         Self {
             expression: Box::new(expression),
         }
-    }
-}
-impl Display for Negate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(NOT {})", self.expression)
     }
 }

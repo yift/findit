@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -35,20 +35,6 @@ impl Case {
         }
     }
 }
-
-impl Display for Case {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "CASE ")?;
-        for branch in &self.branches {
-            write!(f, "WHEN {} THEN {} ", branch.condition, branch.outcome)?;
-        }
-        if let Some(e) = &self.default_outcome {
-            write!(f, " ELSE {}", e)?;
-        }
-        write!(f, " END")
-    }
-}
-
 pub(super) fn build_case(
     lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
     case_span: &Span,

@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -25,16 +25,6 @@ impl Between {
             lower_limit: Box::new(lower_limit),
             upper_limit: Box::new(upper_limit),
         }
-    }
-}
-
-impl Display for Between {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{} BETWEEN {} AND {}",
-            self.reference, self.lower_limit, self.upper_limit
-        )
     }
 }
 

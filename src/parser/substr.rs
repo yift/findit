@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -27,18 +27,6 @@ impl Substring {
     }
 }
 
-impl Display for Substring {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "SUBSTRING({} ", self.super_string)?;
-        if let Some(substring_from) = &self.substring_from {
-            write!(f, "FROM {}", substring_from)?;
-        };
-        if let Some(substring_for) = &self.substring_for {
-            write!(f, "FROM {}", substring_for)?;
-        };
-        write!(f, ")")
-    }
-}
 pub(super) fn build_substring(
     lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
 ) -> Result<Expression, ParserError> {

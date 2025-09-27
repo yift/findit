@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub(crate) enum StringFunctionName {
     Trim,
@@ -18,35 +16,6 @@ pub(crate) enum EnvFunctionName {
 pub(crate) enum FunctionName {
     String(StringFunctionName),
     Env(EnvFunctionName),
-}
-
-impl Display for StringFunctionName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            StringFunctionName::Trim => write!(f, "Trim"),
-            StringFunctionName::TrimHead => write!(f, "TrimHead"),
-            StringFunctionName::TrimTail => write!(f, "TrimTail"),
-        }
-    }
-}
-
-impl Display for EnvFunctionName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            EnvFunctionName::Rand => write!(f, "Rand"),
-            EnvFunctionName::Env => write!(f, "Env"),
-            EnvFunctionName::Coalesce => write!(f, "Coalesce"),
-            EnvFunctionName::ExecOut => write!(f, "ExecOut"),
-        }
-    }
-}
-impl Display for FunctionName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FunctionName::Env(e) => write!(f, "{}", e),
-            FunctionName::String(e) => write!(f, "{}", e),
-        }
-    }
 }
 
 impl FunctionName {

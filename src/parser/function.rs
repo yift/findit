@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -16,18 +16,6 @@ pub(crate) struct Function {
 impl Function {
     pub(crate) fn new(name: FunctionName, args: Vec<Expression>) -> Self {
         Self { name, args }
-    }
-}
-impl Display for Function {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}(", self.name)?;
-        for (i, arg) in self.args.iter().enumerate() {
-            if i != 0 {
-                write!(f, " ,")?;
-            }
-            write!(f, "{}", arg)?;
-        }
-        write!(f, ")")
     }
 }
 pub(super) fn build_function(

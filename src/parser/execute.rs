@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -27,26 +27,6 @@ impl SpawnOrExecute {
             args,
             into: into.map(Box::new),
         }
-    }
-}
-impl Display for SpawnOrExecute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.spawn {
-            write!(f, "SPAWN")?;
-        } else {
-            write!(f, "EXECUTE")?;
-        }
-        write!(f, "(")?;
-        for (i, arg) in self.args.iter().enumerate() {
-            if i != 0 {
-                write!(f, " ,")?;
-            }
-            write!(f, "{}", arg)?;
-        }
-        if let Some(into) = &self.into {
-            write!(f, " INTO {}", into)?;
-        }
-        write!(f, ")")
     }
 }
 pub(super) fn build_spawn_or_exec(

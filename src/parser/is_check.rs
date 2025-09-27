@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     parser::{
         expression::{Expression, ParserError},
@@ -31,19 +29,6 @@ impl IsCheck {
             check_type,
             negate,
         }
-    }
-}
-
-impl Display for IsCheck {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let tp = match self.check_type {
-            IsType::False => "FALSE",
-            IsType::True => "TRUE",
-            IsType::None => "NONE",
-            IsType::Some => "SOME",
-        };
-        let negate = if self.negate { " NOT" } else { "" };
-        write!(f, "({} IS{negate} {tp})", self.expression)
     }
 }
 

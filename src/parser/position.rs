@@ -1,4 +1,4 @@
-use std::{fmt::Display, iter::Peekable};
+use std::iter::Peekable;
 
 use crate::parser::{
     expression::{Expression, ParserError, build_expression_with_priority},
@@ -18,12 +18,6 @@ impl Position {
             sub_string: Box::new(sub_string),
             super_string: Box::new(super_string),
         }
-    }
-}
-
-impl Display for Position {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "POSITION({} IN {})", self.sub_string, self.super_string,)
     }
 }
 
