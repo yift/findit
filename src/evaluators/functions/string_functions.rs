@@ -175,12 +175,12 @@ pub(crate) fn new_trim(
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     if args.len() > 1 {
         return Err(FindItError::BadExpression(
-            "TRIM mut have only one argument".into(),
+            "TRIM must have only one argument".into(),
         ));
     }
     let Some(str) = args.pop_front() else {
         return Err(FindItError::BadExpression(
-            "TRIM mut have one argument".into(),
+            "TRIM must have one argument".into(),
         ));
     };
     if str.expected_type() != ValueType::String {
@@ -217,12 +217,12 @@ pub(crate) fn new_length(
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     if args.len() > 1 {
         return Err(FindItError::BadExpression(
-            "Length mut have only one argument".into(),
+            "Length must have only one argument".into(),
         ));
     }
     let Some(str) = args.pop_front() else {
         return Err(FindItError::BadExpression(
-            "Length mut have one argument".into(),
+            "Length must have one argument".into(),
         ));
     };
     if str.expected_type() != ValueType::String {
@@ -245,6 +245,78 @@ impl Evaluator for Length {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Number
+    }
+}
+
+pub(crate) fn new_lower(
+    mut args: VecDeque<Box<dyn Evaluator>>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    if args.len() > 1 {
+        return Err(FindItError::BadExpression(
+            "Lower must have only one argument".into(),
+        ));
+    }
+    let Some(str) = args.pop_front() else {
+        return Err(FindItError::BadExpression(
+            "Length must have one argument".into(),
+        ));
+    };
+    if str.expected_type() != ValueType::String {
+        return Err(FindItError::BadExpression(
+            "Length can only work with strings".into(),
+        ));
+    }
+    Ok(Box::new(Lower { str }))
+}
+
+struct Lower {
+    str: Box<dyn Evaluator>,
+}
+impl Evaluator for Lower {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(str) = self.str.eval(file) else {
+            return Value::Empty;
+        };
+        str.to_lowercase().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+}
+
+pub(crate) fn new_upper(
+    mut args: VecDeque<Box<dyn Evaluator>>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    if args.len() > 1 {
+        return Err(FindItError::BadExpression(
+            "Upper must have only one argument".into(),
+        ));
+    }
+    let Some(str) = args.pop_front() else {
+        return Err(FindItError::BadExpression(
+            "Upper must have one argument".into(),
+        ));
+    };
+    if str.expected_type() != ValueType::String {
+        return Err(FindItError::BadExpression(
+            "Upper can only work with strings".into(),
+        ));
+    }
+    Ok(Box::new(Upper { str }))
+}
+
+struct Upper {
+    str: Box<dyn Evaluator>,
+}
+impl Evaluator for Upper {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(str) = self.str.eval(file) else {
+            return Value::Empty;
+        };
+        str.to_uppercase().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
     }
 }
 
@@ -424,8 +496,6 @@ mod tests {
         assert_eq!(expr.expected_type(), ValueType::String);
     }
 
-    ///QQQ
-
     #[test]
     fn length_no_string_expr() {
         let err = read_expr("LEN(12)").err();
@@ -467,5 +537,91 @@ mod tests {
         let value = eval.eval(&wrapper);
 
         assert_eq!(value, Value::Number(3))
+    }
+
+    #[test]
+    fn lower_no_string_expr() {
+        let err = read_expr("Lower(12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn lower_no_args() {
+        let err = read_expr("lower()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn lower_too_many_args() {
+        let err = read_expr("lower(\"abc\", \"def\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn lower_null_str_return_empty() {
+        let eval = read_expr("lower(content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn lower_expect_string() {
+        let expr = read_expr("lower(\"test\")").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::String);
+    }
+
+    #[test]
+    fn lower_return_the_correct_value() {
+        let eval = read_expr("lower(\"abcDEF\")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::String("abcdef".into()))
+    }
+
+    #[test]
+    fn upper_no_string_expr() {
+        let err = read_expr("Upper(12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn upper_no_args() {
+        let err = read_expr("upper()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn upper_too_many_args() {
+        let err = read_expr("upper(\"abc\", \"def\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn upper_null_str_return_empty() {
+        let eval = read_expr("upper(content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn upper_expect_string() {
+        let expr = read_expr("upper(\"test\")").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::String);
+    }
+
+    #[test]
+    fn upper_return_the_correct_value() {
+        let eval = read_expr("upper(\"abcDEF\")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::String("ABCDEF".into()))
     }
 }

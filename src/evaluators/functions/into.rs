@@ -8,7 +8,7 @@ use crate::{
             conditional::{coalesce::build_coalesce, random::build_rand},
             env::build_env,
             spawn::exec::build_capture_output_exec,
-            string_functions::{TrimWhere, new_length, new_trim},
+            string_functions::{TrimWhere, new_length, new_lower, new_trim, new_upper},
         },
     },
     parser::ast::{
@@ -53,6 +53,8 @@ fn new_string_function(
         StringFunctionName::TrimHead => new_trim(args, TrimWhere::Head),
         StringFunctionName::TrimTail => new_trim(args, TrimWhere::Tail),
         StringFunctionName::Length => new_length(args),
+        StringFunctionName::Lower => new_lower(args),
+        StringFunctionName::Upper => new_upper(args),
     }
 }
 

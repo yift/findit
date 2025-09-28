@@ -4,6 +4,8 @@ pub(crate) enum StringFunctionName {
     TrimHead,
     TrimTail,
     Length,
+    Upper,
+    Lower,
 }
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub(crate) enum EnvFunctionName {

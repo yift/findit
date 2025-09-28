@@ -13,6 +13,8 @@ impl FunctionName {
                 Some(FunctionName::Env(EnvFunctionName::ExecOut))
             }
             "LENGTH" | "LEN" => Some(FunctionName::String(StringFunctionName::Length)),
+            "UPPER" => Some(FunctionName::String(StringFunctionName::Upper)),
+            "LOWER" => Some(FunctionName::String(StringFunctionName::Lower)),
             _ => None,
         }
     }
