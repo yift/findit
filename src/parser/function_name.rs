@@ -1,4 +1,6 @@
-use crate::parser::ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName};
+use crate::parser::ast::function_name::{
+    EnvFunctionName, FunctionName, StringFunctionName, TimeFunctionName,
+};
 
 impl FunctionName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -15,6 +17,7 @@ impl FunctionName {
             "LENGTH" | "LEN" => Some(FunctionName::String(StringFunctionName::Length)),
             "UPPER" => Some(FunctionName::String(StringFunctionName::Upper)),
             "LOWER" => Some(FunctionName::String(StringFunctionName::Lower)),
+            "NOW" => Some(FunctionName::Time(TimeFunctionName::Now)),
             _ => None,
         }
     }

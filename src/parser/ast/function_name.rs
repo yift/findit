@@ -14,9 +14,14 @@ pub(crate) enum EnvFunctionName {
     Coalesce,
     ExecOut,
 }
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub(crate) enum TimeFunctionName {
+    Now,
+}
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub(crate) enum FunctionName {
     String(StringFunctionName),
     Env(EnvFunctionName),
+    Time(TimeFunctionName),
 }

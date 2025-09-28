@@ -9,11 +9,12 @@ use crate::{
             env::build_env,
             spawn::exec::build_capture_output_exec,
             string_functions::{TrimWhere, new_length, new_lower, new_trim, new_upper},
+            time::now::build_now,
         },
     },
     parser::ast::{
         function::Function,
-        function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+        function_name::{EnvFunctionName, FunctionName, StringFunctionName, TimeFunctionName},
     },
 };
 
@@ -29,6 +30,7 @@ impl TryFrom<&Function> for Box<dyn Evaluator> {
         match &function.name {
             FunctionName::Env(env) => new_env_function(env, args),
             FunctionName::String(string) => new_string_function(string, args),
+            FunctionName::Time(time) => new_time_function(time, args),
         }
     }
 }
@@ -55,6 +57,15 @@ fn new_string_function(
         StringFunctionName::Length => new_length(args),
         StringFunctionName::Lower => new_lower(args),
         StringFunctionName::Upper => new_upper(args),
+    }
+}
+
+fn new_time_function(
+    name: &TimeFunctionName,
+    args: VecDeque<Box<dyn Evaluator>>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    match name {
+        TimeFunctionName::Now => build_now(args),
     }
 }
 
