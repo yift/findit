@@ -10,35 +10,37 @@ use crate::{
     value::{Value, ValueType},
 };
 
-pub(crate) fn get_extractor(access: &Access) -> Box<dyn Evaluator> {
-    match access {
-        Access::Parent => Box::new(ParentExtractor {}),
+impl From<&Access> for Box<dyn Evaluator> {
+    fn from(access: &Access) -> Self {
+        match access {
+            Access::Parent => Box::new(ParentExtractor {}),
 
-        Access::Name => Box::new(NameExtractor {}),
-        Access::Path => Box::new(PathExtractor {}),
-        Access::Extension => Box::new(ExtensionExtractor {}),
-        Access::Absolute => Box::new(AbsoluteExtractor {}),
-        Access::Me => Box::new(MeExtractor {}),
+            Access::Name => Box::new(NameExtractor {}),
+            Access::Path => Box::new(PathExtractor {}),
+            Access::Extension => Box::new(ExtensionExtractor {}),
+            Access::Absolute => Box::new(AbsoluteExtractor {}),
+            Access::Me => Box::new(MeExtractor {}),
 
-        Access::Content => Box::new(ContentExtractor {}),
-        Access::Length => Box::new(LengthExtractor {}),
-        Access::Depth => Box::new(DepthExtractor {}),
+            Access::Content => Box::new(ContentExtractor {}),
+            Access::Length => Box::new(LengthExtractor {}),
+            Access::Depth => Box::new(DepthExtractor {}),
 
-        Access::Size => Box::new(SizeExtractor {}),
-        Access::Count => Box::new(CountExtractor {}),
-        Access::Created => Box::new(CreatedExtractor {}),
-        Access::Modified => Box::new(ModifiedExtractor {}),
-        Access::Exists => Box::new(ExistsExtractor {}),
-        Access::IsDir => Box::new(IsDirExtractor { negate: false }),
-        Access::IsFile => Box::new(IsFileExtractor { negate: false }),
-        Access::IsLink => Box::new(IsLinkExtractor { negate: false }),
-        Access::IsNotDir => Box::new(IsDirExtractor { negate: true }),
-        Access::IsNotFile => Box::new(IsFileExtractor { negate: true }),
-        Access::IsNotLink => Box::new(IsLinkExtractor { negate: true }),
+            Access::Size => Box::new(SizeExtractor {}),
+            Access::Count => Box::new(CountExtractor {}),
+            Access::Created => Box::new(CreatedExtractor {}),
+            Access::Modified => Box::new(ModifiedExtractor {}),
+            Access::Exists => Box::new(ExistsExtractor {}),
+            Access::IsDir => Box::new(IsDirExtractor { negate: false }),
+            Access::IsFile => Box::new(IsFileExtractor { negate: false }),
+            Access::IsLink => Box::new(IsLinkExtractor { negate: false }),
+            Access::IsNotDir => Box::new(IsDirExtractor { negate: true }),
+            Access::IsNotFile => Box::new(IsFileExtractor { negate: true }),
+            Access::IsNotLink => Box::new(IsLinkExtractor { negate: true }),
 
-        Access::Owner => Box::new(OwnerExtractor {}),
-        Access::Group => Box::new(GroupExtractor {}),
-        Access::Permissions => Box::new(PermissionsExtractor {}),
+            Access::Owner => Box::new(OwnerExtractor {}),
+            Access::Group => Box::new(GroupExtractor {}),
+            Access::Permissions => Box::new(PermissionsExtractor {}),
+        }
     }
 }
 
@@ -265,7 +267,7 @@ mod tests {
     fn test_file_creation() -> Result<(), FindItError> {
         let file = env::current_dir()?;
         let creation = file.metadata()?.created()?;
-        let exe = get_extractor(&Access::Created);
+        let exe: Box<dyn Evaluator> = (&Access::Created).into();
         let wrapper = FileWrapper::new(file, 1);
 
         let value = exe.eval(&wrapper);

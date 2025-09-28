@@ -15,16 +15,19 @@ use crate::{
     string_functions::{TrimWhere, new_trim},
 };
 
-pub(crate) fn new_function(function: &Function) -> Result<Box<dyn Evaluator>, FindItError> {
-    let mut args = VecDeque::new();
+impl TryFrom<&Function> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(function: &Function) -> Result<Self, Self::Error> {
+        let mut args = VecDeque::new();
 
-    for expr in &function.args {
-        let eval = get_eval(expr)?;
-        args.push_back(eval);
-    }
-    match &function.name {
-        FunctionName::Env(env) => new_env_function(env, args),
-        FunctionName::String(string) => new_string_function(string, args),
+        for expr in &function.args {
+            let eval = get_eval(expr)?;
+            args.push_back(eval);
+        }
+        match &function.name {
+            FunctionName::Env(env) => new_env_function(env, args),
+            FunctionName::String(string) => new_string_function(string, args),
+        }
     }
 }
 

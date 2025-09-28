@@ -41,28 +41,31 @@ impl Evaluator for IfWithElse {
     }
 }
 
-pub(crate) fn build_if(iff: &IfExpression) -> Result<Box<dyn Evaluator>, FindItError> {
-    let condition = get_eval(&iff.condition)?;
-    if condition.expected_type() != ValueType::Bool {
-        return Err(FindItError::BadExpression(
-            "IF condition must be boolean.".into(),
-        ));
-    }
-    let then = get_eval(&iff.then_branch)?;
-    if let Some(else_branch) = &iff.else_branch {
-        let else_branch = get_eval(else_branch)?;
-        if else_branch.expected_type() != then.expected_type() {
+impl TryFrom<&IfExpression> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(value: &IfExpression) -> Result<Self, Self::Error> {
+        let condition = get_eval(&value.condition)?;
+        if condition.expected_type() != ValueType::Bool {
             return Err(FindItError::BadExpression(
-                "IF results must be the same.".into(),
+                "IF condition must be boolean.".into(),
             ));
         }
-        Ok(Box::new(IfWithElse {
-            condition,
-            then,
-            else_branch,
-        }))
-    } else {
-        Ok(Box::new(NoElseIf { condition, then }))
+        let then = get_eval(&value.then_branch)?;
+        if let Some(else_branch) = &value.else_branch {
+            let else_branch = get_eval(else_branch)?;
+            if else_branch.expected_type() != then.expected_type() {
+                return Err(FindItError::BadExpression(
+                    "IF results must be the same.".into(),
+                ));
+            }
+            Ok(Box::new(IfWithElse {
+                condition,
+                then,
+                else_branch,
+            }))
+        } else {
+            Ok(Box::new(NoElseIf { condition, then }))
+        }
     }
 }
 

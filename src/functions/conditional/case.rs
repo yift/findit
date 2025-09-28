@@ -44,42 +44,45 @@ impl Evaluator for Case {
     }
 }
 
-pub(crate) fn new_case(case: &CaseExpression) -> Result<Box<dyn Evaluator>, FindItError> {
-    let mut value_type = ValueType::Empty;
-    let mut branches = vec![];
-    for b in &case.branches {
-        let b: Condition = b.try_into()?;
-        let expected_type = b.result.expected_type();
-        if expected_type != ValueType::Empty && value_type == ValueType::Empty {
-            value_type = expected_type;
-        } else if expected_type != ValueType::Empty && expected_type != value_type {
-            return Err(FindItError::BadExpression(
-                "CASE should result in the same type for all the branches".into(),
-            ));
-        }
-
-        branches.push(b);
-    }
-    let default = match &case.default_outcome {
-        None => None,
-        Some(d) => {
-            let d = get_eval(d)?;
-            if d.expected_type() != ValueType::Empty
-                && value_type != ValueType::Empty
-                && d.expected_type() != value_type
-            {
+impl TryFrom<&CaseExpression> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(case: &CaseExpression) -> Result<Self, Self::Error> {
+        let mut value_type = ValueType::Empty;
+        let mut branches = vec![];
+        for b in &case.branches {
+            let b: Condition = b.try_into()?;
+            let expected_type = b.result.expected_type();
+            if expected_type != ValueType::Empty && value_type == ValueType::Empty {
+                value_type = expected_type;
+            } else if expected_type != ValueType::Empty && expected_type != value_type {
                 return Err(FindItError::BadExpression(
-                    "CASE else should result in the same type as all the branches".into(),
+                    "CASE should result in the same type for all the branches".into(),
                 ));
             }
-            Some(d)
+
+            branches.push(b);
         }
-    };
-    Ok(Box::new(Case {
-        branches,
-        default,
-        value_type,
-    }))
+        let default = match &case.default_outcome {
+            None => None,
+            Some(d) => {
+                let d = get_eval(d)?;
+                if d.expected_type() != ValueType::Empty
+                    && value_type != ValueType::Empty
+                    && d.expected_type() != value_type
+                {
+                    return Err(FindItError::BadExpression(
+                        "CASE else should result in the same type as all the branches".into(),
+                    ));
+                }
+                Some(d)
+            }
+        };
+        Ok(Box::new(Case {
+            branches,
+            default,
+            value_type,
+        }))
+    }
 }
 
 #[cfg(test)]

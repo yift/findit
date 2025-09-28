@@ -50,18 +50,20 @@ impl Evaluator for Regexp {
     }
 }
 
-pub(crate) fn new_position(
-    position: &PositionExpression,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    let str = get_eval(&position.super_string)?;
-    let sub_str = get_eval(&position.sub_string)?;
+impl TryFrom<&PositionExpression> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(position: &PositionExpression) -> Result<Self, Self::Error> {
+        let str = get_eval(&position.super_string)?;
+        let sub_str = get_eval(&position.sub_string)?;
 
-    if (str.expected_type(), sub_str.expected_type()) != (ValueType::String, ValueType::String) {
-        return Err(FindItError::BadExpression(
-            "POSITION can only work with strings".into(),
-        ));
+        if (str.expected_type(), sub_str.expected_type()) != (ValueType::String, ValueType::String)
+        {
+            return Err(FindItError::BadExpression(
+                "POSITION can only work with strings".into(),
+            ));
+        }
+        Ok(Box::new(Position { str, sub_str }))
     }
-    Ok(Box::new(Position { str, sub_str }))
 }
 
 struct Position {
@@ -83,36 +85,39 @@ impl Evaluator for Position {
     }
 }
 
-pub(crate) fn new_substring(substr: &Substring) -> Result<Box<dyn Evaluator>, FindItError> {
-    let str = get_eval(&substr.super_string)?;
-    if str.expected_type() != ValueType::String {
-        return Err(FindItError::BadExpression(
-            "SUBSTRING can only work with strings".into(),
-        ));
+impl TryFrom<&Substring> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(substr: &Substring) -> Result<Self, Self::Error> {
+        let str = get_eval(&substr.super_string)?;
+        if str.expected_type() != ValueType::String {
+            return Err(FindItError::BadExpression(
+                "SUBSTRING can only work with strings".into(),
+            ));
+        }
+        let from = if let Some(from) = &substr.substring_from {
+            let from = get_eval(from)?;
+            if from.expected_type() != ValueType::Number {
+                return Err(FindItError::BadExpression(
+                    "SUBSTRING can only start from a number".into(),
+                ));
+            }
+            Some(from)
+        } else {
+            None
+        };
+        let length = if let Some(length) = &substr.substring_for {
+            let length = get_eval(length)?;
+            if length.expected_type() != ValueType::Number {
+                return Err(FindItError::BadExpression(
+                    "SUBSTRING can only have numeric length".into(),
+                ));
+            }
+            Some(length)
+        } else {
+            None
+        };
+        Ok(Box::new(SubString { str, from, length }))
     }
-    let from = if let Some(from) = &substr.substring_from {
-        let from = get_eval(from)?;
-        if from.expected_type() != ValueType::Number {
-            return Err(FindItError::BadExpression(
-                "SUBSTRING can only start from a number".into(),
-            ));
-        }
-        Some(from)
-    } else {
-        None
-    };
-    let length = if let Some(length) = &substr.substring_for {
-        let length = get_eval(length)?;
-        if length.expected_type() != ValueType::Number {
-            return Err(FindItError::BadExpression(
-                "SUBSTRING can only have numeric length".into(),
-            ));
-        }
-        Some(length)
-    } else {
-        None
-    };
-    Ok(Box::new(SubString { str, from, length }))
 }
 
 struct SubString {

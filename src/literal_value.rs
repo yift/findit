@@ -4,8 +4,10 @@ use crate::{
     value::{Value, ValueType},
 };
 
-pub(crate) fn new_literal_value(value: &Value) -> Box<dyn Evaluator> {
-    Box::new(value.clone())
+impl From<&Value> for Box<dyn Evaluator> {
+    fn from(value: &Value) -> Self {
+        Box::new(value.clone())
+    }
 }
 
 impl Evaluator for Value {

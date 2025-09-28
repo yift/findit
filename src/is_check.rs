@@ -57,34 +57,37 @@ impl Evaluator for IsSome {
     }
 }
 
-pub(crate) fn new_is_check(is_check: &IsCheck) -> Result<Box<dyn Evaluator>, FindItError> {
-    let evaluator = get_eval(&is_check.expression)?;
-    let checker: Box<dyn Evaluator> = match is_check.check_type {
-        IsType::True => {
-            if evaluator.expected_type() != ValueType::Bool {
-                return Err(FindItError::BadExpression(
-                    "IS (NOT) TRUE/FALSE must refer to a Boolean".into(),
-                ));
+impl TryFrom<&IsCheck> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(is_check: &IsCheck) -> Result<Self, Self::Error> {
+        let evaluator = get_eval(&is_check.expression)?;
+        let checker: Box<dyn Evaluator> = match is_check.check_type {
+            IsType::True => {
+                if evaluator.expected_type() != ValueType::Bool {
+                    return Err(FindItError::BadExpression(
+                        "IS (NOT) TRUE/FALSE must refer to a Boolean".into(),
+                    ));
+                }
+                Box::new(IsTrue { evaluator })
             }
-            Box::new(IsTrue { evaluator })
-        }
-        IsType::False => {
-            if evaluator.expected_type() != ValueType::Bool {
-                return Err(FindItError::BadExpression(
-                    "IS (NOT) TRUE/FALSE must refer to a Boolean".into(),
-                ));
+            IsType::False => {
+                if evaluator.expected_type() != ValueType::Bool {
+                    return Err(FindItError::BadExpression(
+                        "IS (NOT) TRUE/FALSE must refer to a Boolean".into(),
+                    ));
+                }
+                Box::new(IsFalse { evaluator })
             }
-            Box::new(IsFalse { evaluator })
-        }
-        IsType::None => Box::new(IsNone { evaluator }),
-        IsType::Some => Box::new(IsSome { evaluator }),
-    };
-    let checker = if is_check.negate {
-        make_negate(checker)
-    } else {
-        checker
-    };
-    Ok(checker)
+            IsType::None => Box::new(IsNone { evaluator }),
+            IsType::Some => Box::new(IsSome { evaluator }),
+        };
+        let checker = if is_check.negate {
+            make_negate(checker)
+        } else {
+            checker
+        };
+        Ok(checker)
+    }
 }
 
 #[cfg(test)]

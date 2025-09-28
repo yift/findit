@@ -1,20 +1,11 @@
 use crate::{
-    between::new_between,
     errors::FindItError,
-    extract::get_extractor,
     file_wrapper::FileWrapper,
-    functions::{
-        conditional::{case::new_case, if_func::build_if},
-        into::new_function,
-    },
-    is_check::new_is_check,
-    literal_value::new_literal_value,
     order::{OrderDirection, OrderItem},
     parser::{
         ast::expression::Expression, ast::order_by::OrderByDirection, parse_expression,
         parse_order_by,
     },
-    string_functions::{new_position, new_substring},
     value::{Value, ValueType},
 };
 
@@ -25,18 +16,18 @@ pub(crate) trait Evaluator {
 
 pub(crate) fn get_eval(expr: &Expression) -> Result<Box<dyn Evaluator>, FindItError> {
     match expr {
-        Expression::Literal(val) => Ok(new_literal_value(val)),
+        Expression::Literal(val) => Ok(val.into()),
         Expression::Binary(bin) => bin.try_into(),
         Expression::Negate(exp) => exp.try_into(),
         Expression::Brackets(expr) => get_eval(expr),
-        Expression::Access(access) => Ok(get_extractor(access)),
-        Expression::IsCheck(is_check) => new_is_check(is_check),
-        Expression::If(iff) => build_if(iff),
-        Expression::Case(case) => new_case(case),
-        Expression::Between(between) => new_between(between),
-        Expression::Position(position) => new_position(position),
-        Expression::Substring(substring) => new_substring(substring),
-        Expression::Function(func) => new_function(func),
+        Expression::Access(access) => Ok(access.into()),
+        Expression::IsCheck(is_check) => is_check.try_into(),
+        Expression::If(iff) => iff.try_into(),
+        Expression::Case(case) => case.try_into(),
+        Expression::Between(between) => between.try_into(),
+        Expression::Position(position) => position.try_into(),
+        Expression::Substring(substring) => substring.try_into(),
+        Expression::Function(func) => func.try_into(),
         Expression::SpawnOrExecute(spawn_or_exec) => spawn_or_exec.try_into(),
         Expression::SelfDivide(self_divide) => self_divide.try_into(),
     }
