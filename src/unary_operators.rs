@@ -74,6 +74,7 @@ mod tests {
     use std::path::Path;
 
     use crate::{
+        errors::FindItError,
         expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
@@ -104,5 +105,53 @@ mod tests {
     fn not_expect_bool() {
         let eval = read_expr("NOT TRUE").unwrap();
         assert_eq!(eval.expected_type(), ValueType::Bool)
+    }
+
+    #[test]
+    fn self_divide_number() {
+        let err = read_expr(" / 100").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn self_divide_string() -> Result<(), FindItError> {
+        let file = Path::new("tests/test_cases/display/test_files/other-247.txt");
+        let expr = read_expr("extension of (/ \"other-247.txt\")")?;
+
+        let wrapper = FileWrapper::new(file.parent().unwrap().to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::String("txt".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn self_divide_path() -> Result<(), FindItError> {
+        let file = Path::new("tests/test_cases/display/test_files/other-247.txt");
+        let expr = read_expr("extension of (/ 'other-247.txt')")?;
+
+        let wrapper = FileWrapper::new(file.parent().unwrap().to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::String("txt".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn self_divide_empty() -> Result<(), FindItError> {
+        let file = Path::new("/no/such/file");
+        let expr = read_expr("extension of (/ content)")?;
+
+        let wrapper = FileWrapper::new(file.parent().unwrap().to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
     }
 }
