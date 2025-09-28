@@ -1,21 +1,15 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::{execute::SpawnOrExecute, expression::Expression},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     tokens::Token,
 };
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct SpawnOrExecute {
-    pub(crate) spawn: bool,
-    pub(crate) bin: Box<Expression>,
-    pub(crate) args: Vec<Expression>,
-    pub(crate) into: Option<Box<Expression>>,
-}
-
 impl SpawnOrExecute {
-    pub(crate) fn new(
+    pub(super) fn new(
         spawn: bool,
         bin: Expression,
         args: Vec<Expression>,
@@ -80,7 +74,7 @@ pub(super) fn build_spawn_or_exec(
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::expression::parse_expression;
+    use crate::parser::parse_expression;
 
     #[test]
     fn test_spawn_just_spawn() {

@@ -1,63 +1,22 @@
 use std::iter::Peekable;
-use thiserror::Error;
 
-use crate::{
-    parser::{
-        access::Access,
-        between::{Between, build_between},
-        binary_expression::BinaryExpression,
-        case::{Case, build_case},
-        execute::{SpawnOrExecute, build_spawn_or_exec},
-        function::{Function, build_function},
-        if_expression::{If, build_if},
-        is_check::{IsCheck, IsType},
-        lexer::{LexerError, LexerItem, lex},
-        negate::Negate,
-        operator::{ArithmeticOperator, BinaryOperator, LogicalOperator},
-        position::{Position, build_position},
-        self_divide::SelfDivide,
-        span::Span,
-        substr::{Substring, build_substring},
-        tokens::Token,
-    },
-    value::Value,
+use crate::parser::{
+    ast::is_check::{IsCheck, IsType},
+    ast::negate::Negate,
+    ast::operator::{ArithmeticOperator, BinaryOperator, LogicalOperator},
+    ast::self_divide::SelfDivide,
+    ast::{access::Access, binary_expression::BinaryExpression, expression::Expression},
+    between::build_between,
+    case::build_case,
+    execute::build_spawn_or_exec,
+    function::build_function,
+    if_expression::build_if,
+    lexer::LexerItem,
+    parser_error::ParserError,
+    position::build_position,
+    substr::build_substring,
+    tokens::Token,
 };
-
-#[derive(Debug, PartialEq)]
-pub(crate) enum Expression {
-    Literal(Value),
-    Binary(BinaryExpression),
-    Negate(Negate),
-    Brackets(Box<Expression>),
-    Access(Access),
-    IsCheck(IsCheck),
-    If(If),
-    Case(Case),
-    Between(Between),
-    Position(Position),
-    Substring(Substring),
-    Function(Function),
-    SpawnOrExecute(SpawnOrExecute),
-    SelfDivide(SelfDivide),
-}
-
-#[derive(Error, Debug)]
-pub enum ParserError {
-    #[error("Lexer error: `{0}`")]
-    LexerError(#[from] LexerError),
-    #[error("Unexpected end of expression")]
-    UnexpectedEof,
-    #[error("Unexpected token at `{0}`")]
-    UnexpectedToken(Span),
-    #[error("Case without any branches `{0}`")]
-    NoBranches(Span),
-}
-
-pub(crate) fn parse_expression(source: &str) -> Result<Expression, ParserError> {
-    let mut lexer = lex(source)?;
-
-    build_expression_with_priority(&mut lexer, 0, |f| f.is_none())
-}
 
 fn build_brackets(
     lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
@@ -231,10 +190,22 @@ fn read_postfix_is(
 #[cfg(test)]
 mod tests {
 
-    use crate::parser::{
-        case::CaseBranch,
-        function_name::{EnvFunctionName, FunctionName, StringFunctionName},
-        operator::ComparisonOperator,
+    use crate::{
+        parser::{
+            ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+            ast::if_expression::If,
+            ast::position::Position,
+            ast::substr::Substring,
+            ast::{
+                between::Between,
+                case::{Case, CaseBranch},
+                execute::SpawnOrExecute,
+                function::Function,
+                operator::ComparisonOperator,
+            },
+            parse_expression,
+        },
+        value::Value,
     };
 
     use super::*;

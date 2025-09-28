@@ -1,17 +1,13 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
-    function_name::FunctionName,
+    ast::function_name::FunctionName,
+    ast::{expression::Expression, function::Function},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     tokens::Token,
 };
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct Function {
-    pub(crate) name: FunctionName,
-    pub(crate) args: Vec<Expression>,
-}
 
 impl Function {
     pub(crate) fn new(name: FunctionName, args: Vec<Expression>) -> Self {
@@ -51,7 +47,7 @@ pub(super) fn build_function(
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::expression::parse_expression;
+    use crate::parser::parse_expression;
 
     #[test]
     fn test_func_just_name() {

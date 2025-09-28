@@ -2,7 +2,7 @@ use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::if_expression::If as IfExpression,
+    parser::ast::if_expression::If as IfExpression,
     value::{Value, ValueType},
 };
 

@@ -54,7 +54,7 @@ pub(super) fn lex(
 #[cfg(test)]
 mod tests {
     use crate::{
-        parser::operator::{ArithmeticOperator, BinaryOperator},
+        parser::ast::operator::{ArithmeticOperator, BinaryOperator},
         value::Value,
     };
 

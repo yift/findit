@@ -1,17 +1,12 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::{expression::Expression, if_expression::If},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     tokens::Token,
 };
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct If {
-    pub(crate) condition: Box<Expression>,
-    pub(crate) then_branch: Box<Expression>,
-    pub(crate) else_branch: Option<Box<Expression>>,
-}
 
 impl If {
     pub(crate) fn new(

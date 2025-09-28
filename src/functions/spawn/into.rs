@@ -6,7 +6,7 @@ use crate::{
         execute::Executor,
         fire::build_fire,
     },
-    parser::execute::SpawnOrExecute,
+    parser::ast::execute::SpawnOrExecute,
     value::ValueType,
 };
 

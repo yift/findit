@@ -6,7 +6,7 @@ use uzers::{get_group_by_gid, get_user_by_uid};
 use crate::{
     expr::Evaluator,
     file_wrapper::FileWrapper,
-    parser::access::Access,
+    parser::ast::access::Access,
     value::{Value, ValueType},
 };
 

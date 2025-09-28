@@ -1,7 +1,7 @@
 use std::{io::Error as IoError, num::ParseIntError, path::PathBuf};
 use thiserror::Error;
 
-use crate::parser::expression::ParserError;
+use crate::parser::parser_error::ParserError;
 
 #[derive(Error, Debug)]
 pub enum FindItError {

@@ -2,8 +2,8 @@ use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::case::Case as CaseExpression,
-    parser::case::CaseBranch,
+    parser::ast::case::Case as CaseExpression,
+    parser::ast::case::CaseBranch,
     value::{Value, ValueType},
 };
 

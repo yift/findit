@@ -2,7 +2,7 @@ use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::is_check::{IsCheck, IsType},
+    parser::ast::is_check::{IsCheck, IsType},
     unary_operators::make_negate,
     value::{Value, ValueType},
 };

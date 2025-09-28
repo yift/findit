@@ -1,29 +1,18 @@
 use crate::{
     parser::{
-        expression::{Expression, ParserError},
+        ast::{
+            expression::Expression,
+            is_check::{IsCheck, IsType},
+        },
         lexer::LexerItem,
+        parser_error::ParserError,
         tokens::Token,
     },
     value::Value,
 };
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct IsCheck {
-    pub(crate) expression: Box<Expression>,
-    pub(crate) check_type: IsType,
-    pub(crate) negate: bool,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub(crate) enum IsType {
-    True,
-    False,
-    None,
-    Some,
-}
-
 impl IsCheck {
-    pub(crate) fn new(expression: Expression, check_type: IsType, negate: bool) -> Self {
+    pub(super) fn new(expression: Expression, check_type: IsType, negate: bool) -> Self {
         Self {
             expression: Box::new(expression),
             check_type,

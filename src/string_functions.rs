@@ -6,8 +6,8 @@ use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::position::Position as PositionExpression,
-    parser::substr::Substring,
+    parser::ast::position::Position as PositionExpression,
+    parser::ast::substr::Substring,
     value::{Value, ValueType},
 };
 

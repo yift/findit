@@ -1,11 +1,6 @@
-use crate::parser::expression::Expression;
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct Negate {
-    pub(crate) expression: Box<Expression>,
-}
+use crate::parser::ast::{expression::Expression, negate::Negate};
 impl Negate {
-    pub(crate) fn new(expression: Expression) -> Self {
+    pub(super) fn new(expression: Expression) -> Self {
         Self {
             expression: Box::new(expression),
         }

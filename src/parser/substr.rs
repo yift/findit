@@ -1,17 +1,12 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::{expression::Expression, substr::Substring},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     tokens::Token,
 };
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct Substring {
-    pub(crate) super_string: Box<Expression>,
-    pub(crate) substring_from: Option<Box<Expression>>,
-    pub(crate) substring_for: Option<Box<Expression>>,
-}
 
 impl Substring {
     pub(crate) fn new(
@@ -90,7 +85,7 @@ pub(super) fn build_substring(
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::expression::parse_expression;
+    use crate::parser::parse_expression;
 
     #[test]
     fn test_substr_just_name() {

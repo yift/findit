@@ -1,11 +1,7 @@
-use crate::parser::expression::Expression;
+use crate::parser::ast::{expression::Expression, self_divide::SelfDivide};
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct SelfDivide {
-    pub(crate) expression: Box<Expression>,
-}
 impl SelfDivide {
-    pub(crate) fn new(expression: Expression) -> Self {
+    pub(super) fn new(expression: Expression) -> Self {
         Self {
             expression: Box::new(expression),
         }

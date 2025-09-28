@@ -1,21 +1,16 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::operator::{BinaryOperator, LogicalOperator},
+    ast::{between::Between, expression::Expression},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
-    operator::{BinaryOperator, LogicalOperator},
+    parser_error::ParserError,
     tokens::Token,
 };
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct Between {
-    pub(crate) reference: Box<Expression>,
-    pub(crate) lower_limit: Box<Expression>,
-    pub(crate) upper_limit: Box<Expression>,
-}
-
 impl Between {
-    pub(crate) fn new(
+    pub(super) fn new(
         reference: Expression,
         lower_limit: Expression,
         upper_limit: Expression,

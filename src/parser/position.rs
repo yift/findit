@@ -1,16 +1,12 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::{expression::Expression, position::Position},
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     tokens::Token,
 };
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct Position {
-    pub(crate) sub_string: Box<Expression>,
-    pub(crate) super_string: Box<Expression>,
-}
 
 impl Position {
     pub(crate) fn new(sub_string: Expression, super_string: Expression) -> Self {
@@ -43,7 +39,7 @@ pub(super) fn build_position(
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::expression::parse_expression;
+    use crate::parser::parse_expression;
 
     #[test]
     fn test_position_just_name() {

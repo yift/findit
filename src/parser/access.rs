@@ -1,32 +1,7 @@
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub(crate) enum Access {
-    Parent,
-    Name,
-    Path,
-    Absolute,
-    Me,
-    Extension,
-    Content,
-    Length,
-    Depth,
-    Size,
-    Count,
-    Created,
-    Modified,
-    Exists,
-    IsDir,
-    IsFile,
-    IsLink,
-    IsNotDir,
-    IsNotFile,
-    IsNotLink,
-    Owner,
-    Group,
-    Permissions,
-}
+use crate::parser::ast::access::Access;
 
 impl Access {
-    pub(crate) fn from_str(name: &str) -> Option<Self> {
+    pub(super) fn from_str(name: &str) -> Option<Self> {
         match name {
             "PARENT" => Some(Access::Parent),
             "NAME" => Some(Access::Name),

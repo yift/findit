@@ -2,7 +2,7 @@ use crate::{
     errors::FindItError,
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::{negate::Negate as NegateExpression, self_divide::SelfDivide},
+    parser::{ast::negate::Negate as NegateExpression, ast::self_divide::SelfDivide},
     value::{Value, ValueType},
 };
 

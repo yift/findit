@@ -9,8 +9,8 @@ use crate::{
         spawn::exec::build_capture_output_exec,
     },
     parser::{
-        function::Function,
-        function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+        ast::function::Function,
+        ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName},
     },
     string_functions::{TrimWhere, new_trim},
 };

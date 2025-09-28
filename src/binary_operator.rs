@@ -5,8 +5,8 @@ use crate::{
     expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
     parser::{
-        binary_expression::BinaryExpression,
-        operator::{
+        ast::binary_expression::BinaryExpression,
+        ast::operator::{
             ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
             LogicalOperator,
         },

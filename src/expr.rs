@@ -11,8 +11,8 @@ use crate::{
     literal_value::new_literal_value,
     order::{OrderDirection, OrderItem},
     parser::{
-        expression::{Expression, parse_expression},
-        order_by::{OrderByDirection, parse_order_by},
+        ast::expression::Expression, ast::order_by::OrderByDirection, parse_expression,
+        parse_order_by,
     },
     string_functions::{new_position, new_substring},
     value::{Value, ValueType},

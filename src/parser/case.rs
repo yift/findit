@@ -1,34 +1,19 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    expression::{Expression, ParserError, build_expression_with_priority},
+    ast::{
+        case::{Case, CaseBranch},
+        expression::Expression,
+    },
+    expression::build_expression_with_priority,
     lexer::LexerItem,
+    parser_error::ParserError,
     span::Span,
     tokens::Token,
 };
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct CaseBranch {
-    pub(crate) condition: Box<Expression>,
-    pub(crate) outcome: Box<Expression>,
-}
-impl CaseBranch {
-    pub(crate) fn new(condition: Expression, outcome: Expression) -> Self {
-        Self {
-            condition: Box::new(condition),
-            outcome: Box::new(outcome),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct Case {
-    pub(crate) branches: Vec<CaseBranch>,
-    pub(crate) default_outcome: Option<Box<Expression>>,
-}
-
 impl Case {
-    pub(crate) fn new(branches: Vec<CaseBranch>, default_outcome: Option<Expression>) -> Self {
+    pub(super) fn new(branches: Vec<CaseBranch>, default_outcome: Option<Expression>) -> Self {
         Self {
             branches,
             default_outcome: default_outcome.map(Box::new),

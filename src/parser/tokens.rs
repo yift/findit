@@ -4,9 +4,9 @@ use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, offset::LocalResult};
 
 use crate::{
     parser::{
-        access::Access,
-        function_name::FunctionName,
-        operator::{
+        ast::access::Access,
+        ast::function_name::FunctionName,
+        ast::operator::{
             ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
             LogicalOperator,
         },
@@ -450,7 +450,7 @@ fn read_number_with_radix(
 mod tests {
     use chrono::{FixedOffset, MappedLocalTime, NaiveTime, TimeZone, Utc};
 
-    use crate::parser::function_name::StringFunctionName;
+    use crate::parser::ast::function_name::StringFunctionName;
 
     use super::*;
 
