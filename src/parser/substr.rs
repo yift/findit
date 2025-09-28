@@ -39,17 +39,15 @@ pub(super) fn build_substring(
     let super_string = build_expression_with_priority(lex, 0, |f| {
         f == Some(&Token::From) || f == Some(&Token::For)
     })?;
-    let Some(next) = lex.next() else {
-        return Err(ParserError::UnexpectedEof);
-    };
-    if next.token == Token::From {
+    if let Some(next) = lex.next()
+        && next.token == Token::From
+    {
         let substring_from = build_expression_with_priority(lex, 0, |f| {
             f == Some(&Token::CloseBrackets) || f == Some(&Token::For)
         })?;
-        let Some(next) = lex.next() else {
-            return Err(ParserError::UnexpectedEof);
-        };
-        if next.token == Token::CloseBrackets {
+        if let Some(next) = lex.next()
+            && next.token == Token::CloseBrackets
+        {
             Ok(Expression::Substring(Substring::new(
                 super_string,
                 Some(substring_from),
@@ -69,10 +67,9 @@ pub(super) fn build_substring(
         let substring_for = build_expression_with_priority(lex, 0, |f| {
             f == Some(&Token::CloseBrackets) || f == Some(&Token::From)
         })?;
-        let Some(next) = lex.next() else {
-            return Err(ParserError::UnexpectedEof);
-        };
-        if next.token == Token::CloseBrackets {
+        if let Some(next) = lex.next()
+            && next.token == Token::CloseBrackets
+        {
             Ok(Expression::Substring(Substring::new(
                 super_string,
                 None,

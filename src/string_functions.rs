@@ -112,11 +112,6 @@ pub(crate) fn new_substring(substr: &Substring) -> Result<Box<dyn Evaluator>, Fi
     } else {
         None
     };
-    if length.is_none() && from.is_none() {
-        return Err(FindItError::BadExpression(
-            "SUBSTRING must have at least FROM or FOR".into(),
-        ));
-    }
     Ok(Box::new(SubString { str, from, length }))
 }
 
@@ -358,6 +353,18 @@ mod tests {
     #[test]
     fn trim_no_string_expr() {
         let err = read_expr("TRIM(12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn trim_no_args() {
+        let err = read_expr("TRIM()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn trim_too_many_args() {
+        let err = read_expr("TRIM(\"abc\", \"def\")").err();
         assert!(err.is_some())
     }
 

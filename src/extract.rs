@@ -255,7 +255,7 @@ impl Evaluator for PermissionsExtractor {
 
 #[cfg(test)]
 mod tests {
-    use std::env;
+    use std::{env, path::Path};
 
     use crate::{errors::FindItError, expr::read_expr};
 
@@ -376,5 +376,62 @@ mod tests {
     #[test]
     fn test_permissions_expected_type() -> Result<(), FindItError> {
         test_expected_type("permissions", ValueType::Number)
+    }
+
+    #[test]
+    fn test_is_not_dir_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is not dir", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_is_not_file_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is not file", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_is_not_link_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is not link", ValueType::Bool)
+    }
+
+    #[test]
+    fn test_me() -> Result<(), FindItError> {
+        let expr = read_expr("me")?;
+
+        let file = env::current_dir()?;
+        let wrapper = FileWrapper::new(file.clone(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Path(file));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_owner_with_no_file() -> Result<(), FindItError> {
+        let expr = read_expr("owner")?;
+
+        let file = Path::new("/no/such/file");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_group_with_no_file() -> Result<(), FindItError> {
+        let expr = read_expr("group")?;
+
+        let file = Path::new("/no/such/file");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+
+        Ok(())
     }
 }

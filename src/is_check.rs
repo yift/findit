@@ -86,3 +86,115 @@ pub(crate) fn new_is_check(is_check: &IsCheck) -> Result<Box<dyn Evaluator>, Fin
     };
     Ok(checker)
 }
+
+#[cfg(test)]
+mod tests {
+
+    use std::path::Path;
+
+    use crate::{
+        errors::FindItError,
+        expr::read_expr,
+        file_wrapper::FileWrapper,
+        value::{Value, ValueType},
+    };
+
+    #[test]
+    fn test_is_true_with_non_bool_returns_error() {
+        let err = read_expr("20 IS TRUE").err();
+
+        assert!(err.is_some());
+    }
+
+    #[test]
+    fn test_is_false_with_non_bool_returns_error() {
+        let err = read_expr("'test' IS FALSE").err();
+
+        assert!(err.is_some());
+    }
+
+    fn test_expected_type(name: &str) -> Result<(), FindItError> {
+        let expr = read_expr(&format!("TRUE {}", name))?;
+        let tp = expr.expected_type();
+
+        assert_eq!(tp, ValueType::Bool);
+
+        Ok(())
+    }
+
+    #[test]
+    fn is_false_expected_type() -> Result<(), FindItError> {
+        test_expected_type("IS FALSE")
+    }
+
+    #[test]
+    fn is_true_expected_type() -> Result<(), FindItError> {
+        test_expected_type("IS TRUE")
+    }
+
+    #[test]
+    fn is_some_expected_type() -> Result<(), FindItError> {
+        test_expected_type("IS some")
+    }
+
+    #[test]
+    fn is_none_expected_type() -> Result<(), FindItError> {
+        test_expected_type("is none")
+    }
+
+    #[test]
+    fn test_is_some_true() -> Result<(), FindItError> {
+        let expr = read_expr("content is some")?;
+
+        let file = Path::new("tests/test_cases/display/test_files/other-247.txt");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(true));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_is_some_false() -> Result<(), FindItError> {
+        let expr = read_expr("content is some")?;
+
+        let file = Path::new("/no/such/file");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(false));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_is_none_false() -> Result<(), FindItError> {
+        let expr = read_expr("content is none")?;
+
+        let file = Path::new("tests/test_cases/display/test_files/other-247.txt");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(false));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_is_none_true() -> Result<(), FindItError> {
+        let expr = read_expr("(content of self) is none")?;
+
+        let file = Path::new("/no/such/file");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(true));
+
+        Ok(())
+    }
+}

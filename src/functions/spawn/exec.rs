@@ -196,7 +196,33 @@ mod tests {
     #[test]
     fn test_exec_nothing_if_nothing_to_execute() -> Result<(), FindItError> {
         let sql = "exec(content)";
-        let expr = read_expr(sql).unwrap();
+        let expr = read_expr(sql)?;
+        let file = Path::new("no/such/file/text.txt").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+        Ok(())
+    }
+
+    #[test]
+    fn test_exec_bad_command() -> Result<(), FindItError> {
+        let sql = "exec(\"nothing_to_run\")";
+        let expr = read_expr(sql)?;
+        let file = Path::new("no/such/file/text.txt").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
+        Ok(())
+    }
+
+    #[test]
+    fn test_exec_out_bad_command() -> Result<(), FindItError> {
+        let sql = "execOut(\"nothing_to_run\")";
+        let expr = read_expr(sql)?;
         let file = Path::new("no/such/file/text.txt").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
 
