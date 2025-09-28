@@ -12,6 +12,7 @@ impl FunctionName {
             "EXECUTE_OUTPUT" | "EXECUTEOUTPUT" | "EXECOUT" | "EXEC_OUT" => {
                 Some(FunctionName::Env(EnvFunctionName::ExecOut))
             }
+            "LENGTH" | "LEN" => Some(FunctionName::String(StringFunctionName::Length)),
             _ => None,
         }
     }

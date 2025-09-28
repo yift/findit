@@ -2,16 +2,18 @@ use std::collections::VecDeque;
 
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
-    evaluators::functions::string_functions::{TrimWhere, new_trim},
-    evaluators::functions::{
-        conditional::{coalesce::build_coalesce, random::build_rand},
-        env::build_env,
-        spawn::exec::build_capture_output_exec,
+    evaluators::{
+        expr::{Evaluator, get_eval},
+        functions::{
+            conditional::{coalesce::build_coalesce, random::build_rand},
+            env::build_env,
+            spawn::exec::build_capture_output_exec,
+            string_functions::{TrimWhere, new_length, new_trim},
+        },
     },
-    parser::{
-        ast::function::Function,
-        ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+    parser::ast::{
+        function::Function,
+        function_name::{EnvFunctionName, FunctionName, StringFunctionName},
     },
 };
 
@@ -50,6 +52,7 @@ fn new_string_function(
         StringFunctionName::Trim => new_trim(args, TrimWhere::Both),
         StringFunctionName::TrimHead => new_trim(args, TrimWhere::Head),
         StringFunctionName::TrimTail => new_trim(args, TrimWhere::Tail),
+        StringFunctionName::Length => new_length(args),
     }
 }
 

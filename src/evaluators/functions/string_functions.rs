@@ -212,6 +212,42 @@ impl Evaluator for Trim {
     }
 }
 
+pub(crate) fn new_length(
+    mut args: VecDeque<Box<dyn Evaluator>>,
+) -> Result<Box<dyn Evaluator>, FindItError> {
+    if args.len() > 1 {
+        return Err(FindItError::BadExpression(
+            "Length mut have only one argument".into(),
+        ));
+    }
+    let Some(str) = args.pop_front() else {
+        return Err(FindItError::BadExpression(
+            "Length mut have one argument".into(),
+        ));
+    };
+    if str.expected_type() != ValueType::String {
+        return Err(FindItError::BadExpression(
+            "Length can only work with strings".into(),
+        ));
+    }
+    Ok(Box::new(Length { str }))
+}
+
+struct Length {
+    str: Box<dyn Evaluator>,
+}
+impl Evaluator for Length {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(str) = self.str.eval(file) else {
+            return Value::Empty;
+        };
+        str.len().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -386,5 +422,50 @@ mod tests {
     fn trim_expect_string() {
         let expr = read_expr("TRIM(\"\")").unwrap();
         assert_eq!(expr.expected_type(), ValueType::String);
+    }
+
+    ///QQQ
+
+    #[test]
+    fn length_no_string_expr() {
+        let err = read_expr("LEN(12)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn length_no_args() {
+        let err = read_expr("LEN()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn length_too_many_args() {
+        let err = read_expr("len(\"abc\", \"def\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn length_null_str_return_empty() {
+        let eval = read_expr("len(content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn length_expect_number() {
+        let expr = read_expr("len(\"test\")").unwrap();
+        assert_eq!(expr.expected_type(), ValueType::Number);
+    }
+
+    #[test]
+    fn length_return_the_correct_value() {
+        let eval = read_expr("len(\"123\")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Number(3))
     }
 }
