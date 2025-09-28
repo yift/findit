@@ -1,11 +1,16 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    ast::is_check::{IsCheck, IsType},
-    ast::negate::Negate,
-    ast::operator::{ArithmeticOperator, BinaryOperator, LogicalOperator},
-    ast::self_divide::SelfDivide,
-    ast::{access::Access, binary_expression::BinaryExpression, expression::Expression},
+    ast::{
+        access::Access,
+        as_cast::{As, CastType},
+        binary_expression::BinaryExpression,
+        expression::Expression,
+        is_check::{IsCheck, IsType},
+        negate::Negate,
+        operator::{ArithmeticOperator, BinaryOperator, LogicalOperator},
+        self_divide::SelfDivide,
+    },
     between::build_between,
     case::build_case,
     execute::build_spawn_or_exec,
@@ -70,6 +75,7 @@ pub(super) fn build_expression_with_priority(
             Some(item) => match item.token {
                 Token::BinaryOperator(operator) => Operator::Binary(operator),
                 Token::Is => Operator::PostIs,
+                Token::As => Operator::As,
                 Token::Between => Operator::Between,
                 _ => return Err(ParserError::UnexpectedToken(item.span)),
             },
@@ -87,6 +93,9 @@ pub(super) fn build_expression_with_priority(
             Operator::PostIs => {
                 left = read_postfix_is(left, lex)?;
             }
+            Operator::As => {
+                left = read_postfix_as(left, lex)?;
+            }
             Operator::Between => {
                 left = build_between(left, lex)?;
             }
@@ -100,6 +109,7 @@ enum Operator {
     Binary(BinaryOperator),
     PostIs,
     Between,
+    As,
 }
 
 impl Operator {
@@ -112,6 +122,7 @@ impl Operator {
             Operator::Binary(BinaryOperator::Logical(LogicalOperator::And)) => 20,
             Operator::Binary(BinaryOperator::Comparison(_)) => 40,
             Operator::Binary(BinaryOperator::Matches) => 40,
+            Operator::As => 40,
             Operator::PostIs => 40,
             Operator::Binary(BinaryOperator::Arithmetic(ArithmeticOperator::Plus)) => 50,
             Operator::Binary(BinaryOperator::Arithmetic(ArithmeticOperator::Minus)) => 50,
@@ -185,6 +196,19 @@ fn read_postfix_is(
     let check_type = IsType::try_from(next)?;
 
     Ok(Expression::IsCheck(IsCheck::new(left, check_type, negate)))
+}
+fn read_postfix_as(
+    left: Expression,
+    lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
+) -> Result<Expression, ParserError> {
+    lex.next();
+    let Some(next) = lex.next() else {
+        return Err(ParserError::UnexpectedEof);
+    };
+
+    let cast_type = CastType::try_from(next)?;
+
+    Ok(Expression::Cast(As::new(left, cast_type)))
 }
 
 #[cfg(test)]

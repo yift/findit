@@ -1,5 +1,6 @@
 mod between;
 mod binary_operator;
+mod cast;
 pub(crate) mod expr;
 mod extract;
 pub(crate) mod functions;

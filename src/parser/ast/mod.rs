@@ -1,4 +1,5 @@
 pub(crate) mod access;
+pub(crate) mod as_cast;
 pub(crate) mod between;
 pub(crate) mod binary_expression;
 pub(crate) mod case;

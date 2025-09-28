@@ -12,6 +12,7 @@ pub(crate) mod ast;
 mod between;
 mod binary_expression;
 mod case;
+mod cast;
 mod execute;
 mod expression;
 mod function;

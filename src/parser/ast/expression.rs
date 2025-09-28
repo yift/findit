@@ -1,14 +1,9 @@
 use crate::{
-    parser::{
-        ast::binary_expression::BinaryExpression,
-        ast::function::Function,
-        ast::if_expression::If,
-        ast::is_check::IsCheck,
-        ast::negate::Negate,
-        ast::position::Position,
-        ast::self_divide::SelfDivide,
-        ast::substr::Substring,
-        ast::{access::Access, between::Between, case::Case, execute::SpawnOrExecute},
+    parser::ast::{
+        access::Access, as_cast::As, between::Between, binary_expression::BinaryExpression,
+        case::Case, execute::SpawnOrExecute, function::Function, if_expression::If,
+        is_check::IsCheck, negate::Negate, position::Position, self_divide::SelfDivide,
+        substr::Substring,
     },
     value::Value,
 };
@@ -29,4 +24,5 @@ pub(crate) enum Expression {
     Function(Function),
     SpawnOrExecute(SpawnOrExecute),
     SelfDivide(SelfDivide),
+    Cast(As),
 }
