@@ -4,7 +4,7 @@ use rand::RngCore;
 
 use crate::{
     errors::FindItError,
-    expr::Evaluator,
+    evaluators::expr::Evaluator,
     file_wrapper::FileWrapper,
     value::{Value, ValueType},
 };
@@ -36,7 +36,7 @@ mod tests {
 
     use crate::{
         errors::FindItError,
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

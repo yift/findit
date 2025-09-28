@@ -4,7 +4,7 @@ use std::os::unix::fs::PermissionsExt;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
 use crate::{
-    expr::Evaluator,
+    evaluators::expr::Evaluator,
     file_wrapper::FileWrapper,
     parser::ast::access::Access,
     value::{Value, ValueType},
@@ -259,7 +259,7 @@ impl Evaluator for PermissionsExtractor {
 mod tests {
     use std::{env, path::Path};
 
-    use crate::{errors::FindItError, expr::read_expr};
+    use crate::{errors::FindItError, evaluators::expr::read_expr};
 
     use super::*;
 

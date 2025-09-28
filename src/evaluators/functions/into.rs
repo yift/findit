@@ -2,8 +2,9 @@ use std::collections::VecDeque;
 
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
-    functions::{
+    evaluators::expr::{Evaluator, get_eval},
+    evaluators::functions::string_functions::{TrimWhere, new_trim},
+    evaluators::functions::{
         conditional::{coalesce::build_coalesce, random::build_rand},
         env::build_env,
         spawn::exec::build_capture_output_exec,
@@ -12,7 +13,6 @@ use crate::{
         ast::function::Function,
         ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName},
     },
-    string_functions::{TrimWhere, new_trim},
 };
 
 impl TryFrom<&Function> for Box<dyn Evaluator> {
@@ -55,7 +55,7 @@ fn new_string_function(
 
 #[cfg(test)]
 mod tests {
-    use crate::expr::read_expr;
+    use crate::evaluators::expr::read_expr;
 
     #[test]
     fn test_function_within_group() {

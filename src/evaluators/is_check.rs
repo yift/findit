@@ -1,9 +1,9 @@
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
+    evaluators::unary_operators::make_negate,
     file_wrapper::FileWrapper,
     parser::ast::is_check::{IsCheck, IsType},
-    unary_operators::make_negate,
     value::{Value, ValueType},
 };
 
@@ -97,7 +97,7 @@ mod tests {
 
     use crate::{
         errors::FindItError,
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

@@ -1,5 +1,5 @@
 use crate::{
-    expr::Evaluator,
+    evaluators::expr::Evaluator,
     file_wrapper::FileWrapper,
     value::{Value, ValueType},
 };
@@ -33,7 +33,7 @@ mod tests {
 
     use chrono::{FixedOffset, Local, MappedLocalTime, NaiveDate, NaiveTime, TimeZone, Utc};
 
-    use crate::{expr::read_expr, file_wrapper::FileWrapper, value::Value};
+    use crate::{evaluators::expr::read_expr, file_wrapper::FileWrapper, value::Value};
 
     #[test]
     fn numeric_literal() {

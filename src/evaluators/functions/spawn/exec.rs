@@ -2,9 +2,9 @@ use std::collections::VecDeque;
 
 use crate::{
     errors::FindItError,
-    expr::Evaluator,
+    evaluators::expr::Evaluator,
+    evaluators::functions::spawn::execute::Executor,
     file_wrapper::FileWrapper,
-    functions::spawn::execute::Executor,
     value::{Value, ValueType},
 };
 
@@ -79,7 +79,7 @@ mod tests {
 
     use crate::{
         errors::FindItError,
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

@@ -1,6 +1,6 @@
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
     parser::ast::if_expression::If as IfExpression,
     value::{Value, ValueType},
@@ -71,7 +71,7 @@ impl TryFrom<&IfExpression> for Box<dyn Evaluator> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{expr::read_expr, value::ValueType};
+    use crate::{evaluators::expr::read_expr, value::ValueType};
 
     #[test]
     fn test_if_with_different_type() {

@@ -2,7 +2,8 @@ use chrono::TimeDelta;
 
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
+    evaluators::functions::string_functions::new_regex,
     file_wrapper::FileWrapper,
     parser::{
         ast::binary_expression::BinaryExpression,
@@ -11,7 +12,6 @@ use crate::{
             LogicalOperator,
         },
     },
-    string_functions::new_regex,
     value::{Value, ValueType},
 };
 
@@ -575,7 +575,7 @@ mod tests {
 
     use crate::{
         errors::FindItError,
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

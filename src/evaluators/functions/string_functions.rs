@@ -4,7 +4,7 @@ use regex::Regex;
 
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
     parser::ast::position::Position as PositionExpression,
     parser::ast::substr::Substring,
@@ -218,7 +218,7 @@ mod tests {
     use std::path::Path;
 
     use crate::{
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

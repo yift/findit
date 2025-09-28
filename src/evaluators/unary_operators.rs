@@ -1,6 +1,6 @@
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
     parser::{ast::negate::Negate as NegateExpression, ast::self_divide::SelfDivide},
     value::{Value, ValueType},
@@ -75,7 +75,7 @@ mod tests {
 
     use crate::{
         errors::FindItError,
-        expr::read_expr,
+        evaluators::expr::read_expr,
         file_wrapper::FileWrapper,
         value::{Value, ValueType},
     };

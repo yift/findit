@@ -1,6 +1,6 @@
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
+    evaluators::expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
     parser::ast::case::Case as CaseExpression,
     parser::ast::case::CaseBranch,
@@ -87,7 +87,7 @@ impl TryFrom<&CaseExpression> for Box<dyn Evaluator> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{expr::read_expr, value::ValueType};
+    use crate::{evaluators::expr::read_expr, value::ValueType};
 
     #[test]
     fn test_case_with_different_result_type() {

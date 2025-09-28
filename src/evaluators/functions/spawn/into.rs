@@ -1,7 +1,7 @@
 use crate::{
     errors::FindItError,
-    expr::{Evaluator, get_eval},
-    functions::spawn::{
+    evaluators::expr::{Evaluator, get_eval},
+    evaluators::functions::spawn::{
         exec::{ExecType, build_exec},
         execute::Executor,
         fire::build_fire,

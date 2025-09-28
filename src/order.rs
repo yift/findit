@@ -3,7 +3,7 @@ use std::{cmp::Ordering, io::Write};
 use crate::{
     cli_args::CliArgs,
     errors::FindItError,
-    expr::{Evaluator, read_order_by},
+    evaluators::expr::{Evaluator, read_order_by},
     file_wrapper::FileWrapper,
     output::build_output,
     walker::Walk,

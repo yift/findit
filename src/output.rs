@@ -2,8 +2,8 @@ use std::io::Error as IoError;
 use std::io::Write;
 
 use crate::errors::FindItError;
-use crate::expr::Evaluator;
-use crate::expr::read_expr;
+use crate::evaluators::expr::Evaluator;
+use crate::evaluators::expr::read_expr;
 use crate::{cli_args::CliArgs, file_wrapper::FileWrapper, limit::make_limit, walker::Walk};
 
 pub(crate) fn build_output<W: Write + 'static>(
