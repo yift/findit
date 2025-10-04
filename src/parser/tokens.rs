@@ -53,6 +53,9 @@ pub(crate) enum Token {
     Boolean,
     String,
     Number,
+    Replace,
+    To,
+    Pattern,
     FunctionName(FunctionName),
 }
 
@@ -256,6 +259,9 @@ fn read_reserved_word(
         "DATE" | "TIME" | "TIMESTAMP" => Ok(Token::Date),
         "BOOL" | "BOOLEAN" => Ok(Token::Boolean),
         "STRING" | "TEXT" | "STR" => Ok(Token::String),
+        "REPLACE" => Ok(Token::Replace),
+        "TO" => Ok(Token::To),
+        "PATTERN" => Ok(Token::Pattern),
         "NUMBER" | "NUM" | "INT" | "INTEGER" => Ok(Token::Number),
         _ => {
             if let Some(access) = Access::from_str(&str) {

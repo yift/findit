@@ -21,6 +21,7 @@ use crate::parser::{
     parse_date::build_parse_date,
     parser_error::ParserError,
     position::build_position,
+    replace::build_replace,
     substr::build_substring,
     tokens::Token,
 };
@@ -48,6 +49,7 @@ pub(super) fn build_expression_with_priority(
             Token::Parse => build_parse_date(lex)?,
             Token::Format => build_format(lex)?,
             Token::Substring => build_substring(lex)?,
+            Token::Replace => build_replace(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
             Token::Not => {
                 let expression = build_expression_with_priority(lex, 30, end_condition)?;

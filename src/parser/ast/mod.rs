@@ -15,5 +15,6 @@ pub(crate) mod operator;
 pub(crate) mod order_by;
 pub(crate) mod parse;
 pub(crate) mod position;
+pub(crate) mod replace;
 pub(crate) mod self_divide;
 pub(crate) mod substr;

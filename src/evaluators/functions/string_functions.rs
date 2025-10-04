@@ -6,8 +6,11 @@ use crate::{
     errors::FindItError,
     evaluators::expr::{Evaluator, get_eval},
     file_wrapper::FileWrapper,
-    parser::ast::position::Position as PositionExpression,
-    parser::ast::substr::Substring,
+    parser::ast::{
+        position::Position as PositionExpression,
+        replace::{Replace, ReplaceWhat},
+        substr::Substring,
+    },
     value::{Value, ValueType},
 };
 
@@ -63,6 +66,91 @@ impl TryFrom<&PositionExpression> for Box<dyn Evaluator> {
             ));
         }
         Ok(Box::new(Position { str, sub_str }))
+    }
+}
+
+struct ReplaceString {
+    source: Box<dyn Evaluator>,
+    from: Box<dyn Evaluator>,
+    to: Box<dyn Evaluator>,
+}
+impl Evaluator for ReplaceString {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(source) = self.source.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::String(from) = self.from.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::String(to) = self.to.eval(file) else {
+            return Value::Empty;
+        };
+        source.as_str().replace(&from, &to).into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+}
+
+struct ReplaceRegex {
+    source: Box<dyn Evaluator>,
+    pattern: Box<dyn Evaluator>,
+    to: Box<dyn Evaluator>,
+}
+impl Evaluator for ReplaceRegex {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(source) = self.source.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::String(pattern) = self.pattern.eval(file) else {
+            return Value::Empty;
+        };
+        let Ok(regexp) = Regex::new(&pattern) else {
+            return Value::Empty;
+        };
+        let Value::String(to) = self.to.eval(file) else {
+            return Value::Empty;
+        };
+        regexp.replace_all(&source, to).to_string().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+}
+
+impl TryFrom<&Replace> for Box<dyn Evaluator> {
+    type Error = FindItError;
+    fn try_from(replace: &Replace) -> Result<Self, Self::Error> {
+        let source = get_eval(&replace.source)?;
+        let (what, regex) = match &replace.what {
+            ReplaceWhat::Pattern(p) => (get_eval(p)?, true),
+            ReplaceWhat::String(p) => (get_eval(p)?, false),
+        };
+        let to = get_eval(&replace.to)?;
+
+        if (
+            to.expected_type(),
+            source.expected_type(),
+            what.expected_type(),
+        ) != (ValueType::String, ValueType::String, ValueType::String)
+        {
+            return Err(FindItError::BadExpression(
+                "Replace can only work with strings".into(),
+            ));
+        }
+        if regex {
+            Ok(Box::new(ReplaceRegex {
+                source,
+                pattern: what,
+                to,
+            }))
+        } else {
+            Ok(Box::new(ReplaceString {
+                source,
+                from: what,
+                to,
+            }))
+        }
     }
 }
 
@@ -623,5 +711,152 @@ mod tests {
         let value = eval.eval(&wrapper);
 
         assert_eq!(value, Value::String("ABCDEF".into()))
+    }
+
+    #[test]
+    fn replace_return_the_correct_value() {
+        let eval = read_expr("replace(\"abc123def123\" from \"12\" to \" 12 \")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::String("abc 12 3def 12 3".into()))
+    }
+
+    #[test]
+    fn replace_return_the_correct_value_when_replacement_is_invalid_regex() {
+        let eval = read_expr("replace(\"[[--]]\" from \"[\" to \".\")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::String("..--]]".into()))
+    }
+
+    #[test]
+    fn replace_return_the_correct_value_with_pattern() {
+        let eval =
+            read_expr("replace(\"abc 123 def 2345 gsr 23\" pattern \"[0-9]+\" to \"<numbers>\")")
+                .unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(
+            value,
+            Value::String("abc <numbers> def <numbers> gsr <numbers>".into())
+        )
+    }
+
+    #[test]
+    fn replace_return_empty_if_source_is_not_a_string() {
+        let eval = read_expr("replace(content from \"12\" to \" 12 \")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_return_empty_if_substr_is_not_a_string() {
+        let eval = read_expr("replace(\"abc123def123\" from content to \" 12 \")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_return_empty_if_the_replacement_is_not_a_string() {
+        let eval = read_expr("replace(\"abc123def123\" from \"12\" to content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_with_pattern_return_empty_if_source_is_not_a_string() {
+        let eval = read_expr("replace(content pattern \"12\" to \" 12 \")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_with_pattern_return_empty_if_substr_is_not_a_string() {
+        let eval = read_expr("replace(\"abc123def123\" pattern content to \" 12 \")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_with_pattern_return_empty_if_the_replacement_is_not_a_string() {
+        let eval = read_expr("replace(\"abc123def123\" pattern \"12\" to content)").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_with_pattern_return_empty_if_the_pattern_is_invalid() {
+        let eval = read_expr("replace(\"abc123def123\" pattern \"[\" to \"-\")").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty)
+    }
+
+    #[test]
+    fn replace_return_the_correct_expected_value() {
+        let eval = read_expr("replace(\"abc123def123\" from \"12\" to \" 12 \")").unwrap();
+
+        assert_eq!(eval.expected_type(), ValueType::String)
+    }
+
+    #[test]
+    fn replace_with_pattern_return_the_correct_expected_value() {
+        let eval = read_expr("replace(\"abc123def123\" pattern \"12\" to \" 12 \")").unwrap();
+
+        assert_eq!(eval.expected_type(), ValueType::String)
+    }
+
+    #[test]
+    fn replace_fails_when_source_is_not_a_string() {
+        let err = read_expr("replace(1 from \"12\" to \" 12 \")").err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn replace_fails_when_from_is_not_a_string() {
+        let err = read_expr("replace(\"1\" from 12 to \" 12 \")").err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn replace_fails_when_pattern_is_not_a_string() {
+        let err = read_expr("replace(\"1\" pattern 12 to \" 12 \")").err();
+
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn replace_fails_when_to_is_not_a_string() {
+        let err = read_expr("replace(\"1\" pattern \"12\" to  12 )").err();
+
+        assert!(err.is_some())
     }
 }
