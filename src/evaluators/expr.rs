@@ -31,6 +31,8 @@ pub(crate) fn get_eval(expr: &Expression) -> Result<Box<dyn Evaluator>, FindItEr
         Expression::SpawnOrExecute(spawn_or_exec) => spawn_or_exec.try_into(),
         Expression::SelfDivide(self_divide) => self_divide.try_into(),
         Expression::Cast(a) => a.try_into(),
+        Expression::Format(f) => f.try_into(),
+        Expression::Parse(p) => p.try_into(),
     }
 }
 

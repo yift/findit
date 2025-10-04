@@ -14,9 +14,11 @@ use crate::parser::{
     between::build_between,
     case::build_case,
     execute::build_spawn_or_exec,
+    format::build_format,
     function::build_function,
     if_expression::build_if,
     lexer::LexerItem,
+    parse_date::build_parse_date,
     parser_error::ParserError,
     position::build_position,
     substr::build_substring,
@@ -43,6 +45,8 @@ pub(super) fn build_expression_with_priority(
             Token::If => build_if(lex)?,
             Token::Case => build_case(lex, &item.span)?,
             Token::Position => build_position(lex)?,
+            Token::Parse => build_parse_date(lex)?,
+            Token::Format => build_format(lex)?,
             Token::Substring => build_substring(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
             Token::Not => {
@@ -216,16 +220,17 @@ mod tests {
 
     use crate::{
         parser::{
-            ast::function_name::{EnvFunctionName, FunctionName, StringFunctionName},
-            ast::if_expression::If,
-            ast::position::Position,
-            ast::substr::Substring,
             ast::{
                 between::Between,
                 case::{Case, CaseBranch},
                 execute::SpawnOrExecute,
+                format::Format,
                 function::Function,
+                function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+                if_expression::If,
                 operator::ComparisonOperator,
+                position::Position,
+                substr::Substring,
             },
             parse_expression,
         },
@@ -285,6 +290,9 @@ mod tests {
     }
     fn position(sub_string: Expression, super_string: Expression) -> Expression {
         Expression::Position(Position::new(sub_string, super_string))
+    }
+    fn format(timestamp: Expression, format: Expression) -> Expression {
+        Expression::Format(Format::new(timestamp, format))
     }
 
     fn sub_string(
@@ -821,6 +829,16 @@ mod tests {
         let exp = parse_expression(str)?;
 
         assert_eq!(exp, position(lit_s("str"), lit_s("string")));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_format() -> Result<(), ParserError> {
+        let str = "format(\"str\" as \"string\")";
+        let exp = parse_expression(str)?;
+
+        assert_eq!(exp, format(lit_s("str"), lit_s("string")));
 
         Ok(())
     }

@@ -1,23 +1,23 @@
 use std::iter::Peekable;
 
 use crate::parser::{
-    ast::{expression::Expression, position::Position},
+    ast::{expression::Expression, parse::Parse},
     expression::build_expression_with_priority,
     lexer::LexerItem,
     parser_error::ParserError,
     tokens::Token,
 };
 
-impl Position {
-    pub(super) fn new(sub_string: Expression, super_string: Expression) -> Self {
+impl Parse {
+    pub(super) fn new(str: Expression, format: Expression) -> Self {
         Self {
-            sub_string: Box::new(sub_string),
-            super_string: Box::new(super_string),
+            str: Box::new(str),
+            format: Box::new(format),
         }
     }
 }
 
-pub(super) fn build_position(
+pub(super) fn build_parse_date(
     lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
 ) -> Result<Expression, ParserError> {
     let Some(open) = lex.next() else {
@@ -26,15 +26,11 @@ pub(super) fn build_position(
     if open.token != Token::OpenBrackets {
         return Err(ParserError::UnexpectedToken(open.span));
     }
-    let sub_string = build_expression_with_priority(lex, 0, |f| f == Some(&Token::In))?;
+    let str = build_expression_with_priority(lex, 0, |f| f == Some(&Token::From))?;
     lex.next();
-    let super_string =
-        build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+    let format = build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
     lex.next();
-    Ok(Expression::Position(Position::new(
-        sub_string,
-        super_string,
-    )))
+    Ok(Expression::Parse(Parse::new(str, format)))
 }
 
 #[cfg(test)]
@@ -42,15 +38,15 @@ mod tests {
     use crate::parser::parse_expression;
 
     #[test]
-    fn test_position_just_name() {
-        let source = "position";
+    fn test_pars_just_name() {
+        let source = "parse";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
     }
     #[test]
-    fn test_position_with_no_open_brackets() {
-        let source = "position +";
+    fn test_parser_with_no_open_brackets() {
+        let source = "parse +";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
