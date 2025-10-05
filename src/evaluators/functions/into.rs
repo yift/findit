@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use crate::{
     errors::FindItError,
     evaluators::{
-        expr::{Evaluator, get_eval},
+        expr::{BindingsTypes, Evaluator, EvaluatorFactory},
         functions::{
             conditional::{coalesce::build_coalesce, random::build_rand},
             env::build_env,
@@ -18,16 +18,15 @@ use crate::{
     },
 };
 
-impl TryFrom<&Function> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(function: &Function) -> Result<Self, Self::Error> {
+impl EvaluatorFactory for Function {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
         let mut args = VecDeque::new();
 
-        for expr in &function.args {
-            let eval = get_eval(expr)?;
+        for expr in &self.args {
+            let eval = expr.build(bindings)?;
             args.push_back(eval);
         }
-        match &function.name {
+        match &self.name {
             FunctionName::Env(env) => new_env_function(env, args),
             FunctionName::String(string) => new_string_function(string, args),
             FunctionName::Time(time) => new_time_function(time, args),

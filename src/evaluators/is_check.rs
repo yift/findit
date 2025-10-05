@@ -1,7 +1,9 @@
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
-    evaluators::unary_operators::make_negate,
+    evaluators::{
+        expr::{BindingsTypes, Evaluator, EvaluatorFactory},
+        unary_operators::make_negate,
+    },
     file_wrapper::FileWrapper,
     parser::ast::is_check::{IsCheck, IsType},
     value::{Value, ValueType},
@@ -57,11 +59,10 @@ impl Evaluator for IsSome {
     }
 }
 
-impl TryFrom<&IsCheck> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(is_check: &IsCheck) -> Result<Self, Self::Error> {
-        let evaluator = get_eval(&is_check.expression)?;
-        let checker: Box<dyn Evaluator> = match is_check.check_type {
+impl EvaluatorFactory for IsCheck {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let evaluator = self.expression.build(bindings)?;
+        let checker: Box<dyn Evaluator> = match self.check_type {
             IsType::True => {
                 if evaluator.expected_type() != ValueType::Bool {
                     return Err(FindItError::BadExpression(
@@ -81,7 +82,7 @@ impl TryFrom<&IsCheck> for Box<dyn Evaluator> {
             IsType::None => Box::new(IsNone { evaluator }),
             IsType::Some => Box::new(IsSome { evaluator }),
         };
-        let checker = if is_check.negate {
+        let checker = if self.negate {
             make_negate(checker)
         } else {
             checker

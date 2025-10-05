@@ -4,7 +4,7 @@ use regex::Regex;
 
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
+    evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
     parser::ast::{
         position::Position as PositionExpression,
@@ -53,11 +53,10 @@ impl Evaluator for Regexp {
     }
 }
 
-impl TryFrom<&PositionExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(position: &PositionExpression) -> Result<Self, Self::Error> {
-        let str = get_eval(&position.super_string)?;
-        let sub_str = get_eval(&position.sub_string)?;
+impl EvaluatorFactory for PositionExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let str = self.super_string.build(bindings)?;
+        let sub_str = self.sub_string.build(bindings)?;
 
         if (str.expected_type(), sub_str.expected_type()) != (ValueType::String, ValueType::String)
         {
@@ -118,15 +117,14 @@ impl Evaluator for ReplaceRegex {
     }
 }
 
-impl TryFrom<&Replace> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(replace: &Replace) -> Result<Self, Self::Error> {
-        let source = get_eval(&replace.source)?;
-        let (what, regex) = match &replace.what {
-            ReplaceWhat::Pattern(p) => (get_eval(p)?, true),
-            ReplaceWhat::String(p) => (get_eval(p)?, false),
+impl EvaluatorFactory for Replace {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let source = self.source.build(bindings)?;
+        let (what, regex) = match &self.what {
+            ReplaceWhat::Pattern(p) => (p.build(bindings)?, true),
+            ReplaceWhat::String(p) => (p.build(bindings)?, false),
         };
-        let to = get_eval(&replace.to)?;
+        let to = self.to.build(bindings)?;
 
         if (
             to.expected_type(),
@@ -173,17 +171,16 @@ impl Evaluator for Position {
     }
 }
 
-impl TryFrom<&Substring> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(substr: &Substring) -> Result<Self, Self::Error> {
-        let str = get_eval(&substr.super_string)?;
+impl EvaluatorFactory for Substring {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let str = self.super_string.build(bindings)?;
         if str.expected_type() != ValueType::String {
             return Err(FindItError::BadExpression(
                 "SUBSTRING can only work with strings".into(),
             ));
         }
-        let from = if let Some(from) = &substr.substring_from {
-            let from = get_eval(from)?;
+        let from = if let Some(from) = &self.substring_from {
+            let from = from.build(bindings)?;
             if from.expected_type() != ValueType::Number {
                 return Err(FindItError::BadExpression(
                     "SUBSTRING can only start from a number".into(),
@@ -193,8 +190,8 @@ impl TryFrom<&Substring> for Box<dyn Evaluator> {
         } else {
             None
         };
-        let length = if let Some(length) = &substr.substring_for {
-            let length = get_eval(length)?;
+        let length = if let Some(length) = &self.substring_for {
+            let length = length.build(bindings)?;
             if length.expected_type() != ValueType::Number {
                 return Err(FindItError::BadExpression(
                     "SUBSTRING can only have numeric length".into(),

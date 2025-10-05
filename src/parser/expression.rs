@@ -5,6 +5,7 @@ use crate::parser::{
         access::Access,
         as_cast::{As, CastType},
         binary_expression::BinaryExpression,
+        binding::Binding,
         expression::Expression,
         is_check::{IsCheck, IsType},
         negate::Negate,
@@ -24,6 +25,7 @@ use crate::parser::{
     replace::build_replace,
     substr::build_substring,
     tokens::Token,
+    with::build_with,
 };
 
 fn build_brackets(
@@ -42,6 +44,7 @@ pub(super) fn build_expression_with_priority(
         None => return Err(ParserError::UnexpectedEof),
         Some(item) => match item.token {
             Token::Value(value) => Expression::Literal(value),
+            Token::BindingName(name) => Expression::BindingReplacement(Binding { name }),
             Token::OpenBrackets => build_brackets(lex)?,
             Token::If => build_if(lex)?,
             Token::Case => build_case(lex, &item.span)?,
@@ -50,6 +53,7 @@ pub(super) fn build_expression_with_priority(
             Token::Format => build_format(lex)?,
             Token::Substring => build_substring(lex)?,
             Token::Replace => build_replace(lex)?,
+            Token::With => build_with(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
             Token::Not => {
                 let expression = build_expression_with_priority(lex, 30, end_condition)?;

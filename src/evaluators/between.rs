@@ -1,5 +1,5 @@
 use crate::errors::FindItError;
-use crate::evaluators::expr::{Evaluator, get_eval};
+use crate::evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory};
 use crate::file_wrapper::FileWrapper;
 use crate::parser::ast::between::Between as BetweenExpression;
 use crate::value::{Value, ValueType};
@@ -9,17 +9,16 @@ struct Between {
     low: Box<dyn Evaluator>,
     high: Box<dyn Evaluator>,
 }
-impl TryFrom<&BetweenExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(between: &BetweenExpression) -> Result<Self, Self::Error> {
-        let evaluator = get_eval(&between.reference)?;
-        let low = get_eval(&between.lower_limit)?;
+impl EvaluatorFactory for BetweenExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let evaluator = self.reference.build(bindings)?;
+        let low = self.lower_limit.build(bindings)?;
         if evaluator.expected_type() != low.expected_type() {
             return Err(FindItError::BadExpression(
                 "Between low must have the same type as the expression".into(),
             ));
         }
-        let high = get_eval(&between.upper_limit)?;
+        let high = self.upper_limit.build(bindings)?;
         if evaluator.expected_type() != high.expected_type() {
             return Err(FindItError::BadExpression(
                 "Between high must have the same type as the expression".into(),

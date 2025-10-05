@@ -2,12 +2,14 @@ use chrono::TimeDelta;
 
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
-    evaluators::functions::string_functions::new_regex,
+    evaluators::{
+        expr::{BindingsTypes, Evaluator, EvaluatorFactory},
+        functions::string_functions::new_regex,
+    },
     file_wrapper::FileWrapper,
-    parser::{
-        ast::binary_expression::BinaryExpression,
-        ast::operator::{
+    parser::ast::{
+        binary_expression::BinaryExpression,
+        operator::{
             ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
             LogicalOperator,
         },
@@ -15,13 +17,12 @@ use crate::{
     value::{Value, ValueType},
 };
 
-impl TryFrom<&BinaryExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(operator: &BinaryExpression) -> Result<Self, Self::Error> {
-        let left = get_eval(&operator.left)?;
-        let right = get_eval(&operator.right)?;
+impl EvaluatorFactory for BinaryExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let left = self.left.build(bindings)?;
+        let right = self.right.build(bindings)?;
 
-        match operator.operator {
+        match self.operator {
             BinaryOperator::Arithmetic(operator) => new_arithmetic_operator(left, &operator, right),
             BinaryOperator::Logical(operator) => new_logical_operator(left, &operator, right),
             BinaryOperator::Comparison(operator) => new_comparison_operator(left, &operator, right),

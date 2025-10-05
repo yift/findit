@@ -1,6 +1,6 @@
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
+    evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
     parser::ast::if_expression::If as IfExpression,
     value::{Value, ValueType},
@@ -41,18 +41,17 @@ impl Evaluator for IfWithElse {
     }
 }
 
-impl TryFrom<&IfExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(value: &IfExpression) -> Result<Self, Self::Error> {
-        let condition = get_eval(&value.condition)?;
+impl EvaluatorFactory for IfExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let condition = self.condition.build(bindings)?;
         if condition.expected_type() != ValueType::Bool {
             return Err(FindItError::BadExpression(
                 "IF condition must be boolean.".into(),
             ));
         }
-        let then = get_eval(&value.then_branch)?;
-        if let Some(else_branch) = &value.else_branch {
-            let else_branch = get_eval(else_branch)?;
+        let then = self.then_branch.build(bindings)?;
+        if let Some(else_branch) = &self.else_branch {
+            let else_branch = else_branch.build(bindings)?;
             if else_branch.expected_type() != then.expected_type() {
                 return Err(FindItError::BadExpression(
                     "IF results must be the same.".into(),

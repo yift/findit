@@ -1,9 +1,8 @@
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
+    evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
-    parser::ast::case::Case as CaseExpression,
-    parser::ast::case::CaseBranch,
+    parser::ast::case::{Case as CaseExpression, CaseBranch},
     value::{Value, ValueType},
 };
 
@@ -12,12 +11,11 @@ struct Condition {
     result: Box<dyn Evaluator>,
 }
 
-impl TryFrom<&CaseBranch> for Condition {
-    type Error = FindItError;
-    fn try_from(value: &CaseBranch) -> Result<Self, Self::Error> {
-        let condition = get_eval(&value.condition)?;
-        let result = get_eval(&value.outcome)?;
-        Ok(Self { condition, result })
+impl CaseBranch {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Condition, FindItError> {
+        let condition = self.condition.build(bindings)?;
+        let result = self.outcome.build(bindings)?;
+        Ok(Condition { condition, result })
     }
 }
 
@@ -44,13 +42,12 @@ impl Evaluator for Case {
     }
 }
 
-impl TryFrom<&CaseExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(case: &CaseExpression) -> Result<Self, Self::Error> {
+impl EvaluatorFactory for CaseExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
         let mut value_type = ValueType::Empty;
         let mut branches = vec![];
-        for b in &case.branches {
-            let b: Condition = b.try_into()?;
+        for b in &self.branches {
+            let b = b.build(bindings)?;
             let expected_type = b.result.expected_type();
             if expected_type != ValueType::Empty && value_type == ValueType::Empty {
                 value_type = expected_type;
@@ -62,10 +59,10 @@ impl TryFrom<&CaseExpression> for Box<dyn Evaluator> {
 
             branches.push(b);
         }
-        let default = match &case.default_outcome {
+        let default = match &self.default_outcome {
             None => None,
             Some(d) => {
-                let d = get_eval(d)?;
+                let d = d.build(bindings)?;
                 if d.expected_type() != ValueType::Empty
                     && value_type != ValueType::Empty
                     && d.expected_type() != value_type

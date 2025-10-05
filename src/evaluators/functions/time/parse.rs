@@ -2,19 +2,18 @@ use chrono::offset::LocalResult;
 use chrono::{DateTime, Local, NaiveDate, NaiveDateTime};
 
 use crate::errors::FindItError;
-use crate::evaluators::expr::{Evaluator, get_eval};
+use crate::evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory};
 use crate::file_wrapper::FileWrapper;
 use crate::parser::ast::parse::Parse as ParseExpression;
 use crate::value::{Value, ValueType};
 
-impl TryFrom<&ParseExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(parse: &ParseExpression) -> Result<Self, Self::Error> {
-        let str = get_eval(&parse.str)?;
+impl EvaluatorFactory for ParseExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let str = self.str.build(bindings)?;
         if str.expected_type() != ValueType::String {
             return Err(FindItError::BadExpression("Can only parse strings".into()));
         }
-        let format = get_eval(&parse.format)?;
+        let format = self.format.build(bindings)?;
         if format.expected_type() != ValueType::String {
             return Err(FindItError::BadExpression(
                 "Parse format must be a string value".into(),

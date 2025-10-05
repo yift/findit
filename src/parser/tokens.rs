@@ -57,6 +57,9 @@ pub(crate) enum Token {
     To,
     Pattern,
     FunctionName(FunctionName),
+    BindingName(String),
+    With,
+    Do,
 }
 
 #[derive(Debug)]
@@ -83,6 +86,7 @@ impl Token {
             '0'..='9' => Ok(Some(Token::Value(Value::Number(read_number(chars))))),
             '"' => Ok(Some(Token::Value(Value::String(read_string(chars)?)))),
             '[' => Ok(Some(Token::Value(Value::Date(read_date(chars)?)))),
+            '{' => Ok(Some(Token::BindingName(read_binding_name(chars)?))),
             '\'' => Ok(Some(Token::Value(Value::Path(read_path(chars)?)))),
             '(' => {
                 chars.next();
@@ -256,6 +260,8 @@ fn read_reserved_word(
         "ASC" => Ok(Token::Asc),
         "DESC" => Ok(Token::Desc),
         "AS" => Ok(Token::As),
+        "WITH" => Ok(Token::With),
+        "DO" => Ok(Token::Do),
         "DATE" | "TIME" | "TIMESTAMP" => Ok(Token::Date),
         "BOOL" | "BOOLEAN" => Ok(Token::Boolean),
         "STRING" | "TEXT" | "STR" => Ok(Token::String),
@@ -313,6 +319,7 @@ fn read_date(
     }
     parse_date(&str)
 }
+
 fn parse_date(val: &str) -> Result<DateTime<Local>, TokenError> {
     if let Ok(date) = DateTime::parse_from_rfc3339(val) {
         return Ok(date.into());
@@ -464,6 +471,36 @@ fn read_number_with_radix(
         number = number * (radix as u64) + (digit as u64);
     }
     number
+}
+
+fn read_binding_name(
+    chars: &mut impl Iterator<Item = (usize, char)>,
+) -> Result<String, TokenError> {
+    // eat the curly_brackets
+    chars.next();
+    let mut str = String::new();
+    loop {
+        let Some((_, chr)) = chars.next() else {
+            return Err(TokenError {
+                cause: "Unended binding name".into(),
+            });
+        };
+        if chr == '}' {
+            break;
+        } else if chr.is_ascii_alphanumeric() || chr == '-' || chr == '_' {
+            str.push(chr)
+        } else {
+            return Err(TokenError {
+                cause: format!("Character '{}' is not valid within binding name", chr),
+            });
+        }
+    }
+    if str.is_empty() {
+        return Err(TokenError {
+            cause: "Empty Binding".into(),
+        });
+    }
+    Ok(str)
 }
 
 #[cfg(test)]
@@ -1179,6 +1216,54 @@ mod tests {
                 BitwiseOperator::Xor
             )))
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn binding_name() -> Result<(), TokenError> {
+        let str = "{test-this}";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(token, Some(Token::BindingName("test-this".into())));
+
+        Ok(())
+    }
+
+    #[test]
+    fn binding_name_not_ended() -> Result<(), TokenError> {
+        let str = "{test-this";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let err = Token::new(&mut chars).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn binding_name_invalid_character() -> Result<(), TokenError> {
+        let str = "{test{}this}";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let err = Token::new(&mut chars).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn binding_name_empty() -> Result<(), TokenError> {
+        let str = "{}";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let err = Token::new(&mut chars).err();
+
+        assert!(err.is_some());
 
         Ok(())
     }

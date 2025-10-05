@@ -1,15 +1,14 @@
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
+    evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
-    parser::{ast::negate::Negate as NegateExpression, ast::self_divide::SelfDivide},
+    parser::ast::{negate::Negate as NegateExpression, self_divide::SelfDivide},
     value::{Value, ValueType},
 };
 
-impl TryFrom<&NegateExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(value: &NegateExpression) -> Result<Self, Self::Error> {
-        let expr = get_eval(&value.expression)?;
+impl EvaluatorFactory for NegateExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let expr = self.expression.build(bindings)?;
         if expr.expected_type() != ValueType::Bool {
             Err(FindItError::BadExpression(
                 "NOT can only applied to boolean expressions".into(),
@@ -38,10 +37,9 @@ impl Evaluator for Negate {
     }
 }
 
-impl TryFrom<&SelfDivide> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(value: &SelfDivide) -> Result<Self, Self::Error> {
-        let expr = get_eval(&value.expression)?;
+impl EvaluatorFactory for SelfDivide {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let expr = self.expression.build(bindings)?;
         match expr.expected_type() {
             ValueType::String | ValueType::Path => Ok(Box::new(AccessFile { expr })),
             _ => Err(FindItError::BadExpression(

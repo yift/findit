@@ -103,9 +103,9 @@ mod tests {
 
     #[test]
     fn new_with_err_display() {
-        let err = lex("10 + { 20 }").err().unwrap();
+        let err = lex("10 + _ 20 ").err().unwrap();
         let str = err.to_string();
 
-        assert_eq!(str, "Error: Unknown character: { at: At 4 - 5");
+        assert_eq!(str, "Error: Unknown character: _ at: At 4 - 5");
     }
 }

@@ -1,19 +1,20 @@
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
-    evaluators::functions::spawn::{
-        exec::{ExecType, build_exec},
-        execute::Executor,
-        fire::build_fire,
+    evaluators::{
+        expr::{BindingsTypes, Evaluator, EvaluatorFactory},
+        functions::spawn::{
+            exec::{ExecType, build_exec},
+            execute::Executor,
+            fire::build_fire,
+        },
     },
     parser::ast::execute::SpawnOrExecute,
     value::ValueType,
 };
 
-impl TryFrom<&SpawnOrExecute> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(value: &SpawnOrExecute) -> Result<Self, Self::Error> {
-        let exec = get_eval(&value.bin)?;
+impl EvaluatorFactory for SpawnOrExecute {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let exec = self.bin.build(bindings)?;
         if exec.expected_type() != ValueType::String && exec.expected_type() != ValueType::Path {
             return Err(FindItError::BadExpression(
                 "Can only execute string or files.".into(),
@@ -21,13 +22,13 @@ impl TryFrom<&SpawnOrExecute> for Box<dyn Evaluator> {
         }
 
         let mut args = vec![];
-        for arg in &value.args {
-            args.push(get_eval(arg)?);
+        for arg in &self.args {
+            args.push(arg.build(bindings)?);
         }
 
-        let (exec_type, into) = match &value.into {
+        let (exec_type, into) = match &self.into {
             Some(into) => {
-                let into = get_eval(into)?;
+                let into = into.build(bindings)?;
                 if into.expected_type() != ValueType::String
                     && into.expected_type() != ValueType::Path
                 {
@@ -42,7 +43,7 @@ impl TryFrom<&SpawnOrExecute> for Box<dyn Evaluator> {
         };
 
         let executor = Executor::new(exec, args, into);
-        if value.spawn {
+        if self.spawn {
             Ok(build_fire(executor))
         } else {
             Ok(build_exec(executor, exec_type))

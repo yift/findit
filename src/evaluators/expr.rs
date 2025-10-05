@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     errors::FindItError,
     file_wrapper::FileWrapper,
@@ -14,40 +16,73 @@ pub(crate) trait Evaluator {
     fn expected_type(&self) -> ValueType;
 }
 
-pub(crate) fn get_eval(expr: &Expression) -> Result<Box<dyn Evaluator>, FindItError> {
-    match expr {
-        Expression::Literal(val) => Ok(val.into()),
-        Expression::Binary(bin) => bin.try_into(),
-        Expression::Negate(exp) => exp.try_into(),
-        Expression::Brackets(expr) => get_eval(expr),
-        Expression::Access(access) => Ok(access.into()),
-        Expression::IsCheck(is_check) => is_check.try_into(),
-        Expression::If(iff) => iff.try_into(),
-        Expression::Case(case) => case.try_into(),
-        Expression::Between(between) => between.try_into(),
-        Expression::Position(position) => position.try_into(),
-        Expression::Substring(substring) => substring.try_into(),
-        Expression::Function(func) => func.try_into(),
-        Expression::SpawnOrExecute(spawn_or_exec) => spawn_or_exec.try_into(),
-        Expression::SelfDivide(self_divide) => self_divide.try_into(),
-        Expression::Cast(a) => a.try_into(),
-        Expression::Format(f) => f.try_into(),
-        Expression::Parse(p) => p.try_into(),
-        Expression::Replace(p) => p.try_into(),
+#[derive(Debug, Default)]
+pub(crate) struct BindingsTypes {
+    types: HashMap<String, (usize, ValueType)>,
+    max_index: usize,
+}
+impl BindingsTypes {
+    pub(crate) fn get(&self, name: &str) -> Result<(&usize, &ValueType), FindItError> {
+        let Some((index, tp)) = self.types.get(name) else {
+            return Err(FindItError::BadExpression(format!(
+                "Can not find binding name: '{name}'"
+            )));
+        };
+        Ok((index, tp))
+    }
+    pub(crate) fn with(&self, name: &str, tp: ValueType) -> Self {
+        let mut types = self.types.clone();
+        types.insert(name.to_string(), (self.max_index, tp));
+        Self {
+            types,
+            max_index: self.max_index + 1,
+        }
+    }
+}
+pub(crate) trait EvaluatorFactory {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError>;
+}
+
+impl EvaluatorFactory for Expression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        match self {
+            Expression::Literal(val) => Ok(val.into()),
+            Expression::Binary(bin) => bin.build(bindings),
+            Expression::Negate(exp) => exp.build(bindings),
+            Expression::Brackets(expr) => expr.build(bindings),
+            Expression::Access(access) => Ok(access.into()),
+            Expression::IsCheck(is_check) => is_check.build(bindings),
+            Expression::If(iff) => iff.build(bindings),
+            Expression::Case(case) => case.build(bindings),
+            Expression::Between(between) => between.build(bindings),
+            Expression::Position(position) => position.build(bindings),
+            Expression::Substring(substring) => substring.build(bindings),
+            Expression::Function(func) => func.build(bindings),
+            Expression::SpawnOrExecute(spawn_or_exec) => spawn_or_exec.build(bindings),
+            Expression::SelfDivide(self_divide) => self_divide.build(bindings),
+            Expression::Cast(a) => a.build(bindings),
+            Expression::Format(f) => f.build(bindings),
+            Expression::Parse(p) => p.build(bindings),
+            Expression::Replace(p) => p.build(bindings),
+            Expression::BindingReplacement(b) => b.build(bindings),
+            Expression::With(w) => w.build(bindings),
+        }
     }
 }
 
 pub(crate) fn read_expr(expr: &str) -> Result<Box<dyn Evaluator>, FindItError> {
     let expression = parse_expression(expr)?;
-    get_eval(&expression)
+
+    expression.build(&BindingsTypes::default())
 }
 
 pub(crate) fn read_order_by(sql: &str) -> Result<Vec<OrderItem>, FindItError> {
     let order_by = parse_order_by(sql)?;
 
     let mut order = vec![];
+    let types = BindingsTypes::default();
     for item in order_by.items {
-        let evaluator = get_eval(&item.expression)?;
+        let evaluator = item.expression.build(&types)?;
         let direction = match &item.direction {
             OrderByDirection::Asc => OrderDirection::Asc,
             OrderByDirection::Desc => OrderDirection::Desc,

@@ -4,7 +4,7 @@ use chrono::DateTime;
 
 use crate::{
     errors::FindItError,
-    evaluators::expr::{Evaluator, get_eval},
+    evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
     parser::{
         ast::{
@@ -124,11 +124,10 @@ impl Evaluator for CastToPath {
     }
 }
 
-impl TryFrom<&As> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(value: &As) -> Result<Self, Self::Error> {
-        let expr = get_eval(&value.expression)?;
-        match value.cast_type {
+impl EvaluatorFactory for As {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let expr = self.expression.build(bindings)?;
+        match self.cast_type {
             CastType::Bool => Ok(Box::new(CastToBool { expr })),
             CastType::String => Ok(Box::new(CastToString { expr })),
             CastType::Number => Ok(Box::new(CastToNumber { expr })),

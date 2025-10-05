@@ -1,17 +1,16 @@
 use crate::errors::FindItError;
-use crate::evaluators::expr::{Evaluator, get_eval};
+use crate::evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory};
 use crate::file_wrapper::FileWrapper;
 use crate::parser::ast::format::Format as FormatExpression;
 use crate::value::{Value, ValueType};
 
-impl TryFrom<&FormatExpression> for Box<dyn Evaluator> {
-    type Error = FindItError;
-    fn try_from(format: &FormatExpression) -> Result<Self, Self::Error> {
-        let timestamp = get_eval(&format.timestamp)?;
+impl EvaluatorFactory for FormatExpression {
+    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
+        let timestamp = self.timestamp.build(bindings)?;
         if timestamp.expected_type() != ValueType::Date {
             return Err(FindItError::BadExpression("Can only format dates".into()));
         }
-        let format = get_eval(&format.format)?;
+        let format = self.format.build(bindings)?;
         if format.expected_type() != ValueType::String {
             return Err(FindItError::BadExpression(
                 "Format must be a string value".into(),

@@ -31,6 +31,7 @@ mod self_divide;
 mod span;
 mod substr;
 mod tokens;
+mod with;
 
 pub(crate) fn parse_expression(source: &str) -> Result<Expression, ParserError> {
     let mut lexer = lex(source)?;
