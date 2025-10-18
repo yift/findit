@@ -23,4 +23,5 @@ pub(crate) enum Access {
     Owner,
     Group,
     Permissions,
+    Files,
 }

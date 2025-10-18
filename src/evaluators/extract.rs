@@ -1,5 +1,6 @@
 use std::{fs, os::unix::fs::MetadataExt};
 
+use itertools::Itertools;
 use std::os::unix::fs::PermissionsExt;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
@@ -40,6 +41,7 @@ impl From<&Access> for Box<dyn Evaluator> {
             Access::Owner => Box::new(OwnerExtractor {}),
             Access::Group => Box::new(GroupExtractor {}),
             Access::Permissions => Box::new(PermissionsExtractor {}),
+            Access::Files => Box::new(FilesExtractor {}),
         }
     }
 }
@@ -252,6 +254,23 @@ impl Evaluator for PermissionsExtractor {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Number
+    }
+}
+
+struct FilesExtractor {}
+impl Evaluator for FilesExtractor {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Ok(paths) = fs::read_dir(file.path()) else {
+            return Value::Empty;
+        };
+        paths
+            .filter_map(Result::ok)
+            .filter_map(|f| f.path().to_str().map(|f| f.to_string()))
+            .join(", ")
+            .into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
     }
 }
 

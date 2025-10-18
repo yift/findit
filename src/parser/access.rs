@@ -19,6 +19,7 @@ impl Access {
             "GROUP" => Some(Access::Group),
             "PERMISSIONS" => Some(Access::Permissions),
             "ABSOLUTE" => Some(Access::Absolute),
+            "FILES" => Some(Access::Files),
             "ME" | "SELF" | "THIS" => Some(Access::Me),
             _ => None,
         }
