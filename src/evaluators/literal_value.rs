@@ -22,6 +22,7 @@ impl Evaluator for Value {
             Value::Number(_) => ValueType::Number,
             Value::String(_) => ValueType::String,
             Value::Path(_) => ValueType::Path,
+            Value::List(lst) => lst.item_type().clone(),
         }
     }
 }

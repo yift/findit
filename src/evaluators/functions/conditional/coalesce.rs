@@ -23,7 +23,7 @@ impl Evaluator for Coalesce {
         Value::Empty
     }
     fn expected_type(&self) -> ValueType {
-        self.value_type
+        self.value_type.clone()
     }
 }
 

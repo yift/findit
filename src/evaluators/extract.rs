@@ -1,6 +1,5 @@
-use std::{fs, os::unix::fs::MetadataExt};
+use std::{fs, os::unix::fs::MetadataExt, rc::Rc};
 
-use itertools::Itertools;
 use std::os::unix::fs::PermissionsExt;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
@@ -8,7 +7,7 @@ use crate::{
     evaluators::expr::Evaluator,
     file_wrapper::FileWrapper,
     parser::ast::access::Access,
-    value::{Value, ValueType},
+    value::{List, Value, ValueType},
 };
 
 impl From<&Access> for Box<dyn Evaluator> {
@@ -263,14 +262,17 @@ impl Evaluator for FilesExtractor {
         let Ok(paths) = fs::read_dir(file.path()) else {
             return Value::Empty;
         };
-        paths
-            .filter_map(Result::ok)
-            .filter_map(|f| f.path().to_str().map(|f| f.to_string()))
-            .join(", ")
-            .into()
+        let list = List::new(
+            ValueType::Path,
+            paths
+                .filter_map(Result::ok)
+                .map(|f| f.path())
+                .map(|f| f.into()),
+        );
+        Value::List(list)
     }
     fn expected_type(&self) -> ValueType {
-        ValueType::String
+        ValueType::List(Rc::new(ValueType::Path))
     }
 }
 

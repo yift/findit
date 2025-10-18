@@ -12,7 +12,7 @@ struct BindingReplacement {
 }
 impl Evaluator for BindingReplacement {
     fn expected_type(&self) -> ValueType {
-        self.value_type
+        self.value_type.clone()
     }
     fn eval(&self, file: &FileWrapper) -> Value {
         file.get_binding(self.index)
@@ -24,7 +24,7 @@ impl EvaluatorFactory for Binding {
         let (index, value_type) = bindings.get(&self.name)?;
         Ok(Box::new(BindingReplacement {
             index: *index,
-            value_type: *value_type,
+            value_type: value_type.clone(),
         }))
     }
 }

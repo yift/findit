@@ -33,6 +33,7 @@ impl Evaluator for CastToBool {
             Value::Empty => Value::Empty,
             Value::Number(n) => (n != 0).into(),
             Value::Path(p) => p.exists().into(),
+            Value::List(l) => l.has_items().into(),
         }
     }
 }
@@ -70,6 +71,7 @@ impl Evaluator for CastToNumber {
                 Err(_) => Value::Empty,
             },
             Value::Number(n) => Value::Number(n),
+            Value::List(l) => l.count().into(),
             Value::Path(_) => Value::Empty,
         }
     }
@@ -104,6 +106,7 @@ impl Evaluator for CastToDate {
                 },
                 Err(_) => Value::Empty,
             },
+            Value::List(_) => Value::Empty,
         }
     }
 }
@@ -117,7 +120,9 @@ impl Evaluator for CastToPath {
     }
     fn eval(&self, file: &FileWrapper) -> Value {
         match self.expr.eval(file) {
-            Value::Bool(_) | Value::Empty | Value::Date(_) | Value::Number(_) => Value::Empty,
+            Value::Bool(_) | Value::Empty | Value::Date(_) | Value::Number(_) | Value::List(_) => {
+                Value::Empty
+            }
             Value::Path(p) => Value::Path(p),
             Value::String(s) => Value::Path(Path::new(&s).to_path_buf()),
         }

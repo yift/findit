@@ -38,7 +38,7 @@ impl Evaluator for Case {
         }
     }
     fn expected_type(&self) -> ValueType {
-        self.value_type
+        self.value_type.clone()
     }
 }
 

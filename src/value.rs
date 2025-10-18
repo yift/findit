@@ -2,10 +2,12 @@ use std::{
     ffi::OsStr,
     fmt::Display,
     path::{Path, PathBuf},
+    rc::Rc,
     time::SystemTime,
 };
 
 use chrono::{DateTime, Local};
+use itertools::Itertools;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum Value {
@@ -14,9 +16,32 @@ pub(crate) enum Value {
     Number(u64),
     Bool(bool),
     Date(DateTime<Local>),
+    List(List),
     Empty,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub(crate) struct List {
+    items: Rc<Vec<Value>>,
+    item_type: ValueType,
+}
+
+impl List {
+    pub(crate) fn new(item_type: ValueType, items: impl Iterator<Item = Value>) -> Self {
+        let items = items.collect();
+        let items = Rc::new(items);
+        Self { items, item_type }
+    }
+    pub(crate) fn has_items(&self) -> bool {
+        !self.items.is_empty()
+    }
+    pub(crate) fn count(&self) -> usize {
+        self.items.len()
+    }
+    pub(crate) fn item_type(&self) -> &ValueType {
+        &self.item_type
+    }
+}
 impl From<&Path> for Value {
     fn from(value: &Path) -> Self {
         Value::Path(value.to_path_buf())
@@ -103,17 +128,23 @@ impl Display for Value {
             Value::Path(p) => write!(f, "{}", p.as_os_str().to_str().unwrap_or_default()),
             Value::String(s) => write!(f, "{s}"),
             Value::Date(dt) => write!(f, "{}", dt.format("%d/%b/%Y %H:%M:%S")),
+            Value::List(lst) => write!(
+                f,
+                "[{}]",
+                lst.items.iter().map(|t| t.to_string()).join(", ")
+            ),
         }
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) enum ValueType {
     Bool,
     Number,
     Path,
     String,
     Date,
+    List(Rc<ValueType>),
     Empty,
 }
 
@@ -126,6 +157,7 @@ impl Display for ValueType {
             ValueType::Number => "number".fmt(f),
             ValueType::Path => "path".fmt(f),
             ValueType::String => "string".fmt(f),
+            ValueType::List(tp) => write!(f, "list<{tp}>"),
         }
     }
 }
