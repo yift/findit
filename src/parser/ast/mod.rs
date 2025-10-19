@@ -11,6 +11,7 @@ pub(crate) mod function;
 pub(crate) mod function_name;
 pub(crate) mod if_expression;
 pub(crate) mod is_check;
+pub(crate) mod list;
 pub(crate) mod negate;
 pub(crate) mod operator;
 pub(crate) mod order_by;

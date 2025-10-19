@@ -23,11 +23,11 @@ pub(crate) enum Value {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub(crate) struct List {
     items: Rc<Vec<Value>>,
-    item_type: ValueType,
+    item_type: Rc<ValueType>,
 }
 
 impl List {
-    pub(crate) fn new(item_type: ValueType, items: impl Iterator<Item = Value>) -> Self {
+    pub(crate) fn new(item_type: Rc<ValueType>, items: impl Iterator<Item = Value>) -> Self {
         let items = items.collect();
         let items = Rc::new(items);
         Self { items, item_type }

@@ -66,6 +66,7 @@ impl EvaluatorFactory for Expression {
             Expression::Replace(p) => p.build(bindings),
             Expression::BindingReplacement(b) => b.build(bindings),
             Expression::With(w) => w.build(bindings),
+            Expression::List(l) => l.build(bindings),
         }
     }
 }

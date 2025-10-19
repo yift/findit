@@ -56,6 +56,8 @@ pub(crate) enum Token {
     Replace,
     To,
     Pattern,
+    ListStart,
+    ListEnds,
     FunctionName(FunctionName),
     BindingName(String),
     With,
@@ -154,10 +156,32 @@ impl Token {
             }
             'A'..='Z' | 'a'..='z' => Ok(Some(read_reserved_word(chars)?)),
             '=' | '!' | '<' | '>' => Ok(Some(read_symbol(chars)?)),
+            ':' => Ok(Some(read_complex_literal(chars)?)),
+            ']' => {
+                chars.next();
+                Ok(Some(Token::ListEnds))
+            }
             _ => Err(TokenError {
                 cause: format!("Unknown character: {}", chr),
             }),
         }
+    }
+}
+
+fn read_complex_literal(
+    chars: &mut impl Iterator<Item = (usize, char)>,
+) -> Result<Token, TokenError> {
+    chars.next();
+    let Some((_, next)) = chars.next() else {
+        return Err(TokenError {
+            cause: "Unexpected EOF".into(),
+        });
+    };
+    match next {
+        '[' => Ok(Token::ListStart),
+        _ => Err(TokenError {
+            cause: format!("Unexpected '{next}'"),
+        }),
     }
 }
 

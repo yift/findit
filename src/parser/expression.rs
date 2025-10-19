@@ -19,6 +19,7 @@ use crate::parser::{
     function::build_function,
     if_expression::build_if,
     lexer::LexerItem,
+    literal_list::build_literal_list,
     parse_date::build_parse_date,
     parser_error::ParserError,
     position::build_position,
@@ -55,6 +56,7 @@ pub(super) fn build_expression_with_priority(
             Token::Replace => build_replace(lex)?,
             Token::With => build_with(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
+            Token::ListStart => build_literal_list(lex)?,
             Token::Not => {
                 let expression = build_expression_with_priority(lex, 30, end_condition)?;
                 Expression::Negate(Negate::new(expression))

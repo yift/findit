@@ -263,7 +263,7 @@ impl Evaluator for FilesExtractor {
             return Value::Empty;
         };
         let list = List::new(
-            ValueType::Path,
+            Rc::new(ValueType::Path),
             paths
                 .filter_map(Result::ok)
                 .map(|f| f.path())

@@ -11,13 +11,6 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
-echo '  fix...'
-cargo fix --tests --all-features --allow-dirty > /tmp/out.txt 2>&1
-if [ $? -ne 0 ]; then
-    less /tmp/out.txt
-    exit -1
-fi
-
 echo '  Check...'
 cargo check --tests --all-features > /tmp/out.txt 2>&1
 if [ $? -ne 0 ]; then
@@ -25,6 +18,12 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
+echo '  fix...'
+cargo fix --tests --all-features --allow-dirty > /tmp/out.txt 2>&1
+if [ $? -ne 0 ]; then
+    less /tmp/out.txt
+    exit -1
+fi
 
 echo '  Build...'
 cargo build --all-targets --all-features > /tmp/out.txt 2>&1
