@@ -262,7 +262,7 @@ impl Evaluator for FilesExtractor {
         let Ok(paths) = fs::read_dir(file.path()) else {
             return Value::Empty;
         };
-        let list = List::new(
+        let list = List::new_lazy(
             Rc::new(ValueType::Path),
             paths
                 .filter_map(Result::ok)

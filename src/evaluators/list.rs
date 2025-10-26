@@ -18,7 +18,7 @@ impl Evaluator for ListEval {
     }
     fn eval(&self, file: &FileWrapper) -> Value {
         let items = self.items.iter().map(|f| f.eval(file));
-        let list = List::new(self.items_type.clone(), items);
+        let list = List::new_eager(self.items_type.clone(), items);
         Value::List(list)
     }
 }
@@ -64,7 +64,7 @@ mod tests {
 
         assert_eq!(
             expr.eval(file),
-            Value::List(List::new(
+            Value::List(List::new_lazy(
                 Rc::new(ValueType::Number),
                 [10, 20, 30].iter().map(|i| Value::Number(*i))
             ))
@@ -80,7 +80,7 @@ mod tests {
 
         assert_eq!(
             expr.eval(file),
-            Value::List(List::new(
+            Value::List(List::new_lazy(
                 Rc::new(ValueType::Empty),
                 [].iter().map(|i| Value::Number(*i))
             ))

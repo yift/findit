@@ -5,6 +5,7 @@ pub mod errors;
 mod evaluators;
 mod file_wrapper;
 mod filter;
+mod lazy_list;
 mod limit;
 mod min_depth;
 mod order;
