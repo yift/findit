@@ -159,3 +159,59 @@ impl<T: Ord> Ord for LazyList<T> {
         self.eager().deref().cmp(other.eager().deref())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::{cmp::Ordering, vec};
+
+    use crate::lazy_list::LazyList;
+
+    #[test]
+    fn test_lazy_list_display() {
+        let lst = vec![10, 20];
+        let lst: LazyList<_> = lst.into();
+        assert_eq!(format!("{}", lst), "[10, 20]");
+    }
+
+    #[test]
+    fn test_lazy_list_lazy_display() {
+        let lst: Box<dyn Iterator<Item = _>> = Box::new(vec![11, 21].into_iter());
+        let lst: LazyList<_> = lst.into();
+        assert_eq!(format!("{}", lst), "[11, 21]");
+    }
+
+    #[test]
+    fn test_lazy_list_debug() {
+        let lst = vec![10, 20];
+        let lst: LazyList<_> = lst.into();
+        assert_eq!(format!("{:?}", lst), "[10, 20]");
+    }
+
+    #[test]
+    fn test_lazy_list_order() {
+        let lst_one = vec![10, 20];
+        let lst_two = vec![10, 30];
+        let lst_one: LazyList<_> = lst_one.into();
+        let lst_two: LazyList<_> = lst_two.into();
+        assert!(lst_one < lst_two);
+    }
+
+    #[test]
+    fn test_lazy_list_ordering() {
+        let lst_one: Box<dyn Iterator<Item = _>> = Box::new(vec![11, 21].into_iter());
+        let lst_two: Box<dyn Iterator<Item = _>> = Box::new(vec![10, 30].into_iter());
+        let lst_one: LazyList<_> = lst_one.into();
+        let lst_two: LazyList<_> = lst_two.into();
+
+        assert_eq!(lst_one.cmp(&lst_two), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_lazy_clone() {
+        let lst_one: Box<dyn Iterator<Item = _>> = Box::new(vec![11, 21].into_iter());
+        let lst_one: LazyList<_> = lst_one.into();
+        let lst_two = lst_one.clone();
+
+        assert_eq!(lst_one.cmp(&lst_two), Ordering::Equal);
+    }
+}
