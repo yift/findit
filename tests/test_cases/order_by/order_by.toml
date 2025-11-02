@@ -1,9 +1,9 @@
 [order_by_number]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "count, length, depth, name", "-d", "`name`: count: `count`, length: `length`, depth: `depth`"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "count, length(), depth, name", "-d", "`name`: count: `count`, length: `length()`, depth: `depth`"]
 order = true
 
 [order_by_number_desc]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length DESC, count, depth DESC, name", "-d", "`name`: count: `count`, length: `length`, depth: `depth`"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length() DESC, count, depth DESC, name", "-d", "`name`: count: `count`, length: `length()`, depth: `depth`"]
 order = true
 
 [order_by_string]
@@ -42,21 +42,21 @@ arguments = ["/tmp/findit/tests/order_by_date_desc", "-d", "`name` -> modified: 
 run_after = ["rm -rf /tmp/findit/tests/order_by_date_desc"]
 
 [order_by_null_last_implicit]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length(), name", "-d", "`name`: length: `length()`"]
 order = true
 
 [order_by_with_limit]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`", "--limit", "6"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length(), name", "-d", "`name`: length: `length()`", "--limit", "6"]
 order = true
 
 [order_by_with_filter]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length, name", "-d", "`name`: length: `length`", "-w", "extension = \"txt\""]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length(), name", "-d", "`name`: length: `length()`", "-w", "extension = \"txt\""]
 order = true
 
 [order_by_with_filter_and_limit]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length DESC, name", "-d", "`name`: length: `length`", "-w", "extension = \"txt\"", "--limit", "10"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length() DESC, name", "-d", "`name`: length: `length()`", "-w", "extension = \"txt\"", "--limit", "10"]
 order = true
 
 [order_by_with_asc]
-arguments = ["tests/test_cases/order_by/test_files/", "-o", "length ASC, name", "-d", "`name`: length: `length`", "-w", "extension = \"txt\"", "--limit", "700"]
+arguments = ["tests/test_cases/order_by/test_files/", "-o", "length() ASC, name", "-d", "`name`: length: `length()`", "-w", "extension = \"txt\"", "--limit", "700"]
 order = true

@@ -2,9 +2,9 @@ use crate::{
     parser::ast::{
         access::Access, as_cast::As, between::Between, binary_expression::BinaryExpression,
         binding::Binding, case::Case, execute::SpawnOrExecute, format::Format, function::Function,
-        if_expression::If, is_check::IsCheck, list::List, negate::Negate, parse::Parse,
-        position::Position, replace::Replace, self_divide::SelfDivide, substr::Substring,
-        with::With,
+        if_expression::If, is_check::IsCheck, list::List, methods::MethodInvocation,
+        negate::Negate, parse::Parse, position::Position, replace::Replace,
+        self_divide::SelfDivide, substr::Substring, with::With,
     },
     value::Value,
 };
@@ -32,4 +32,5 @@ pub(crate) enum Expression {
     BindingReplacement(Binding),
     With(With),
     List(List),
+    MethodInvocation(MethodInvocation),
 }

@@ -7,7 +7,6 @@ pub(crate) enum Access {
     Me,
     Extension,
     Content,
-    Length,
     Depth,
     Size,
     Count,

@@ -8,7 +8,6 @@ impl Access {
             "PATH" => Some(Access::Path),
             "EXTENSION" => Some(Access::Extension),
             "CONTENT" => Some(Access::Content),
-            "LENGTH" => Some(Access::Length),
             "DEPTH" => Some(Access::Depth),
             "SIZE" => Some(Access::Size),
             "COUNT" => Some(Access::Count),

@@ -11,9 +11,9 @@ arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF size >
 order = false
 
 [if_with_nulls]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF length > 70 then \"large\" else \"small\" end`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF length() > 70 then \"large\" else \"small\" end`"]
 order = false
 
 [if_without_else]
-arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF length > 70 then \"large\" end`"]
+arguments = ["tests/test_cases/functions/test_files", "-d", "`size` - `IF content.length() > 70 then \"large\" end`"]
 order = false

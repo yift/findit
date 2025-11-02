@@ -637,7 +637,7 @@ mod tests {
 
     #[test]
     fn plus_return_empty_if_not_a_number() {
-        let eval = read_expr("parent.length + 200").unwrap();
+        let eval = read_expr("parent.length() + 200").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -646,7 +646,7 @@ mod tests {
 
     #[test]
     fn plus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("[2025-04-19 08:42:00] + parent.length").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] + parent.length()").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -664,7 +664,7 @@ mod tests {
 
     #[test]
     fn minus_return_empty_if_not_a_number() {
-        let eval = read_expr("parent.length - 200").unwrap();
+        let eval = read_expr("parent.length() - 200").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -673,7 +673,7 @@ mod tests {
 
     #[test]
     fn minus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("[2025-04-19 08:42:00] - parent.length").unwrap();
+        let eval = read_expr("[2025-04-19 08:42:00] - parent.length()").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -961,7 +961,7 @@ mod tests {
 
     #[test]
     fn or_bitwise_no_left() -> Result<(), FindItError> {
-        let expr = read_expr("length | 0x20")?;
+        let expr = read_expr("length() | 0x20")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);
@@ -973,7 +973,7 @@ mod tests {
 
     #[test]
     fn or_bitwise_no_right() -> Result<(), FindItError> {
-        let expr = read_expr("0x20 | length")?;
+        let expr = read_expr("0x20 | length()")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);
@@ -985,7 +985,7 @@ mod tests {
 
     #[test]
     fn and_bitwise_no_left() -> Result<(), FindItError> {
-        let expr = read_expr("length & 0x20")?;
+        let expr = read_expr("length() & 0x20")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);
@@ -997,7 +997,7 @@ mod tests {
 
     #[test]
     fn and_bitwise_no_right() -> Result<(), FindItError> {
-        let expr = read_expr("0x20 & length")?;
+        let expr = read_expr("0x20 & length()")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);
@@ -1009,7 +1009,7 @@ mod tests {
 
     #[test]
     fn xor_bitwise_no_left() -> Result<(), FindItError> {
-        let expr = read_expr("length ^ 0x20")?;
+        let expr = read_expr("length() ^ 0x20")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);
@@ -1021,7 +1021,7 @@ mod tests {
 
     #[test]
     fn xor_bitwise_no_right() -> Result<(), FindItError> {
-        let expr = read_expr("0x20 ^ length")?;
+        let expr = read_expr("0x20 ^ length()")?;
         let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
 
         let val = expr.eval(&file);

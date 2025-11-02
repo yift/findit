@@ -257,6 +257,30 @@ mod tests {
     }
 
     #[test]
+    fn empty_list_cast_to_bool_false() -> Result<(), FindItError> {
+        let sql = ":[] as bool";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(false));
+        Ok(())
+    }
+
+    #[test]
+    fn non_empty_list_cast_to_bool_true() -> Result<(), FindItError> {
+        let sql = ":[1] as bool";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(true));
+        Ok(())
+    }
+
+    #[test]
     fn bool_cast_to_string() -> Result<(), FindItError> {
         let sql = "true as text";
         let eval = read_expr(sql)?;
@@ -373,6 +397,18 @@ mod tests {
         let value = eval.eval(&wrapper);
 
         assert_eq!(value, Value::Empty);
+        Ok(())
+    }
+
+    #[test]
+    fn list_cast_to_number() -> Result<(), FindItError> {
+        let sql = ":[1, 2, 12] as number";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Number(3));
         Ok(())
     }
 
@@ -608,6 +644,19 @@ mod tests {
         let eval = read_expr(sql)?;
 
         assert_eq!(eval.expected_type(), ValueType::Number);
+        Ok(())
+    }
+
+    #[test]
+    fn test_cast_list_to_date() -> Result<(), FindItError> {
+        let sql = ":[1, 2] as date";
+        let eval = read_expr(sql)?;
+
+        let file = Path::new("/no/such/file");
+        let wrapper = FileWrapper::new(file.to_path_buf(), 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Empty);
         Ok(())
     }
 }

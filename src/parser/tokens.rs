@@ -4,12 +4,15 @@ use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, offset::LocalResult};
 
 use crate::{
     parser::{
-        ast::access::Access,
-        ast::function_name::FunctionName,
-        ast::operator::{
-            ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
-            LogicalOperator,
+        ast::{
+            access::Access,
+            function_name::FunctionName,
+            operator::{
+                ArithmeticOperator, BinaryOperator, BitwiseOperator, ComparisonOperator,
+                LogicalOperator,
+            },
         },
+        method::MethodName,
     },
     value::Value,
 };
@@ -60,6 +63,7 @@ pub(crate) enum Token {
     ListEnds,
     FunctionName(FunctionName),
     BindingName(String),
+    MethodName(MethodName),
     With,
     Do,
 }
@@ -298,6 +302,8 @@ fn read_reserved_word(
                 Ok(Token::SimpleAccess(access))
             } else if let Some(f) = FunctionName::from_str(&str) {
                 Ok(Token::FunctionName(f))
+            } else if let Some(n) = MethodName::from_str(&str) {
+                Ok(Token::MethodName(n))
             } else {
                 Err(TokenError {
                     cause: format!("Unknown reserved word: {str}"),
@@ -531,7 +537,7 @@ fn read_binding_name(
 mod tests {
     use chrono::{FixedOffset, MappedLocalTime, NaiveTime, TimeZone, Utc};
 
-    use crate::parser::ast::function_name::StringFunctionName;
+    use crate::parser::ast::function_name::EnvFunctionName;
 
     use super::*;
 
@@ -1098,7 +1104,7 @@ mod tests {
 
     #[test]
     fn function_name() -> Result<(), TokenError> {
-        let str = "trim_head".to_string();
+        let str = "rand".to_string();
 
         let mut chars = str.chars().enumerate().peekable();
 
@@ -1106,8 +1112,8 @@ mod tests {
 
         assert_eq!(
             token,
-            Some(Token::FunctionName(FunctionName::String(
-                StringFunctionName::TrimHead
+            Some(Token::FunctionName(FunctionName::Env(
+                EnvFunctionName::Rand
             )))
         );
 
@@ -1283,6 +1289,30 @@ mod tests {
     #[test]
     fn binding_name_empty() -> Result<(), TokenError> {
         let str = "{}";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let err = Token::new(&mut chars).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn complex_just_started() -> Result<(), TokenError> {
+        let str = ":";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let err = Token::new(&mut chars).err();
+
+        assert!(err.is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn complex_unknown_char() -> Result<(), TokenError> {
+        let str = ":-";
         let mut chars = str.chars().enumerate().peekable();
 
         let err = Token::new(&mut chars).err();

@@ -22,7 +22,6 @@ impl From<&Access> for Box<dyn Evaluator> {
             Access::Me => Box::new(MeExtractor {}),
 
             Access::Content => Box::new(ContentExtractor {}),
-            Access::Length => Box::new(LengthExtractor {}),
             Access::Depth => Box::new(DepthExtractor {}),
 
             Access::Size => Box::new(SizeExtractor {}),
@@ -92,7 +91,7 @@ impl Evaluator for AbsoluteExtractor {
         ValueType::Path
     }
 }
-struct MeExtractor {}
+pub(super) struct MeExtractor {}
 impl Evaluator for MeExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().as_path().into()
@@ -109,16 +108,6 @@ impl Evaluator for ContentExtractor {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::String
-    }
-}
-
-struct LengthExtractor {}
-impl Evaluator for LengthExtractor {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        file.read().map(|f| f.chars().count()).into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Number
     }
 }
 
@@ -349,11 +338,6 @@ mod tests {
     #[test]
     fn test_count_expected_type() -> Result<(), FindItError> {
         test_expected_type("count", ValueType::Number)
-    }
-
-    #[test]
-    fn test_length_expected_type() -> Result<(), FindItError> {
-        test_expected_type("length", ValueType::Number)
     }
 
     #[test]

@@ -8,6 +8,7 @@ use crate::parser::{
         binding::Binding,
         expression::Expression,
         is_check::{IsCheck, IsType},
+        methods::MethodInvocation,
         negate::Negate,
         operator::{ArithmeticOperator, BinaryOperator, LogicalOperator},
         self_divide::SelfDivide,
@@ -20,6 +21,7 @@ use crate::parser::{
     if_expression::build_if,
     lexer::LexerItem,
     literal_list::build_literal_list,
+    method::build_method,
     parse_date::build_parse_date,
     parser_error::ParserError,
     position::build_position,
@@ -72,6 +74,13 @@ pub(super) fn build_expression_with_priority(
             }
             Token::Spawn => build_spawn_or_exec(true, lex)?,
             Token::Execute => build_spawn_or_exec(false, lex)?,
+            Token::MethodName(name) => {
+                let method = build_method(&name, lex)?;
+                Expression::MethodInvocation(MethodInvocation {
+                    target: None,
+                    method,
+                })
+            }
             _ => return Err(ParserError::UnexpectedToken(item.span)),
         },
     };
@@ -100,7 +109,16 @@ pub(super) fn build_expression_with_priority(
             Operator::Binary(operator) => {
                 lex.next();
                 let right = build_expression_with_priority(lex, priority, end_condition)?;
-                left = Expression::Binary(BinaryExpression::new(left, operator, right));
+                if operator == BinaryOperator::Dot
+                    && let Expression::MethodInvocation(m) = right
+                {
+                    left = Expression::MethodInvocation(MethodInvocation {
+                        target: Some(Box::new(left)),
+                        method: m.method,
+                    });
+                } else {
+                    left = Expression::Binary(BinaryExpression::new(left, operator, right));
+                }
             }
             Operator::PostIs => {
                 left = read_postfix_is(left, lex)?;
@@ -234,7 +252,7 @@ mod tests {
                 execute::SpawnOrExecute,
                 format::Format,
                 function::Function,
-                function_name::{EnvFunctionName, FunctionName, StringFunctionName},
+                function_name::{EnvFunctionName, FunctionName},
                 if_expression::If,
                 operator::ComparisonOperator,
                 position::Position,
@@ -905,22 +923,6 @@ mod tests {
         let exp = parse_expression(str)?;
 
         assert_eq!(exp, func(FunctionName::Env(EnvFunctionName::Rand), vec![]));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_function_single_arg() -> Result<(), ParserError> {
-        let str = "trim(\"text\")";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(
-            exp,
-            func(
-                FunctionName::String(StringFunctionName::Trim),
-                vec![lit_s("text")]
-            )
-        );
 
         Ok(())
     }

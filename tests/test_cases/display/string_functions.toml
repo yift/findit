@@ -24,17 +24,17 @@ arguments = ["tests/test_cases/display/test_files", "-d", "substr_for_0: `SUBSTR
 order = false
 
 [simple_trim]
-arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(\"  test  \")`|", '--limit', '1']
+arguments = ["tests/test_cases/display/test_files", "-d", "|`\"  test  \".TRIM()`|", '--limit', '1']
 order = false
 
 [trim_trailing]
-arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM_tail(\"  test  \")`|", '--limit', '1']
+arguments = ["tests/test_cases/display/test_files", "-d", "|`\"  test  \".TRIM_tail()`|", '--limit', '1']
 order = false
 
 [trim_leading]
-arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM_head(\"  test  \")`|", '--limit', '1']
+arguments = ["tests/test_cases/display/test_files", "-d", "|`\"  test  \".TRIM_head()`|", '--limit', '1']
 order = false
 
 [trim_both]
-arguments = ["tests/test_cases/display/test_files", "-d", "|`TRIM(\"  test  \")`|", '--limit', '1']
+arguments = ["tests/test_cases/display/test_files", "-d", "|`\"  test  \".TRIM()`|", '--limit', '1']
 order = false

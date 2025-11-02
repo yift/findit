@@ -49,8 +49,8 @@ impl List {
     pub(crate) fn count(&self) -> usize {
         self.items.len()
     }
-    pub(crate) fn item_type(&self) -> &ValueType {
-        &self.item_type
+    pub(crate) fn items(self) -> LazyList<Value> {
+        self.items
     }
 }
 impl From<&Path> for Value {

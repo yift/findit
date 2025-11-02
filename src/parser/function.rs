@@ -51,14 +51,15 @@ mod tests {
 
     #[test]
     fn test_func_just_name() {
-        let source = "trim";
+        let source = "rand";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
     }
+
     #[test]
     fn test_func_with_no_open_brackets() {
-        let source = "trim +";
+        let source = "rand +";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());

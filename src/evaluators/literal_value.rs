@@ -17,12 +17,11 @@ impl Evaluator for Value {
     fn expected_type(&self) -> ValueType {
         match self {
             Value::Bool(_) => ValueType::Bool,
-            Value::Empty => ValueType::Empty,
             Value::Date(_) => ValueType::Date,
             Value::Number(_) => ValueType::Number,
             Value::String(_) => ValueType::String,
             Value::Path(_) => ValueType::Path,
-            Value::List(lst) => lst.item_type().clone(),
+            _ => ValueType::Empty,
         }
     }
 }

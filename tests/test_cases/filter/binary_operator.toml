@@ -7,11 +7,11 @@ arguments = ["tests/test_cases/filter/test_files", "-w", 'count - 4 = 0']
 order = false
 
 [multiply]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'length * 2 = 146']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'length() * 2 = 146']
 order = false
 
 [divide]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'length / 5 = 9']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'length() / 5 = 9']
 order = false
 
 [divide_with_path]
@@ -19,23 +19,23 @@ arguments = ["tests/test_cases/filter/test_files", "-w", "(parent / \"mia-23.bas
 order = false
 
 [modulo]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'length % 5 = 3']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'length() % 5 = 3']
 order = false
 
 [gt]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'length > 73', '-d', '`path` -> `length`']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'length() > 73', '-d', '`path` -> `length()`']
 order = false
 
 [gte]
-arguments = ["tests/test_cases/filter/test_files", "-w", 'length >= 73', '-d', '`path` -> `length`']
+arguments = ["tests/test_cases/filter/test_files", "-w", 'length() >= 73', '-d', '`path` -> `length()`']
 order = false
 
 [lt]
-arguments = ["tests/test_cases/filter/test_files", "-w", '73 < length', '-d', '`path` -> `length`']
+arguments = ["tests/test_cases/filter/test_files", "-w", '73 < length()', '-d', '`path` -> `length()`']
 order = false
 
 [lte]
-arguments = ["tests/test_cases/filter/test_files", "-w", '73 <= length', '-d', '`path` -> `length`']
+arguments = ["tests/test_cases/filter/test_files", "-w", '73 <= length()', '-d', '`path` -> `length()`']
 order = false
 
 [eq]
@@ -55,7 +55,7 @@ arguments = ["tests/test_cases/filter/test_files", "-w", "name = \"big-322.txt\"
 order = false
 
 [xor]
-arguments = ["tests/test_cases/filter/test_files", "-w", "(length = 57) XOR (parent.name = \"noah\")"]
+arguments = ["tests/test_cases/filter/test_files", "-w", "(length() = 57) XOR (parent.name = \"noah\")"]
 order = false
 
 [concat]
@@ -63,7 +63,7 @@ arguments = ["tests/test_cases/filter/test_files", "-w", "(\"2\" + extension + \
 order = false
 
 [concat_with_plus]
-arguments = ["tests/test_cases/filter/test_files", "-w", "extension + ' - ' + length = \"txt - 65\""]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension + ' - ' + length() = \"txt - 65\""]
 order = false
 
 [plus_with_date]

@@ -8,5 +8,6 @@ pub(crate) mod functions;
 mod is_check;
 mod list;
 mod literal_value;
+mod method_invocation;
 pub(crate) mod unary_operators;
 mod with;

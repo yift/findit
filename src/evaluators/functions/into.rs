@@ -8,13 +8,12 @@ use crate::{
             conditional::{coalesce::build_coalesce, random::build_rand},
             env::build_env,
             spawn::exec::build_capture_output_exec,
-            string_functions::{TrimWhere, new_length, new_lower, new_trim, new_upper},
             time::now::build_now,
         },
     },
     parser::ast::{
         function::Function,
-        function_name::{EnvFunctionName, FunctionName, StringFunctionName, TimeFunctionName},
+        function_name::{EnvFunctionName, FunctionName, TimeFunctionName},
     },
 };
 
@@ -28,7 +27,6 @@ impl EvaluatorFactory for Function {
         }
         match &self.name {
             FunctionName::Env(env) => new_env_function(env, args),
-            FunctionName::String(string) => new_string_function(string, args),
             FunctionName::Time(time) => new_time_function(time, args),
         }
     }
@@ -43,19 +41,6 @@ fn new_env_function(
         EnvFunctionName::Coalesce => build_coalesce(args),
         EnvFunctionName::Env => build_env(args),
         EnvFunctionName::ExecOut => build_capture_output_exec(args),
-    }
-}
-fn new_string_function(
-    name: &StringFunctionName,
-    args: VecDeque<Box<dyn Evaluator>>,
-) -> Result<Box<dyn Evaluator>, FindItError> {
-    match name {
-        StringFunctionName::Trim => new_trim(args, TrimWhere::Both),
-        StringFunctionName::TrimHead => new_trim(args, TrimWhere::Head),
-        StringFunctionName::TrimTail => new_trim(args, TrimWhere::Tail),
-        StringFunctionName::Length => new_length(args),
-        StringFunctionName::Lower => new_lower(args),
-        StringFunctionName::Upper => new_upper(args),
     }
 }
 

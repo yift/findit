@@ -3,7 +3,7 @@ arguments = ["tests/test_cases/display/test_files", "-d", "`path` - has name: `n
 order = false
 
 [content_and_length]
-arguments = ["tests/test_cases/display/single_line_test_files", "-d", "for: `name` we have: `content` (`length` characters and `size` bytes)"]
+arguments = ["tests/test_cases/display/single_line_test_files", "-d", "for: `name` we have: `content` (`length()` characters and `size` bytes)"]
 order = false
 
 [depth]
@@ -11,7 +11,7 @@ arguments = ["tests/test_cases/display/test_files", "-d", "`name` depth: `depth`
 order = false
 
 [link]
-arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`, `length` link: `is link`", "-x", "1"]
+arguments = ["tests/test_cases/display/test_files/thing", "-d", "`name`, `length()` link: `is link`", "-x", "1"]
 order = false
 
 [attributes]
