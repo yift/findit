@@ -1199,7 +1199,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_skip_empty_string() -> Result<(), FindItError> {
         let expr = read_expr("content.skip(100)")?;
@@ -1210,7 +1209,6 @@ mod tests {
 
         Ok(())
     }
-
 
     #[test]
     fn test_skip_empty_number() -> Result<(), FindItError> {
@@ -1287,7 +1285,6 @@ mod tests {
         assert!(err.is_some())
     }
 
-
     #[test]
     fn test_take_empty_string() -> Result<(), FindItError> {
         let expr = read_expr("content.take(100)")?;
@@ -1299,7 +1296,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_take_empty_number() -> Result<(), FindItError> {
         let expr = read_expr("\"abc\".take(size)")?;
@@ -1310,7 +1306,6 @@ mod tests {
 
         Ok(())
     }
-
 
     #[test]
     fn test_skip_list() -> Result<(), FindItError> {
@@ -1375,7 +1370,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_skip_list_empty_number() -> Result<(), FindItError> {
         let expr = read_expr(":[1, 3].skip(size)")?;
@@ -1439,7 +1433,6 @@ mod tests {
         assert!(err.is_some())
     }
 
-
     #[test]
     fn test_take_list_empty_string() -> Result<(), FindItError> {
         let expr = read_expr("files.take(100)")?;
@@ -1451,7 +1444,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_take_list_empty_number() -> Result<(), FindItError> {
         let expr = read_expr(":[1, 3].take(size)")?;
@@ -1462,7 +1454,6 @@ mod tests {
 
         Ok(())
     }
-
 
     #[test]
     fn test_join_no_arg() -> Result<(), FindItError> {
@@ -1494,7 +1485,6 @@ mod tests {
 
         Ok(())
     }
-
 
     #[test]
     fn test_join_no_target() -> Result<(), FindItError> {
@@ -1575,14 +1565,10 @@ mod tests {
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty
-        );
+        assert_eq!(expr.eval(file), Value::Empty);
 
         Ok(())
     }
-
 
     #[test]
     fn test_split_empty_delim() -> Result<(), FindItError> {
@@ -1590,10 +1576,7 @@ mod tests {
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty
-        );
+        assert_eq!(expr.eval(file), Value::Empty);
 
         Ok(())
     }
@@ -1652,10 +1635,7 @@ mod tests {
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty
-        );
+        assert_eq!(expr.eval(file), Value::Empty);
 
         Ok(())
     }
@@ -1746,10 +1726,7 @@ mod tests {
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty
-        );
+        assert_eq!(expr.eval(file), Value::Empty);
 
         Ok(())
     }
@@ -1843,14 +1820,10 @@ mod tests {
         let path = Path::new("/");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty,
-        );
+        assert_eq!(expr.eval(file), Value::Empty,);
 
         Ok(())
     }
-
 
     #[test]
     fn test_words_file_target_not_a_file() -> Result<(), FindItError> {
@@ -1858,10 +1831,7 @@ mod tests {
         let path = Path::new(".");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty,
-        );
+        assert_eq!(expr.eval(file), Value::Empty,);
 
         Ok(())
     }
@@ -1878,21 +1848,16 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn test_lines_file_no_target() -> Result<(), FindItError> {
         let expr = read_expr("parent.lines()")?;
         let path = Path::new("/");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty,
-        );
+        assert_eq!(expr.eval(file), Value::Empty,);
 
         Ok(())
     }
-
 
     #[test]
     fn test_lines_file_target_not_a_file() -> Result<(), FindItError> {
@@ -1900,12 +1865,8 @@ mod tests {
         let path = Path::new(".");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
-        assert_eq!(
-            expr.eval(file),
-            Value::Empty,
-        );
+        assert_eq!(expr.eval(file), Value::Empty,);
 
         Ok(())
     }
-
 }

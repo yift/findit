@@ -40,7 +40,8 @@ if [ $? -ne 0 ]; then
 fi
 
 echo '  Test...'
-CREATE_RESULTS=TRUE RUST_BACKTRACE=1 cargo test > /tmp/out.txt 2>&1
+# CREATE_RESULTS=TRUE RUST_BACKTRACE=1 cargo test > /tmp/out.txt 2>&1
+RUST_BACKTRACE=1 cargo test > /tmp/out.txt 2>&1
 if [ $? -ne 0 ]; then
     less /tmp/out.txt
     exit -1

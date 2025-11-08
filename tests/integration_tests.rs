@@ -116,7 +116,7 @@ fn integration_test(name: &str, root: &Path, defs: &Map<String, Value>) -> Resul
     let order = defs.get("order").and_then(|o| o.as_bool()).unwrap_or(true);
     let expected_content = fs::read_to_string(expected_output_file)?;
 
-    if !order {
+    if order {
         assert_eq!(expected_content, writer.to_string());
     } else {
         let output: Vec<String> = writer
