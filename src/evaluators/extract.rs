@@ -124,7 +124,14 @@ impl Evaluator for DepthExtractor {
 struct SizeExtractor {}
 impl Evaluator for SizeExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
-        file.path().metadata().map(|m| m.len()).into()
+        let Ok(metadata) = file.path().metadata() else {
+            return Value::Empty;
+        };
+        if metadata.is_dir() {
+            Value::Empty
+        } else {
+            metadata.len().into()
+        }
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Number

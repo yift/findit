@@ -1,4 +1,4 @@
-for: single_line_test_files we have:  ( characters and 4096 bytes)
+for: single_line_test_files we have:  ( characters and  bytes)
 for: empty.txt we have:  (0 characters and 0 bytes)
 for: hello_world.txt we have: Hello World (11 characters and 11 bytes)
 for: hello.txt we have: Hello (5 characters and 5 bytes)
