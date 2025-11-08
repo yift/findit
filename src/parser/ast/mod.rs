@@ -20,5 +20,4 @@ pub(crate) mod parse;
 pub(crate) mod position;
 pub(crate) mod replace;
 pub(crate) mod self_divide;
-pub(crate) mod substr;
 pub(crate) mod with;

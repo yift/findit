@@ -4,7 +4,7 @@ use crate::{
         binding::Binding, case::Case, execute::SpawnOrExecute, format::Format, function::Function,
         if_expression::If, is_check::IsCheck, list::List, methods::MethodInvocation,
         negate::Negate, parse::Parse, position::Position, replace::Replace,
-        self_divide::SelfDivide, substr::Substring, with::With,
+        self_divide::SelfDivide, with::With,
     },
     value::Value,
 };
@@ -23,7 +23,6 @@ pub(crate) enum Expression {
     Position(Position),
     Format(Format),
     Parse(Parse),
-    Substring(Substring),
     Function(Function),
     SpawnOrExecute(SpawnOrExecute),
     SelfDivide(SelfDivide),

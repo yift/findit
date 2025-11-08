@@ -3,24 +3,24 @@ arguments = ["tests/test_cases/display/test_files", "-d", "`path` - position or 
 order = false
 
 [sub_string_for]
-arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FOR 7)` for path `path`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `path.take(7)` for path `path`"]
 order = false
 
 [sub_string_from]
-arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FROM 6)` for path `path`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `path.skip(6)` for path `path`"]
 order = false
 
 [sub_string_from_and_for]
-arguments = ["tests/test_cases/display/test_files", "-d", "substr: `SUBSTRING(path FROM 6 FOR 10)` for path `path`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr: `path.skip(6).take(10)` for path `path`"]
 order = false
 
 [sub_from_0_1_and_a_alot]
-arguments = ["tests/test_cases/display/test_files", "-d", "substr_from_0: `SUBSTRING(name FROM 0)` substr_from_1: `SUBSTRING(name FROM 0)` substr_from_100: `SUBSTRING(name FROM 99)` for name `name`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr_from_0: `name.skip(0)` substr_from_1: `name.skip(0)` substr_from_100: `name.skip(99)` for name `name`"]
 order = false
 
 
 [sub_for_0_1_and_a_alot]
-arguments = ["tests/test_cases/display/test_files", "-d", "substr_for_0: `SUBSTRING(name FOR 0)` substr_for_1: `SUBSTRING(name FOR 1)` substr_for_100: `SUBSTRING(name FOR 100)` substr_for_5: `SUBSTRING(name FOR 5)` for name  `name`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "substr_for_0: `name.take(0)` substr_for_1: `name.take(1)` substr_for_100: `name.take(100)` substr_for_5: `name.take(5)` for name  `name`"]
 order = false
 
 [simple_trim]

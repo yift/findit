@@ -26,7 +26,6 @@ use crate::parser::{
     parser_error::ParserError,
     position::build_position,
     replace::build_replace,
-    substr::build_substring,
     tokens::Token,
     with::build_with,
 };
@@ -54,7 +53,6 @@ pub(super) fn build_expression_with_priority(
             Token::Position => build_position(lex)?,
             Token::Parse => build_parse_date(lex)?,
             Token::Format => build_format(lex)?,
-            Token::Substring => build_substring(lex)?,
             Token::Replace => build_replace(lex)?,
             Token::With => build_with(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
@@ -256,7 +254,6 @@ mod tests {
                 if_expression::If,
                 operator::ComparisonOperator,
                 position::Position,
-                substr::Substring,
             },
             parse_expression,
         },
@@ -319,17 +316,6 @@ mod tests {
     }
     fn format(timestamp: Expression, format: Expression) -> Expression {
         Expression::Format(Format::new(timestamp, format))
-    }
-
-    fn sub_string(
-        super_string: &str,
-        substring_from: Option<u64>,
-        substring_for: Option<u64>,
-    ) -> Expression {
-        let substring_from = substring_from.map(lit_u64);
-        let substring_for = substring_for.map(lit_u64);
-        let super_string = lit_s(super_string);
-        Expression::Substring(Substring::new(super_string, substring_from, substring_for))
     }
 
     fn func(name: FunctionName, args: Vec<Expression>) -> Expression {
@@ -867,54 +853,6 @@ mod tests {
         assert_eq!(exp, format(lit_s("str"), lit_s("string")));
 
         Ok(())
-    }
-
-    #[test]
-    fn test_substring_from_for() -> Result<(), ParserError> {
-        let str = "substr(\"str\" from 5 for 4)";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(exp, sub_string("str", Some(5), Some(4)));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_substring_for_from() -> Result<(), ParserError> {
-        let str = "substr(\"str\" for 5 from 4)";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(exp, sub_string("str", Some(4), Some(5)));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_substring_for_only() -> Result<(), ParserError> {
-        let str = "substr(\"str\" for 5)";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(exp, sub_string("str", None, Some(5)));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_substring_from_only() -> Result<(), ParserError> {
-        let str = "substr(\"str\" from 5)";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(exp, sub_string("str", Some(5), None));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_substring_no_args() {
-        let str = "substr(\"str\")";
-        let err = parse_expression(str).is_err();
-
-        assert!(err);
     }
 
     #[test]

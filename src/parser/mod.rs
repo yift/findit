@@ -31,7 +31,6 @@ mod position;
 mod replace;
 mod self_divide;
 mod span;
-mod substr;
 mod tokens;
 mod with;
 

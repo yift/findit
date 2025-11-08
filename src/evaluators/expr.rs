@@ -56,7 +56,6 @@ impl EvaluatorFactory for Expression {
             Expression::Case(case) => case.build(bindings),
             Expression::Between(between) => between.build(bindings),
             Expression::Position(position) => position.build(bindings),
-            Expression::Substring(substring) => substring.build(bindings),
             Expression::Function(func) => func.build(bindings),
             Expression::SpawnOrExecute(spawn_or_exec) => spawn_or_exec.build(bindings),
             Expression::SelfDivide(self_divide) => self_divide.build(bindings),

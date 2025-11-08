@@ -7,7 +7,6 @@ use crate::{
     parser::ast::{
         position::Position as PositionExpression,
         replace::{Replace, ReplaceWhat},
-        substr::Substring,
     },
     value::{Value, ValueType},
 };
@@ -169,84 +168,6 @@ impl Evaluator for Position {
     }
 }
 
-impl EvaluatorFactory for Substring {
-    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
-        let str = self.super_string.build(bindings)?;
-        if str.expected_type() != ValueType::String {
-            return Err(FindItError::BadExpression(
-                "SUBSTRING can only work with strings".into(),
-            ));
-        }
-        let from = if let Some(from) = &self.substring_from {
-            let from = from.build(bindings)?;
-            if from.expected_type() != ValueType::Number {
-                return Err(FindItError::BadExpression(
-                    "SUBSTRING can only start from a number".into(),
-                ));
-            }
-            Some(from)
-        } else {
-            None
-        };
-        let length = if let Some(length) = &self.substring_for {
-            let length = length.build(bindings)?;
-            if length.expected_type() != ValueType::Number {
-                return Err(FindItError::BadExpression(
-                    "SUBSTRING can only have numeric length".into(),
-                ));
-            }
-            Some(length)
-        } else {
-            None
-        };
-        Ok(Box::new(SubString { str, from, length }))
-    }
-}
-
-struct SubString {
-    str: Box<dyn Evaluator>,
-    from: Option<Box<dyn Evaluator>>,
-    length: Option<Box<dyn Evaluator>>,
-}
-impl Evaluator for SubString {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        let Value::String(str) = self.str.eval(file) else {
-            return Value::Empty;
-        };
-        let mut str = str.as_str();
-
-        if let Some(from) = &self.from {
-            let Value::Number(from) = from.eval(file) else {
-                return Value::Empty;
-            };
-            let Ok(from) = usize::try_from(from) else {
-                return Value::Empty;
-            };
-            if from > str.len() {
-                return "".into();
-            }
-            str = &str[from..];
-        }
-        if let Some(length) = &self.length {
-            let Value::Number(length) = length.eval(file) else {
-                return Value::Empty;
-            };
-            let Ok(length) = length.try_into() else {
-                return Value::Empty;
-            };
-            if length >= str.len() {
-                return str.into();
-            }
-            str = &str[..length];
-        }
-
-        str.into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::String
-    }
-}
-
 #[cfg(test)]
 mod tests {
 
@@ -327,63 +248,6 @@ mod tests {
     #[test]
     fn position_null_str_return_empty() {
         let eval = read_expr("POSITION(\"abc\" IN content)").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn substring_no_from_not_for_return_error() {
-        let err = read_expr("SUBSTRING(content)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn substring_from_not_a_number() {
-        let err = read_expr("SUBSTRING(content FROM path)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn substring_for_not_a_number() {
-        let err = read_expr("SUBSTRING(content FOR path)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn substring_expr_not_a_string() {
-        let err = read_expr("SUBSTRING(12 for 12)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn substring_expect_string() {
-        let expr = read_expr("SUBSTRING(content FROM 1 FOR 4)").unwrap();
-        assert_eq!(expr.expected_type(), ValueType::String);
-    }
-
-    #[test]
-    fn substring_null_for_return_empty() {
-        let eval = read_expr("SUBSTRING(\"abc\" FOR length())").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn substring_null_from_return_empty() {
-        let eval = read_expr("SUBSTRING(\"abc\" FROM length())").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn substring_null_str_return_empty() {
-        let eval = read_expr("SUBSTRING(content FROM 2)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
