@@ -20,6 +20,12 @@ pub(crate) enum Method {
     Sum,
     Sort,
     SortBy(LambdaFunction),
+    Skip(Box<Expression>),
+    Take(Box<Expression>),
+    Join(Option<Box<Expression>>),
+    Split(Box<Expression>),
+    Lines,
+    Words,
 }
 
 #[derive(Debug, PartialEq)]

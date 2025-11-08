@@ -1,4 +1,9 @@
-use std::{ops::Deref, rc::Rc};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    ops::Deref,
+    rc::Rc,
+};
 
 use itertools::Itertools;
 
@@ -257,6 +262,224 @@ impl Evaluator for SortBy {
     }
 }
 
+struct SkipString {
+    target: Box<dyn Evaluator>,
+    by: Box<dyn Evaluator>,
+}
+impl Evaluator for SkipString {
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::Number(by_value) = self.by.eval(file) else {
+            return Value::Empty;
+        };
+        target_value
+            .chars()
+            .skip(by_value as usize)
+            .collect::<String>()
+            .into()
+    }
+}
+
+struct SkipList {
+    target: Box<dyn Evaluator>,
+    by: Box<dyn Evaluator>,
+    items_type: Rc<ValueType>,
+}
+impl Evaluator for SkipList {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(self.items_type.clone())
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::List(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::Number(by_value) = self.by.eval(file) else {
+            return Value::Empty;
+        };
+        let iter = target_value.items().into_iter().skip(by_value as usize);
+        Value::List(List::new_lazy(self.items_type.clone(), iter))
+    }
+}
+
+struct TakeString {
+    target: Box<dyn Evaluator>,
+    limit: Box<dyn Evaluator>,
+}
+impl Evaluator for TakeString {
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::Number(limit_value) = self.limit.eval(file) else {
+            return Value::Empty;
+        };
+        target_value
+            .chars()
+            .take(limit_value as usize)
+            .collect::<String>()
+            .into()
+    }
+}
+
+struct TakeList {
+    target: Box<dyn Evaluator>,
+    limit: Box<dyn Evaluator>,
+    items_type: Rc<ValueType>,
+}
+impl Evaluator for TakeList {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(self.items_type.clone())
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::List(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::Number(limit) = self.limit.eval(file) else {
+            return Value::Empty;
+        };
+        let iter = target_value.items().into_iter().take(limit as usize);
+        Value::List(List::new_lazy(self.items_type.clone(), iter))
+    }
+}
+
+struct Join {
+    target: Box<dyn Evaluator>,
+    delimiter: Option<Box<dyn Evaluator>>,
+}
+impl Evaluator for Join {
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::List(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let delimiter = if let Some(delim_eval) = &self.delimiter {
+            let Value::String(delim_value) = delim_eval.eval(file) else {
+                return Value::Empty;
+            };
+            delim_value
+        } else {
+            ",".to_string()
+        };
+        target_value
+            .items()
+            .into_iter()
+            .map(|f| f.to_string())
+            .join(&delimiter)
+            .into()
+    }
+}
+
+struct Split {
+    target: Box<dyn Evaluator>,
+    delimiter: Box<dyn Evaluator>,
+}
+impl Evaluator for Split {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(Rc::new(ValueType::String))
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Value::String(delimiter) = self.delimiter.eval(file) else {
+            return Value::Empty;
+        };
+        if delimiter.is_empty() {
+            return Value::Empty;
+        }
+        let items = target_value
+            .split(&delimiter)
+            .map(|s| Value::String(s.to_string()));
+        Value::List(List::new_eager(Rc::new(ValueType::String), items))
+    }
+}
+struct LinesString {
+    target: Box<dyn Evaluator>,
+}
+impl Evaluator for LinesString {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(Rc::new(ValueType::String))
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(str) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let items = str.lines().map(|s| Value::String(s.to_string()));
+        Value::List(List::new_eager(Rc::new(ValueType::String), items))
+    }
+}
+
+struct LinesFile {
+    target: Box<dyn Evaluator>,
+}
+impl Evaluator for LinesFile {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(Rc::new(ValueType::String))
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::Path(path) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Ok(file) = File::open(path) else {
+            return Value::Empty;
+        };
+        let buf = BufReader::new(file);
+        let items = buf.lines().map_while(Result::ok).map(Value::String);
+        Value::List(List::new_lazy(Rc::new(ValueType::String), items))
+    }
+}
+struct StringWords {
+    target: Box<dyn Evaluator>,
+}
+impl Evaluator for StringWords {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(Rc::new(ValueType::String))
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::String(target_value) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let items = target_value
+            .split_whitespace()
+            .map(|s| Value::String(s.to_string()));
+        Value::List(List::new_eager(Rc::new(ValueType::String), items))
+    }
+}
+struct FileWords {
+    target: Box<dyn Evaluator>,
+}
+impl Evaluator for FileWords {
+    fn expected_type(&self) -> ValueType {
+        ValueType::List(Rc::new(ValueType::String))
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let Value::Path(path) = self.target.eval(file) else {
+            return Value::Empty;
+        };
+        let Ok(file) = File::open(path) else {
+            return Value::Empty;
+        };
+        let buf = BufReader::new(file);
+        let items = buf.lines().map_while(Result::ok).flat_map(|s| {
+            s.split_whitespace()
+                .map(|s| Value::String(s.into()))
+                .collect::<Vec<_>>()
+        });
+
+        Value::List(List::new_lazy(Rc::new(ValueType::String), items))
+    }
+}
+
 impl LambdaFunction {
     fn build(
         &self,
@@ -367,6 +590,97 @@ impl EvaluatorFactory for MethodInvocation {
             }
             (Method::SortBy(_), _) => Err(FindItError::BadExpression(
                 "Sort by method can only be applied to a List type".to_string(),
+            )),
+            (Method::Skip(by), ValueType::String) => {
+                let by = by.build(bindings)?;
+                if by.expected_type() != ValueType::Number {
+                    return Err(FindItError::BadExpression(
+                        "Skip method argument must be a Number".to_string(),
+                    ));
+                }
+                Ok(Box::new(SkipString { target, by }))
+            }
+            (Method::Skip(by), ValueType::List(items_type)) => {
+                let by = by.build(bindings)?;
+                if by.expected_type() != ValueType::Number {
+                    return Err(FindItError::BadExpression(
+                        "Skip method argument must be a Number".to_string(),
+                    ));
+                }
+                Ok(Box::new(SkipList {
+                    target,
+                    by,
+                    items_type: items_type.clone(),
+                }))
+            }
+            (Method::Skip(_), _) => Err(FindItError::BadExpression(
+                "Skip method can only be applied to String or List types".to_string(),
+            )),
+            (Method::Take(limit), ValueType::String) => {
+                let limit = limit.build(bindings)?;
+                if limit.expected_type() != ValueType::Number {
+                    return Err(FindItError::BadExpression(
+                        "Take method argument must be a Number".to_string(),
+                    ));
+                }
+                Ok(Box::new(TakeString { target, limit }))
+            }
+            (Method::Take(limit), ValueType::List(items_type)) => {
+                let limit = limit.build(bindings)?;
+                if limit.expected_type() != ValueType::Number {
+                    return Err(FindItError::BadExpression(
+                        "Take method argument must be a Number".to_string(),
+                    ));
+                }
+                Ok(Box::new(TakeList {
+                    target,
+                    limit,
+                    items_type: items_type.clone(),
+                }))
+            }
+            (Method::Take(_), _) => Err(FindItError::BadExpression(
+                "Take method can only be applied to String or List types".to_string(),
+            )),
+            (Method::Join(delimiter), ValueType::List(_)) => {
+                let delimiter = match delimiter {
+                    Some(delim) => {
+                        let delim = delim.build(bindings)?;
+                        if delim.expected_type() != ValueType::String {
+                            return Err(FindItError::BadExpression(
+                                "Join method delimiter must be a String".to_string(),
+                            ));
+                        }
+                        Some(delim)
+                    }
+                    None => None,
+                };
+
+                Ok(Box::new(Join { target, delimiter }))
+            }
+            (Method::Join(_), _) => Err(FindItError::BadExpression(
+                "Join method can only be applied to List type".to_string(),
+            )),
+            (Method::Split(delimiter), ValueType::String) => {
+                let delimiter = delimiter.build(bindings)?;
+                if delimiter.expected_type() != ValueType::String {
+                    return Err(FindItError::BadExpression(
+                        "Split method delimiter must be a String".to_string(),
+                    ));
+                }
+                Ok(Box::new(Split { target, delimiter }))
+            }
+            (Method::Split(_), _) => Err(FindItError::BadExpression(
+                "Split method can only be applied to String type".to_string(),
+            )),
+            (Method::Lines, ValueType::String) => Ok(Box::new(LinesString { target })),
+            (Method::Lines, ValueType::Path) => Ok(Box::new(LinesFile { target })),
+            (Method::Lines, _) => Err(FindItError::BadExpression(
+                "Lines method can only be applied to String or Path types".to_string(),
+            )),
+            (Method::Words, ValueType::String) => Ok(Box::new(StringWords { target })),
+            (Method::Words, ValueType::Path) => Ok(Box::new(FileWords { target })),
+            (Method::Words, _) => Err(FindItError::BadExpression(
+                "Words method can only be applied to String or Path types".to_string(),
             )),
         }
     }
@@ -862,4 +1176,736 @@ mod tests {
         let err = read_expr("12.sort_by({f} {f})").err();
         assert!(err.is_some())
     }
+
+    #[test]
+    fn test_simple_skip() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".skip(2)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("c".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_skip_large_number() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".skip(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("".into()));
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_skip_empty_string() -> Result<(), FindItError> {
+        let expr = read_expr("content.skip(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_skip_empty_number() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".skip(size)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn skip_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".skip(2)")?;
+
+        assert_eq!(expr.expected_type(), ValueType::String);
+
+        Ok(())
+    }
+
+    #[test]
+    fn length_no_string_skip() {
+        let err = read_expr("12.skip(2)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn length_no_number_skip() {
+        let err = read_expr("\"abc\".skip(\"a\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn test_simple_take() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".take(2)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("ab".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_take_large_number() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".take(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("abc".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn take_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".take(2)")?;
+
+        assert_eq!(expr.expected_type(), ValueType::String);
+
+        Ok(())
+    }
+
+    #[test]
+    fn length_no_string_take() {
+        let err = read_expr("12.take(2)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn length_no_number_take() {
+        let err = read_expr("\"abc\".take(\"a\")").err();
+        assert!(err.is_some())
+    }
+
+
+    #[test]
+    fn test_take_empty_string() -> Result<(), FindItError> {
+        let expr = read_expr("content.take(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_take_empty_number() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".take(size)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_skip_list() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].skip(2)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::Number),
+                vec![Value::Number(4), Value::Number(5),].into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_skip_list_large_number() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].skip(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::Number),
+                vec![].into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn skip_list_return_type() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].skip(2)")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::Number))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn skip_list_nan() {
+        let err = read_expr(":[1, 2, 4, 5].skip(\"a\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn test_skip_list_empty_string() -> Result<(), FindItError> {
+        let expr = read_expr("files.skip(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_skip_list_empty_number() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 3].skip(size)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_simple_take_list() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 3].take(2)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::Number),
+                vec![Value::Number(1), Value::Number(2),].into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_take_list_large_number() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 3].take(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::Number),
+                vec![Value::Number(1), Value::Number(2), Value::Number(3),].into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn take_list_return_type() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 3].take(2)")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::Number))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn take_list_nan_error() {
+        let err = read_expr(":[1, 2, 3].take(\"a\")").err();
+        assert!(err.is_some())
+    }
+
+
+    #[test]
+    fn test_take_list_empty_string() -> Result<(), FindItError> {
+        let expr = read_expr("files.take(100)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_take_list_empty_number() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 3].take(size)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_join_no_arg() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].join()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("1,2,4,5".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_join_with_arg() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].join(\";\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::String("1;2;4;5".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn join_return_type() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].join(\";\")")?;
+
+        assert_eq!(expr.expected_type(), ValueType::String);
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_join_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("files.join()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_join_with_empty_arg() -> Result<(), FindItError> {
+        let expr = read_expr(":[1, 2, 4, 5].join(content)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn join_no_list() {
+        let err = read_expr("123.join(\"a\")").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn empty_join_no_list() {
+        let err = read_expr("123.join()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn join_no_string() {
+        let err = read_expr(":[1, 2, 3].join(123)").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn test_split() -> Result<(), FindItError> {
+        let expr = read_expr("\"a|b|c\".split(\"|\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::String),
+                vec![
+                    Value::String("a".into()),
+                    Value::String("b".into()),
+                    Value::String("c".into())
+                ]
+                .into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_split_no_delim() -> Result<(), FindItError> {
+        let expr = read_expr("\"a|b|c\".split(\"\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_split_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("content.split(\"|\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty
+        );
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_split_empty_delim() -> Result<(), FindItError> {
+        let expr = read_expr("\"a|b|c\".split(content)")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_split_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"a|b|c\".split(\"\")")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::String))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_split_no_str() {
+        let expr = read_expr("\"a|b|c\".split(12)").err();
+
+        assert!(expr.is_some());
+    }
+
+    #[test]
+    fn test_split_no_str_two() {
+        let expr = read_expr("12.split(\"a\")").err();
+
+        assert!(expr.is_some());
+    }
+
+    #[test]
+    fn test_lines_string() -> Result<(), FindItError> {
+        let expr = read_expr("\"one\ntwo\nthree\n\".lines()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::String),
+                vec![
+                    Value::String("one".into()),
+                    Value::String("two".into()),
+                    Value::String("three".into())
+                ]
+                .into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_lines_string_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("content.lines()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_lines_string_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".lines()")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::String))
+        );
+
+        Ok(())
+    }
+    #[test]
+    fn test_lines_number() {
+        let expr = read_expr("12.lines()").err();
+
+        assert!(expr.is_some());
+    }
+
+    #[test]
+    fn test_lines_file() -> Result<(), FindItError> {
+        let expr = read_expr("lines()")?;
+        let path = Path::new("tests/test_cases/display/test_files/week-362.txt");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::String),
+                vec![
+                    Value::String("quo eligendi amet harum ullam minus quasi ut.".into()),
+                    Value::String("magni neque sed est incidunt expedita.".into()),
+                    Value::String(
+                        "quia quasi illo perferendis doloremque illum qui voluptas ullam.".into()
+                    ),
+                    Value::String("ab nulla nobis maiores nobis beatae velit ea quia.".into()),
+                    Value::String("adipisci debitis facilis molestiae soluta repellat aut.".into()),
+                    Value::String("vero libero repudiandae fugiat ducimus occaecati.".into()),
+                    Value::String("".into()),
+                ]
+                .into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_lines_file_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("lines()")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::String))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_string() -> Result<(), FindItError> {
+        let expr = read_expr("\"  one\ntwo  three \n    \".words()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::String),
+                vec![
+                    Value::String("one".into()),
+                    Value::String("two".into()),
+                    Value::String("three".into())
+                ]
+                .into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_string_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("content.words()")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_string_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"abc\".words()")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::String))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_number() {
+        let expr = read_expr("12.words()").err();
+
+        assert!(expr.is_some());
+    }
+
+    #[test]
+    fn test_words_file() -> Result<(), FindItError> {
+        let expr = read_expr("words()")?;
+        let path = Path::new("tests/test_cases/display/test_files/week-362.txt");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::List(List::new_eager(
+                Rc::new(ValueType::String),
+                vec![
+                    Value::String("quo".into()),
+                    Value::String("eligendi".into()),
+                    Value::String("amet".into()),
+                    Value::String("harum".into()),
+                    Value::String("ullam".into()),
+                    Value::String("minus".into()),
+                    Value::String("quasi".into()),
+                    Value::String("ut.".into()),
+                    Value::String("magni".into()),
+                    Value::String("neque".into()),
+                    Value::String("sed".into()),
+                    Value::String("est".into()),
+                    Value::String("incidunt".into()),
+                    Value::String("expedita.".into()),
+                    Value::String("quia".into()),
+                    Value::String("quasi".into()),
+                    Value::String("illo".into()),
+                    Value::String("perferendis".into()),
+                    Value::String("doloremque".into()),
+                    Value::String("illum".into()),
+                    Value::String("qui".into()),
+                    Value::String("voluptas".into()),
+                    Value::String("ullam.".into()),
+                    Value::String("ab".into()),
+                    Value::String("nulla".into()),
+                    Value::String("nobis".into()),
+                    Value::String("maiores".into()),
+                    Value::String("nobis".into()),
+                    Value::String("beatae".into()),
+                    Value::String("velit".into()),
+                    Value::String("ea".into()),
+                    Value::String("quia.".into()),
+                    Value::String("adipisci".into()),
+                    Value::String("debitis".into()),
+                    Value::String("facilis".into()),
+                    Value::String("molestiae".into()),
+                    Value::String("soluta".into()),
+                    Value::String("repellat".into()),
+                    Value::String("aut.".into()),
+                    Value::String("vero".into()),
+                    Value::String("libero".into()),
+                    Value::String("repudiandae".into()),
+                    Value::String("fugiat".into()),
+                    Value::String("ducimus".into()),
+                    Value::String("occaecati.".into()),
+                ]
+                .into_iter(),
+            ))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_file_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("parent.words()")?;
+        let path = Path::new("/");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty,
+        );
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_words_file_target_not_a_file() -> Result<(), FindItError> {
+        let expr = read_expr("parent.words()")?;
+        let path = Path::new(".");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty,
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_words_file_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("words()")?;
+
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::String))
+        );
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_lines_file_no_target() -> Result<(), FindItError> {
+        let expr = read_expr("parent.lines()")?;
+        let path = Path::new("/");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty,
+        );
+
+        Ok(())
+    }
+
+
+    #[test]
+    fn test_lines_file_target_not_a_file() -> Result<(), FindItError> {
+        let expr = read_expr("parent.lines()")?;
+        let path = Path::new(".");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(
+            expr.eval(file),
+            Value::Empty,
+        );
+
+        Ok(())
+    }
+
 }

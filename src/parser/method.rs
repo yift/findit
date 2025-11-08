@@ -24,6 +24,12 @@ pub(super) enum MethodName {
     Sum,
     Sort,
     SortBy,
+    Skip,
+    Take,
+    Join,
+    Split,
+    Lines,
+    Words,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -40,11 +46,25 @@ impl MethodName {
             "SUM" => Some(MethodName::Sum),
             "SORT" | "ORDER" => Some(MethodName::Sort),
             "SORT_BY" | "ORDER_BY" | "SORTBY" | "ORDERBY" => Some(MethodName::SortBy),
+            "SKIP" => Some(MethodName::Skip),
+            "TAKE" => Some(MethodName::Take),
+            "JOIN" => Some(MethodName::Join),
+            "SPLIT" => Some(MethodName::Split),
+            "LINES" => Some(MethodName::Lines),
+            "WORDS" => Some(MethodName::Words),
             _ => None,
         }
     }
 }
+/*
+    Skip(Box<Expression>),
+    Take(Box<Expression>),
+    Join(Option<Box<Expression>>),
+    Split(Box<Expression>),
+    Lines,
+    Words,
 
+*/
 impl LambdaFunction {
     fn new(parameter: String, body: Expression) -> Self {
         Self {
@@ -98,6 +118,37 @@ pub(super) fn build_method(
             let lambda = build_lambda(lex)?;
             Ok(Method::SortBy(lambda))
         }
+        MethodName::Skip => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::Skip(Box::new(expr)))
+        }
+        MethodName::Take => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::Take(Box::new(expr)))
+        }
+        MethodName::Join => {
+            let next = lex.peek();
+            if let Some(LexerItem {
+                token: Token::CloseBrackets,
+                ..
+            }) = next
+            {
+                Ok(Method::Join(None))
+            } else {
+                let expr =
+                    build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+                Ok(Method::Join(Some(Box::new(expr))))
+            }
+        }
+        MethodName::Split => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::Split(Box::new(expr)))
+        }
+        MethodName::Lines => Ok(Method::Lines),
+        MethodName::Words => Ok(Method::Words),
     };
     let Some(close) = lex.next() else {
         return Err(ParserError::UnexpectedEof);
