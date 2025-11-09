@@ -1,4 +1,3 @@
-emma: count: 0, length: , depth: 4
 amelia-462.txt: count: 1, length: 36, depth: 3
 place-154.txt: count: 1, length: 38, depth: 1
 week-14.bash: count: 1, length: 39, depth: 4
@@ -99,9 +98,9 @@ problem: count: 4, length: , depth: 2
 aria: count: 4, length: , depth: 4
 company: count: 4, length: , depth: 4
 logan: count: 5, length: , depth: 2
+mason: count: 5, length: , depth: 3
 big: count: 5, length: , depth: 4
 liam: count: 6, length: , depth: 2
-mason: count: 6, length: , depth: 3
 test_files: count: 7, length: , depth: 0
 logan: count: 7, length: , depth: 1
 next: count: 7, length: , depth: 1

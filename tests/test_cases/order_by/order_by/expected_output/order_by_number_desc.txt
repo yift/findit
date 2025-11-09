@@ -1,4 +1,3 @@
-emma: count: 0, length: , depth: 4
 ava: count: 2, length: , depth: 4
 life: count: 2, length: , depth: 4
 life: count: 2, length: , depth: 4
@@ -16,8 +15,8 @@ company: count: 4, length: , depth: 4
 problem: count: 4, length: , depth: 2
 child: count: 4, length: , depth: 1
 big: count: 5, length: , depth: 4
+mason: count: 5, length: , depth: 3
 logan: count: 5, length: , depth: 2
-mason: count: 6, length: , depth: 3
 liam: count: 6, length: , depth: 2
 amelia: count: 7, length: , depth: 3
 point: count: 7, length: , depth: 3

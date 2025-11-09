@@ -26,7 +26,6 @@ elijah-18.json
 elijah-313.txt
 elijah-581.txt
 emma
-emma
 emma-13.bash
 emma-230.txt
 emma-247.txt

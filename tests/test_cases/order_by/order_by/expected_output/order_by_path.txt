@@ -85,7 +85,6 @@ emma-13.bash -> tests/test_cases/order_by/test_files/next/emma/amelia
 emma-247.txt -> tests/test_cases/order_by/test_files/next/emma/amelia
 noah-408.txt -> tests/test_cases/order_by/test_files/next/emma/amelia
 old-192.txt -> tests/test_cases/order_by/test_files/next/emma/amelia
-emma -> tests/test_cases/order_by/test_files/next/emma/mason
 james-469.txt -> tests/test_cases/order_by/test_files/next/emma/mason
 life-13.json -> tests/test_cases/order_by/test_files/next/emma/mason
 life-21.json -> tests/test_cases/order_by/test_files/next/emma/mason

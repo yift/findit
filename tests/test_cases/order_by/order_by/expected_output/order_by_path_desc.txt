@@ -15,7 +15,6 @@ own -> tests/test_cases/order_by/test_files/next/liam
 small-21.json -> tests/test_cases/order_by/test_files/next/liam
 person-15.bash -> tests/test_cases/order_by/test_files/next/emma/right
 way-411.txt -> tests/test_cases/order_by/test_files/next/emma/right
-emma -> tests/test_cases/order_by/test_files/next/emma/mason
 james-469.txt -> tests/test_cases/order_by/test_files/next/emma/mason
 life-13.json -> tests/test_cases/order_by/test_files/next/emma/mason
 life-21.json -> tests/test_cases/order_by/test_files/next/emma/mason

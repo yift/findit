@@ -80,7 +80,6 @@ emma-247.txt
 emma-230.txt
 emma-13.bash
 emma
-emma
 elijah-581.txt
 elijah-313.txt
 elijah-18.json

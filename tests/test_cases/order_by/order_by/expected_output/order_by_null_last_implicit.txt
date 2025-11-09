@@ -88,7 +88,6 @@ big: length:
 child: length: 
 company: length: 
 emma: length: 
-emma: length: 
 ethan: length: 
 first: length: 
 james: length: 

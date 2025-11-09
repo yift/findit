@@ -79,7 +79,6 @@ company -> true
 different-17.bash -> true
 early-30.bash -> true
 emma -> true
-emma -> true
 emma-13.bash -> true
 ethan -> true
 few-25.bash -> true
