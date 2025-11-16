@@ -220,25 +220,22 @@ mod tests {
         assert_eq!(lst_one.cmp(&lst_two), Ordering::Equal);
     }
 
-
     #[test]
-    fn test_skip_vec() {
+    fn test_nth_vec() {
         let lst: LazyList<_> = Rc::new(vec![1, 2, 3, 4, 5]).into();
 
-        let num = lst.into_iter().skip(2).next();
+        let num = lst.into_iter().nth(2);
 
         assert_eq!(num, Some(3));
     }
-
 
     #[test]
     fn test_skip_iter() {
-        let lst: Box<dyn Iterator<Item = _>>  = Box::new(vec![1,2, 3, 4,5].into_iter());
+        let lst: Box<dyn Iterator<Item = _>> = Box::new(vec![1, 2, 3, 4, 5].into_iter());
         let lst: LazyList<_> = lst.into();
 
-        let num = lst.into_iter().skip(2).next();
+        let num = lst.into_iter().nth(2);
 
         assert_eq!(num, Some(3));
     }
-
 }

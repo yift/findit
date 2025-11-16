@@ -83,7 +83,6 @@ mod tests {
         Ok(())
     }
 
-
     #[test]
     fn contains_returns_empty_when_needed() -> Result<(), FindItError> {
         let expr = read_expr("lines().contains(\"text\")")?;

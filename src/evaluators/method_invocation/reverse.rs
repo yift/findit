@@ -85,7 +85,10 @@ mod tests {
     #[test]
     fn reverse_expect_list() {
         let expr = read_expr(":[1].REVERSE()").unwrap();
-        assert_eq!(expr.expected_type(), ValueType::List(Rc::new(ValueType::Number)));
+        assert_eq!(
+            expr.expected_type(),
+            ValueType::List(Rc::new(ValueType::Number))
+        );
     }
 
     #[test]
