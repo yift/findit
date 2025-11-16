@@ -16,14 +16,6 @@ pub(crate) struct LazyList<T> {
     list: RefCell<LazyListImpl<T>>,
 }
 
-impl<T> LazyList<T> {
-    pub(crate) fn is_empty(&self) -> bool {
-        self.eager().is_empty()
-    }
-    pub(crate) fn len(&self) -> usize {
-        self.eager().len()
-    }
-}
 impl<T> From<Vec<T>> for LazyList<T> {
     fn from(value: Vec<T>) -> Self {
         Rc::new(value).into()
@@ -88,6 +80,10 @@ impl<T: Clone> Iterator for ListIterator<T> {
         self.index += 1;
         self.list.get(index).cloned()
     }
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.index += n;
+        self.next()
+    }
 }
 impl<T> ListIterator<T> {
     fn new(list: Rc<Vec<T>>) -> Self {
@@ -109,11 +105,20 @@ impl<T: Clone> Iterator for LazyListIteratorImpl<T> {
             Self::Lazy(l) => l.next(),
         }
     }
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        match self {
+            Self::Eager(e) => e.nth(n),
+            Self::Lazy(l) => l.nth(n),
+        }
+    }
 }
 impl<T: Clone> Iterator for LazyListIterator<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
+    }
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.iter.nth(n)
     }
 }
 
@@ -162,7 +167,7 @@ impl<T: Ord> Ord for LazyList<T> {
 
 #[cfg(test)]
 mod tests {
-    use std::{cmp::Ordering, vec};
+    use std::{cmp::Ordering, rc::Rc, vec};
 
     use crate::lazy_list::LazyList;
 
@@ -214,4 +219,26 @@ mod tests {
 
         assert_eq!(lst_one.cmp(&lst_two), Ordering::Equal);
     }
+
+
+    #[test]
+    fn test_skip_vec() {
+        let lst: LazyList<_> = Rc::new(vec![1, 2, 3, 4, 5]).into();
+
+        let num = lst.into_iter().skip(2).next();
+
+        assert_eq!(num, Some(3));
+    }
+
+
+    #[test]
+    fn test_skip_iter() {
+        let lst: Box<dyn Iterator<Item = _>>  = Box::new(vec![1,2, 3, 4,5].into_iter());
+        let lst: LazyList<_> = lst.into();
+
+        let num = lst.into_iter().skip(2).next();
+
+        assert_eq!(num, Some(3));
+    }
+
 }

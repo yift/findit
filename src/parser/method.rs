@@ -30,6 +30,10 @@ pub(super) enum MethodName {
     Split,
     Lines,
     Words,
+    First,
+    Last,
+    Contains,
+    IndexOf,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -52,19 +56,15 @@ impl MethodName {
             "SPLIT" => Some(MethodName::Split),
             "LINES" => Some(MethodName::Lines),
             "WORDS" => Some(MethodName::Words),
+            "FIRST" => Some(MethodName::First),
+            "LAST" => Some(MethodName::Last),
+            "CONTAINS" => Some(MethodName::Contains),
+            "INDEXOF" | "INDEX_OF" => Some(MethodName::IndexOf),
             _ => None,
         }
     }
 }
-/*
-    Skip(Box<Expression>),
-    Take(Box<Expression>),
-    Join(Option<Box<Expression>>),
-    Split(Box<Expression>),
-    Lines,
-    Words,
 
-*/
 impl LambdaFunction {
     fn new(parameter: String, body: Expression) -> Self {
         Self {
@@ -149,6 +149,18 @@ pub(super) fn build_method(
         }
         MethodName::Lines => Ok(Method::Lines),
         MethodName::Words => Ok(Method::Words),
+        MethodName::First => Ok(Method::First),
+        MethodName::Last => Ok(Method::Last),
+        MethodName::Contains => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::Contains(Box::new(expr)))
+        }
+        MethodName::IndexOf => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::IndexOf(Box::new(expr)))
+        }
     };
     let Some(close) = lex.next() else {
         return Err(ParserError::UnexpectedEof);

@@ -39,15 +39,18 @@ impl List {
     }
     pub(crate) fn new_eager(item_type: Rc<ValueType>, items: impl Iterator<Item = Value>) -> Self {
         let items = items.collect::<Vec<_>>();
+        Self::new_from_vec(item_type, items)
+    }
+    pub(crate) fn new_from_vec(item_type: Rc<ValueType>, items: Vec<Value>) -> Self {
         let items = items.into();
 
         Self { items, item_type }
     }
-    pub(crate) fn has_items(&self) -> bool {
-        !self.items.is_empty()
+    pub(crate) fn has_items(self) -> bool {
+        self.items.into_iter().next().is_some()
     }
-    pub(crate) fn count(&self) -> usize {
-        self.items.len()
+    pub(crate) fn count(self) -> usize {
+        self.items.into_iter().count()
     }
     pub(crate) fn items(self) -> LazyList<Value> {
         self.items

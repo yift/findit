@@ -4,8 +4,12 @@ use crate::{
         expr::{BindingsTypes, Evaluator, EvaluatorFactory},
         extract::MeExtractor,
         method_invocation::{
+            contains::new_contains,
             filter::new_filter,
+            first::new_first,
+            index_of::new_index_of,
             join::new_join,
+            last::new_last,
             length::new_length,
             lines::new_lines,
             map::new_map,
@@ -24,9 +28,13 @@ use crate::{
     parser::ast::methods::{Method, MethodInvocation},
 };
 
+mod contains;
 mod filter;
+mod first;
+mod index_of;
 mod join;
 mod lambda_builder;
+mod last;
 mod length;
 mod lines;
 mod map;
@@ -49,7 +57,6 @@ impl EvaluatorFactory for MethodInvocation {
         };
         match &self.method {
             Method::Length => new_length(target),
-
             Method::ToUpper => new_to_upper(target),
             Method::ToLower => new_to_lower(target),
             Method::Trim => new_trim(target),
@@ -67,6 +74,10 @@ impl EvaluatorFactory for MethodInvocation {
             Method::Split(delimiter) => new_split(target, delimiter, bindings),
             Method::Lines => new_lines(target),
             Method::Words => new_words(target),
+            Method::First => new_first(target),
+            Method::Last => new_last(target),
+            Method::Contains(item_to_find) => new_contains(target, item_to_find, bindings),
+            Method::IndexOf(item_to_find) => new_index_of(target, item_to_find, bindings),
         }
     }
 }

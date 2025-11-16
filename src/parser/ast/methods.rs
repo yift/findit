@@ -26,6 +26,10 @@ pub(crate) enum Method {
     Split(Box<Expression>),
     Lines,
     Words,
+    First,
+    Last,
+    Contains(Box<Expression>),
+    IndexOf(Box<Expression>),
 }
 
 #[derive(Debug, PartialEq)]
