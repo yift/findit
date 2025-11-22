@@ -20,6 +20,8 @@ pub(crate) enum Method {
     Sum,
     Sort,
     SortBy(LambdaFunction),
+    Distinct,
+    DistinctBy(LambdaFunction),
     Skip(Box<Expression>),
     Take(Box<Expression>),
     Join(Option<Box<Expression>>),

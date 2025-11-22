@@ -24,6 +24,8 @@ pub(super) enum MethodName {
     Sum,
     Sort,
     SortBy,
+    Distinct,
+    DistinctBy,
     Skip,
     Take,
     Join,
@@ -66,6 +68,8 @@ impl MethodName {
             "FLATMAP" | "FLAT_MAP" => Some(MethodName::FlatMap),
             "ALL" => Some(MethodName::All),
             "ANY" => Some(MethodName::Any),
+            "DISTINCT" | "UNIQUE" => Some(MethodName::Distinct),
+            "DISTINCT_BY" | "DISTINCTBY" | "UNIQUE_BY" | "UNIQUEBY" => Some(MethodName::DistinctBy),
             _ => None,
         }
     }
@@ -123,6 +127,11 @@ pub(super) fn build_method(
         MethodName::SortBy => {
             let lambda = build_lambda(lex)?;
             Ok(Method::SortBy(lambda))
+        }
+        MethodName::Distinct => Ok(Method::Distinct),
+        MethodName::DistinctBy => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::DistinctBy(lambda))
         }
         MethodName::Skip => {
             let expr =

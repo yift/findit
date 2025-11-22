@@ -7,6 +7,7 @@ use crate::{
             all::new_all,
             any::new_any,
             contains::new_contains,
+            distinct::{new_distinct, new_distinct_by},
             filter::new_filter,
             first::new_first,
             flat_map::new_flat_map,
@@ -34,6 +35,7 @@ use crate::{
 mod all;
 mod any;
 mod contains;
+mod distinct;
 mod filter;
 mod first;
 mod flat_map;
@@ -73,6 +75,8 @@ impl EvaluatorFactory for MethodInvocation {
             Method::Filter(lambda) => new_filter(target, lambda, bindings),
             Method::Sum => new_sum(target),
             Method::Sort => new_sort(target),
+            Method::Distinct => new_distinct(target),
+            Method::DistinctBy(lambda) => new_distinct_by(target, lambda, bindings),
             Method::SortBy(lambda) => new_sort_by(target, lambda, bindings),
             Method::Skip(by) => new_skip(target, by, bindings),
             Method::Take(limit) => new_take(target, limit, bindings),

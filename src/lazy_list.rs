@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 use std::fmt::{Debug, Result as FmtResult};
+use std::hash::Hash;
 use std::ops::Deref;
 use std::{
     cell::RefCell,
@@ -67,6 +68,11 @@ impl<T: Display> Display for LazyList<T> {
             t.fmt(f)?;
         }
         write!(f, "]")
+    }
+}
+impl<T: Hash> Hash for LazyList<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.eager().hash(state);
     }
 }
 struct ListIterator<T> {
@@ -167,7 +173,12 @@ impl<T: Ord> Ord for LazyList<T> {
 
 #[cfg(test)]
 mod tests {
-    use std::{cmp::Ordering, rc::Rc, vec};
+    use std::{
+        cmp::Ordering,
+        hash::{DefaultHasher, Hash, Hasher},
+        rc::Rc,
+        vec,
+    };
 
     use crate::lazy_list::LazyList;
 
@@ -237,5 +248,20 @@ mod tests {
         let num = lst.into_iter().nth(2);
 
         assert_eq!(num, Some(3));
+    }
+
+    #[test]
+    fn test_hash() {
+        let lst: Box<dyn Iterator<Item = _>> = Box::new(vec![1, 2, 3, 4, 5].into_iter());
+        let lst: LazyList<_> = lst.into();
+
+        let mut s = DefaultHasher::new();
+        lst.hash(&mut s);
+        let hash = s.finish();
+
+        let mut expected = DefaultHasher::new();
+        vec![1, 2, 3, 4, 5].hash(&mut expected);
+        let expected = expected.finish();
+        assert_eq!(hash, expected);
     }
 }

@@ -10,7 +10,7 @@ use chrono::{DateTime, Local};
 
 use crate::lazy_list::LazyList;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub(crate) enum Value {
     String(String),
     Path(PathBuf),
@@ -21,7 +21,7 @@ pub(crate) enum Value {
     Empty,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub(crate) struct List {
     items: LazyList<Value>,
     item_type: Rc<ValueType>,
@@ -147,7 +147,7 @@ impl Display for Value {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub(crate) enum ValueType {
     Bool,
     Number,
