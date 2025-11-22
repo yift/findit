@@ -34,6 +34,9 @@ pub(super) enum MethodName {
     Last,
     Contains,
     IndexOf,
+    FlatMap,
+    All,
+    Any,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -60,6 +63,9 @@ impl MethodName {
             "LAST" => Some(MethodName::Last),
             "CONTAINS" => Some(MethodName::Contains),
             "INDEXOF" | "INDEX_OF" => Some(MethodName::IndexOf),
+            "FLATMAP" | "FLAT_MAP" => Some(MethodName::FlatMap),
+            "ALL" => Some(MethodName::All),
+            "ANY" => Some(MethodName::Any),
             _ => None,
         }
     }
@@ -160,6 +166,18 @@ pub(super) fn build_method(
             let expr =
                 build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
             Ok(Method::IndexOf(Box::new(expr)))
+        }
+        MethodName::FlatMap => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::FlatMap(lambda))
+        }
+        MethodName::All => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::All(lambda))
+        }
+        MethodName::Any => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::Any(lambda))
         }
     };
     let Some(close) = lex.next() else {

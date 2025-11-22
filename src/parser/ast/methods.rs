@@ -30,6 +30,9 @@ pub(crate) enum Method {
     Last,
     Contains(Box<Expression>),
     IndexOf(Box<Expression>),
+    FlatMap(LambdaFunction),
+    All(LambdaFunction),
+    Any(LambdaFunction),
 }
 
 #[derive(Debug, PartialEq)]
