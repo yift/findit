@@ -22,6 +22,9 @@ pub(super) enum MethodName {
     Map,
     Filter,
     Sum,
+    Max,
+    Min,
+    Avg,
     Sort,
     SortBy,
     Distinct,
@@ -53,6 +56,9 @@ impl MethodName {
             "MAP" => Some(MethodName::Map),
             "FILTER" => Some(MethodName::Filter),
             "SUM" => Some(MethodName::Sum),
+            "MAX" | "MAXIMUM" => Some(MethodName::Max),
+            "MIN" | "MINIMUM" => Some(MethodName::Min),
+            "AVG" | "AVERAGE" => Some(MethodName::Avg),
             "SORT" | "ORDER" => Some(MethodName::Sort),
             "SORT_BY" | "ORDER_BY" | "SORTBY" | "ORDERBY" => Some(MethodName::SortBy),
             "SKIP" => Some(MethodName::Skip),
@@ -123,6 +129,9 @@ pub(super) fn build_method(
             Ok(Method::Filter(lambda))
         }
         MethodName::Sum => Ok(Method::Sum),
+        MethodName::Max => Ok(Method::Max),
+        MethodName::Min => Ok(Method::Min),
+        MethodName::Avg => Ok(Method::Avg),
         MethodName::Sort => Ok(Method::Sort),
         MethodName::SortBy => {
             let lambda = build_lambda(lex)?;

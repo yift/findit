@@ -6,6 +6,7 @@ use crate::{
         method_invocation::{
             all::new_all,
             any::new_any,
+            avg::new_avg,
             contains::new_contains,
             distinct::{new_distinct, new_distinct_by},
             filter::new_filter,
@@ -17,6 +18,8 @@ use crate::{
             length::new_length,
             lines::new_lines,
             map::new_map,
+            max::new_max,
+            min::new_min,
             reverse::new_reverse,
             skip::new_skip,
             sort::{new_sort, new_sort_by},
@@ -34,6 +37,7 @@ use crate::{
 
 mod all;
 mod any;
+mod avg;
 mod contains;
 mod distinct;
 mod filter;
@@ -46,6 +50,8 @@ mod last;
 mod length;
 mod lines;
 mod map;
+mod max;
+mod min;
 mod reverse;
 mod skip;
 mod sort;
@@ -74,6 +80,9 @@ impl EvaluatorFactory for MethodInvocation {
             Method::Map(lambda) => new_map(target, lambda, bindings),
             Method::Filter(lambda) => new_filter(target, lambda, bindings),
             Method::Sum => new_sum(target),
+            Method::Avg => new_avg(target),
+            Method::Max => new_max(target),
+            Method::Min => new_min(target),
             Method::Sort => new_sort(target),
             Method::Distinct => new_distinct(target),
             Method::DistinctBy(lambda) => new_distinct_by(target, lambda, bindings),
