@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn test_is_false_with_non_bool_returns_error() {
-        let err = read_expr("'test' IS FALSE").err();
+        let err = read_expr("@test IS FALSE").err();
 
         assert!(err.is_some());
     }
