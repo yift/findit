@@ -77,7 +77,7 @@ mod tests {
 
     #[test]
     fn test_sum_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).sum()")?;
+        let expr = read_expr("files.map($f $f.length()).sum()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_sum_ignores_non_numbers() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} ({f}/ \"first-229.txt\").length()).sum()")?;
+        let expr = read_expr("files.map($f ($f/ \"first-229.txt\").length()).sum()")?;
         let path = Path::new("tests/test_cases/filter/test_files");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

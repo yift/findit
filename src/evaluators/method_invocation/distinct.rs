@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_simple_distinct_by() -> Result<(), FindItError> {
-        let expr = read_expr(":[\"abcd\", \"1234\", \"z\", \"-\"].distinctBy({str} {str}.len())")?;
+        let expr = read_expr(":[\"abcd\", \"1234\", \"z\", \"-\"].distinctBy($str $str.len())")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_distinct_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).distinct()")?;
+        let expr = read_expr("files.map($f $f.length()).distinct()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_distinct_by_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].distinctBy({f} {f})")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].distinctBy($f $f)")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_distinct_by_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.distinct_by({f} {f}.length())")?;
+        let expr = read_expr("files.distinct_by($f $f.length())")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     fn no_list_distinct_by() {
-        let err = read_expr("12.distinct_by({f} {f})").err();
+        let err = read_expr("12.distinct_by($f $f)").err();
         assert!(err.is_some())
     }
 }

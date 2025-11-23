@@ -69,7 +69,7 @@ mod tests {
 
     #[test]
     fn test_simple_map() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].map({n} {n} * 10)")?;
+        let expr = read_expr(":[1, 2, 3].map($n $n * 10)")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -85,7 +85,7 @@ mod tests {
 
     #[test]
     fn test_map_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.content)")?;
+        let expr = read_expr("files.map($f $f.content)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -96,8 +96,7 @@ mod tests {
 
     #[test]
     fn test_filter_map_sum() -> Result<(), FindItError> {
-        let expr =
-            read_expr(":[1, 2, 3, 4, 5, 6].filter({n} {n} % 2 == 0).map({n} {n} * 10).sum()")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].filter($n $n % 2 == 0).map($n $n * 10).sum()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(120),);
@@ -107,7 +106,7 @@ mod tests {
 
     #[test]
     fn length_no_list_map() {
-        let err = read_expr("12.map({f} {f})").err();
+        let err = read_expr("12.map($f $f)").err();
         assert!(err.is_some())
     }
 }

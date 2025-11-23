@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn test_simple_filter() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].filter({n} {n} % 2 == 0)")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].filter($n $n % 2 == 0)")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_filter_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.filter({f} {f}.length() % 2 == 0)")?;
+        let expr = read_expr("files.filter($f $f.length() % 2 == 0)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -99,13 +99,13 @@ mod tests {
 
     #[test]
     fn length_no_list_filter() {
-        let err = read_expr("12.filter({f} {f})").err();
+        let err = read_expr("12.filter($f $f)").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn length_no_bool_filter() {
-        let err = read_expr(":[1 ,2, 3].filter({f} {f})").err();
+        let err = read_expr(":[1 ,2, 3].filter($f $f)").err();
         assert!(err.is_some())
     }
 }

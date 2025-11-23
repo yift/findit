@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn test_simple_any_true() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any({n} {n} > 4)")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any($n $n > 4)")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Bool(true));
@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_simple_any_false() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any({n} {n} > 10)")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any($n $n > 10)")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Bool(false));
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_any_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.any({f} {f}.length() % 2 == 0)")?;
+        let expr = read_expr("files.any($f $f.length() % 2 == 0)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -99,18 +99,18 @@ mod tests {
 
     #[test]
     fn length_no_list_any() {
-        let err = read_expr("12.any({f} {f})").err();
+        let err = read_expr("12.any($f $f)").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn length_no_bool_any() {
-        let err = read_expr(":[1 ,2, 3].any({f} {f})").err();
+        let err = read_expr(":[1 ,2, 3].any($f $f)").err();
         assert!(err.is_some())
     }
     #[test]
     fn test_any_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any({n} {n} < 20)")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].any($n $n < 20)")?;
 
         assert_eq!(expr.expected_type(), ValueType::Bool);
 

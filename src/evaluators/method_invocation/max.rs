@@ -64,7 +64,7 @@ mod tests {
 
     #[test]
     fn test_max_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).max()")?;
+        let expr = read_expr("files.map($f $f.length()).max()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_max_empty_list_return_nothing() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3, 4].filter({n} {n} > 10).max()")?;
+        let expr = read_expr(":[1, 3, 4].filter($n $n > 10).max()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn test_simple_sort_by() -> Result<(), FindItError> {
-        let expr = read_expr(":[\"abcd\", \"gq\", \"z\", \"12345\"].sortBy({str} {str}.len())")?;
+        let expr = read_expr(":[\"abcd\", \"gq\", \"z\", \"12345\"].sortBy($str $str.len())")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_sort_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).sort()")?;
+        let expr = read_expr("files.map($f $f.length()).sort()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_sort_by_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].sort_by({f} {f})")?;
+        let expr = read_expr(":[1, 2, 3, 4, 5, 6].sort_by($f $f)")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_sort_by_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.sort_by({f} {f}.length())")?;
+        let expr = read_expr("files.sort_by($f $f.length())")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -186,7 +186,7 @@ mod tests {
 
     #[test]
     fn length_no_list_sort_by() {
-        let err = read_expr("12.sort_by({f} {f})").err();
+        let err = read_expr("12.sort_by($f $f)").err();
         assert!(err.is_some())
     }
 }

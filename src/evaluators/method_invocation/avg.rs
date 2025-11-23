@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_empty_avg() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 50, 30, 40].filter({n} {n} < 5).avg()")?;
+        let expr = read_expr(":[10, 20, 50, 30, 40].filter($n $n < 5).avg()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Empty);
@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_avg_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).avg()")?;
+        let expr = read_expr("files.map($f $f.length()).avg()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -122,7 +122,7 @@ mod tests {
 
     #[test]
     fn test_avg_ignores_non_numbers() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} ({f}/ \"first-229.txt\").length()).avg()")?;
+        let expr = read_expr("files.map($f ($f/ \"first-229.txt\").length()).avg()")?;
         let path = Path::new("tests/test_cases/filter/test_files");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

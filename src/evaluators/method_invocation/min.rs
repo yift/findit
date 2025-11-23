@@ -64,7 +64,7 @@ mod tests {
 
     #[test]
     fn test_min_nop_return_empty() -> Result<(), FindItError> {
-        let expr = read_expr("files.map({f} {f}.length()).min()")?;
+        let expr = read_expr("files.map($f $f.length()).min()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_min_empty_list_return_nothing() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3, 4].filter({n} {n} > 10).min()")?;
+        let expr = read_expr(":[1, 3, 4].filter($n $n > 10).min()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

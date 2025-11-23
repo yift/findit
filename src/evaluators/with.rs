@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn test_simple_with() -> Result<(), FindItError> {
-        let expr = read_expr("with {one} as 1 do 1 + {one} + 10 end")?;
+        let expr = read_expr("with $one as 1 do 1 + $one + 10 end")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(12));
@@ -64,7 +64,7 @@ mod tests {
     #[test]
     fn test_multiple_with() -> Result<(), FindItError> {
         let expr = read_expr(
-            "with {one} 1, {two} as 1 + {one}, {three} {two} + 1, {four} as {two} * {two} do {three} + {four} end",
+            "with $one 1, $two as 1 + $one, $three $two + 1, $four as $two * $two do $three + $four end",
         )?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
@@ -75,9 +75,8 @@ mod tests {
 
     #[test]
     fn test_multiple_overwrite() -> Result<(), FindItError> {
-        let expr = read_expr(
-            "with {one} 1, {two} {one} + {one}, {one} \"one\" do {one} + {two} as string end",
-        )?;
+        let expr =
+            read_expr("with $one 1, $two $one + $one, $one \"one\" do $one + $two as string end")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::String("one2".into()));
@@ -87,7 +86,7 @@ mod tests {
 
     #[test]
     fn test_expected_value() -> Result<(), FindItError> {
-        let expr = read_expr("with {content} content do {content} end")?;
+        let expr = read_expr("with $content content do $content end")?;
 
         assert_eq!(expr.expected_type(), ValueType::String);
 
@@ -95,7 +94,7 @@ mod tests {
     }
     #[test]
     fn test_with_with_unknown_type() {
-        let err = read_expr("with {one} as 1 do 1 + {two} + 10 end").err();
+        let err = read_expr("with $one as 1 do 1 + $two + 10 end").err();
 
         assert!(err.is_some());
     }
