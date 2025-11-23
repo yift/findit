@@ -111,7 +111,7 @@ mod tests {
             panic!("Path should exists now");
         }
 
-        let sql = "fire('rm', \"-rf\", path)";
+        let sql = "fire(@rm, \"-rf\", path)";
         let expr = read_expr(sql)?;
         let wrapper = FileWrapper::new(path.to_path_buf(), 1);
 
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_fire_into_non_into_returns_empty() -> Result<(), FindItError> {
-        let sql = "fire('echo' into parent)";
+        let sql = "fire(@echo into parent)";
         let expr = read_expr(sql)?;
         let file = Path::new("/");
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);
@@ -298,7 +298,7 @@ mod tests {
 
     #[test]
     fn test_fire_into_bad_location_returns_empty() -> Result<(), FindItError> {
-        let sql = "fire('echo' into '/bin/not/a/valid/location/a.txt')";
+        let sql = "fire(@echo into @\"/bin/not/a/valid/location/a.txt\")";
         let expr = read_expr(sql)?;
         let file = Path::new("/");
         let wrapper = FileWrapper::new(file.to_path_buf(), 1);

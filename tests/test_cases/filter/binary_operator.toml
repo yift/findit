@@ -63,7 +63,7 @@ arguments = ["tests/test_cases/filter/test_files", "-w", "(\"2\" + extension + \
 order = false
 
 [concat_with_plus]
-arguments = ["tests/test_cases/filter/test_files", "-w", "extension + ' - ' + length() = \"txt - 65\""]
+arguments = ["tests/test_cases/filter/test_files", "-w", "extension + \" - \" + length() = \"txt - 65\""]
 order = false
 
 [plus_with_date]

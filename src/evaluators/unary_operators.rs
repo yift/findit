@@ -128,7 +128,7 @@ mod tests {
     #[test]
     fn self_divide_path() -> Result<(), FindItError> {
         let file = Path::new("tests/test_cases/display/test_files/other-247.txt");
-        let expr = read_expr("extension of (/ 'other-247.txt')")?;
+        let expr = read_expr("extension of (/ @other-247.txt)")?;
 
         let wrapper = FileWrapper::new(file.parent().unwrap().to_path_buf(), 1);
 

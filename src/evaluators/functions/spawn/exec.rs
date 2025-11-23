@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn test_exec_into_number() {
-        let sql = "exec('rm' into 4000)";
+        let sql = "exec(@rm into 4000)";
         let err = read_expr(sql).err();
 
         assert!(err.is_some());
@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_exec_out_expected_return() {
-        let sql = "execOut('echo')";
+        let sql = "execOut(@echo)";
         let expr = read_expr(sql).unwrap();
 
         assert_eq!(expr.expected_type(), ValueType::String);
@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_exec_success_return_true() -> Result<(), FindItError> {
-        let sql = "exec('ls', path)";
+        let sql = "exec(@ls, path)";
         let expr = read_expr(sql).unwrap();
         let file = env::current_dir()?;
         let wrapper = FileWrapper::new(file, 1);
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_exec_fail_return_false() -> Result<(), FindItError> {
-        let sql = "exec('ls', '/bin/no/such/dir/')";
+        let sql = "exec(@ls, @/bin/no/such/dir/)";
         let expr = read_expr(sql).unwrap();
         let file = env::current_dir()?;
         let wrapper = FileWrapper::new(file, 1);
@@ -152,7 +152,7 @@ mod tests {
 
     #[test]
     fn test_exec_out_return_results() -> Result<(), FindItError> {
-        let sql = "exec_out('cat', path)";
+        let sql = "exec_out(@cat, path)";
         let expr = read_expr(sql).unwrap();
         let file =
             Path::new("tests/test_cases/display/test_files/thing/good-581.txt").to_path_buf();
@@ -170,7 +170,7 @@ mod tests {
         let dir = tempdir()?;
         let out_file = dir.path().join("out.txt");
 
-        let sql = format!("exec('cat', path into '{}')", out_file.to_str().unwrap());
+        let sql = format!("exec(@cat, path into @\"{}\")", out_file.to_str().unwrap());
         let expr = read_expr(&sql).unwrap();
         let file =
             Path::new("tests/test_cases/display/test_files/thing/good-581.txt").to_path_buf();

@@ -93,7 +93,7 @@ impl Token {
             '"' => Ok(Some(Token::Value(Value::String(read_string(chars)?)))),
             '[' => Ok(Some(Token::Value(Value::Date(read_date(chars)?)))),
             '{' => Ok(Some(Token::BindingName(read_binding_name(chars)?))),
-            '\'' => Ok(Some(Token::Value(Value::Path(read_path(chars)?)))),
+            '@' => Ok(Some(Token::Value(Value::Path(read_path(chars)?)))),
             '(' => {
                 chars.next();
                 Ok(Some(Token::OpenBrackets))
@@ -312,20 +312,48 @@ fn read_reserved_word(
         }
     }
 }
-fn read_path(chars: &mut impl Iterator<Item = (usize, char)>) -> Result<PathBuf, TokenError> {
+
+fn read_path(
+    chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
+) -> Result<PathBuf, TokenError> {
+    // eat the open @
+    chars.next();
+    if let Some((_, '"')) = chars.peek() {
+        return read_quoted_path(chars);
+    };
+    let mut str = String::new();
+    loop {
+        let chr = chars.peek();
+        match chr {
+            None => break,
+            Some((_, c)) if "[](){}\":|,@".contains(*c) || c.is_whitespace() => break,
+            Some((_, ch)) => {
+                str.push(*ch);
+                chars.next();
+            }
+        };
+    }
+    Ok(PathBuf::from(&str))
+}
+
+fn read_quoted_path(
+    chars: &mut impl Iterator<Item = (usize, char)>,
+) -> Result<PathBuf, TokenError> {
     // eat the open quote
     chars.next();
     let mut str = String::new();
+
     loop {
-        let Some((_, chr)) = chars.next() else {
-            return Err(TokenError {
-                cause: "Unended path".into(),
-            });
-        };
+        let chr = chars.next();
         match chr {
-            '\'' => break,
-            _ => str.push(chr),
-        }
+            None => {
+                return Err(TokenError {
+                    cause: "Unended path".into(),
+                });
+            }
+            Some((_, '\"')) => break,
+            Some((_, ch)) => str.push(ch),
+        };
     }
     Ok(PathBuf::from(&str))
 }
@@ -995,8 +1023,8 @@ mod tests {
     }
 
     #[test]
-    fn read_path() -> Result<(), TokenError> {
-        let str = "'\\home\\user\\'";
+    fn read_path_simple() -> Result<(), TokenError> {
+        let str = "@\\home\\user\\";
         let mut chars = str.chars().enumerate().peekable();
 
         let token = Token::new(&mut chars)?;
@@ -1010,8 +1038,55 @@ mod tests {
     }
 
     #[test]
+    fn read_path_ends_with_ws() -> Result<(), TokenError> {
+        let str = "@\\home\\user\\   ";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::Value(Value::Path(PathBuf::from("\\home\\user\\"))))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn read_path_ends_with_comma() -> Result<(), TokenError> {
+        let str = "@\\home\\user\\,   ";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::Value(Value::Path(PathBuf::from("\\home\\user\\"))))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn read_path_quote() -> Result<(), TokenError> {
+        let str = "@\"\\home\\user\\My Files\"";
+        let mut chars = str.chars().enumerate().peekable();
+
+        let token = Token::new(&mut chars)?;
+
+        assert_eq!(
+            token,
+            Some(Token::Value(Value::Path(PathBuf::from(
+                "\\home\\user\\My Files"
+            ))))
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn never_ending_path() {
-        let str = "'home".to_string();
+        let str = "@\"home".to_string();
 
         let mut chars = str.chars().enumerate().peekable();
 
