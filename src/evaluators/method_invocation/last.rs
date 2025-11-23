@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_last_empty() -> Result<(), FindItError> {
-        let expr = read_expr(":[].last()")?;
+        let expr = read_expr("[].last()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_last_non_empty() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].take(3).last()")?;
+        let expr = read_expr("[1, 2, 4, 5].take(3).last()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn last_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].last()")?;
+        let expr = read_expr("[1, 2, 4, 5].last()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 

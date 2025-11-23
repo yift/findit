@@ -68,10 +68,10 @@ order = false
 
 [plus_with_date]
 run_before = ["rm -rf /tmp/findit/tests/concat_with_date", "mkdir -p /tmp/findit/tests/concat_with_date", "touch /tmp/findit/tests/concat_with_date/file1 -t 202406210810", "touch /tmp/findit/tests/concat_with_date/file2 -t 202406220810.32"]
-arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified + 120 = [2024-06-22 08:12:32]"]
+arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified + 120 = @(2024-06-22 08:12:32)"]
 run_after = ["rm -rf /tmp/findit/tests/concat_with_date"]
 
 [minus_with_date]
 run_before = ["rm -rf /tmp/findit/tests/concat_with_date", "mkdir -p /tmp/findit/tests/concat_with_date", "touch /tmp/findit/tests/concat_with_date/file1 -t 202406210810", "touch /tmp/findit/tests/concat_with_date/file2 -t 202406220810.32"]
-arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified - 120 = [22/Jun/2024 08:08:32]"]
+arguments = ["/tmp/findit/tests/concat_with_date", "-w", "modified - 120 = @(22/Jun/2024 08:08:32)"]
 run_after = ["rm -rf /tmp/findit/tests/concat_with_date"]

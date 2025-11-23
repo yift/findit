@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn test_simple_flat_map() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 30].flat_map($n :[$n+1, $n+5])")?;
+        let expr = read_expr("[10, 20, 30].flat_map($n [$n+1, $n+5])")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_flat_map_with_nothing() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 30].flat_map($n me.words())")?;
+        let expr = read_expr("[10, 20, 30].flat_map($n me.words())")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -156,13 +156,13 @@ mod tests {
 
     #[test]
     fn no_list_flat_map() {
-        let err = read_expr("12.flatMap($f :[$f])").err();
+        let err = read_expr("12.flatMap($f [$f])").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn no_list_lambda_flat_map() {
-        let err = read_expr(":[12].flatMap($f $f)").err();
+        let err = read_expr("[12].flatMap($f $f)").err();
         assert!(err.is_some())
     }
 }

@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn reverse_expect_list() {
-        let expr = read_expr(":[1].REVERSE()").unwrap();
+        let expr = read_expr("[1].REVERSE()").unwrap();
         assert_eq!(
             expr.expected_type(),
             ValueType::List(Rc::new(ValueType::Number))
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn reverse_list_works() {
-        let eval = read_expr(":[1, 2, 3].reverse()").unwrap();
+        let eval = read_expr("[1, 2, 3].reverse()").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

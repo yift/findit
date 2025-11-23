@@ -88,7 +88,7 @@ impl Evaluator for CastToDate {
         match self.expr.eval(file) {
             Value::Bool(_) | Value::Empty => Value::Empty,
             Value::Date(dt) => Value::Date(dt),
-            Value::String(str) => match parse_expression(&format!("[{}]", str)) {
+            Value::String(str) => match parse_expression(&format!("@({})", str)) {
                 Ok(Expression::Literal(Value::Date(dt))) => Value::Date(dt),
                 _ => Value::Empty,
             },
@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn empty_list_cast_to_bool_false() -> Result<(), FindItError> {
-        let sql = ":[] as bool";
+        let sql = "[] as bool";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -270,7 +270,7 @@ mod tests {
 
     #[test]
     fn non_empty_list_cast_to_bool_true() -> Result<(), FindItError> {
-        let sql = ":[1] as bool";
+        let sql = "[1] as bool";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -354,7 +354,7 @@ mod tests {
 
     #[test]
     fn date_cast_to_number() -> Result<(), FindItError> {
-        let sql = "[1970-01-02] as number";
+        let sql = "@(1970-01-02) as number";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -366,7 +366,7 @@ mod tests {
 
     #[test]
     fn date_cast_to_number_fails() -> Result<(), FindItError> {
-        let sql = "[1960-01-02] as number";
+        let sql = "@(1960-01-02) as number";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -402,7 +402,7 @@ mod tests {
 
     #[test]
     fn list_cast_to_number() -> Result<(), FindItError> {
-        let sql = ":[1, 2, 12] as number";
+        let sql = "[1, 2, 12] as number";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -438,7 +438,7 @@ mod tests {
 
     #[test]
     fn date_cast_to_date() -> Result<(), FindItError> {
-        let sql = "[1970-01-02] as time";
+        let sql = "@(1970-01-02) as time";
         let eval = read_expr(sql)?;
         let file = Path::new("/no/such/file").to_path_buf();
         let wrapper = FileWrapper::new(file, 1);
@@ -649,7 +649,7 @@ mod tests {
 
     #[test]
     fn test_cast_list_to_date() -> Result<(), FindItError> {
-        let sql = ":[1, 2] as date";
+        let sql = "[1, 2] as date";
         let eval = read_expr(sql)?;
 
         let file = Path::new("/no/such/file");

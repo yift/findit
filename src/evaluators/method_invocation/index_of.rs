@@ -69,7 +69,7 @@ mod tests {
 
     #[test]
     fn index_of_returns_the_index() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 10, 4, 2, 5, 12].index_of(10)")?;
+        let expr = read_expr("[1, 2, 10, 4, 2, 5, 12].index_of(10)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn index_of_returns_the_first_index() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 10, 4, 2, 5, 12].indexOf(2)")?;
+        let expr = read_expr("[1, 2, 10, 4, 2, 5, 12].indexOf(2)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     fn index_of_return_empty_when_needed() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 10, 4, 2, 5, 12].index_of(11)")?;
+        let expr = read_expr("[1, 2, 10, 4, 2, 5, 12].index_of(11)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn index_of_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].index_of(3)")?;
+        let expr = read_expr("[1, 2, 4, 5].index_of(3)")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 
@@ -128,13 +128,13 @@ mod tests {
 
     #[test]
     fn index_of_different_value_types() {
-        let err = read_expr(":[1, 2, 3].index_of(true)").err();
+        let err = read_expr("[1, 2, 3].index_of(true)").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn index_of_no_item() {
-        let err = read_expr(":[1, 2, 3].index_of()").err();
+        let err = read_expr("[1, 2, 3].index_of()").err();
         assert!(err.is_some())
     }
 }

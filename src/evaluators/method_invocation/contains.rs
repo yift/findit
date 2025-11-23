@@ -63,7 +63,7 @@ mod tests {
 
     #[test]
     fn contains_returns_true_when_needed() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 10, 4, 2, 5, 12].contains(5)")?;
+        let expr = read_expr("[1, 2, 10, 4, 2, 5, 12].contains(5)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn contains_returns_false_when_needed() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 10, 4, 2, 5, 12].contains(11)")?;
+        let expr = read_expr("[1, 2, 10, 4, 2, 5, 12].contains(11)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn contains_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].contains(3)")?;
+        let expr = read_expr("[1, 2, 4, 5].contains(3)")?;
 
         assert_eq!(expr.expected_type(), ValueType::Bool);
 
@@ -111,13 +111,13 @@ mod tests {
 
     #[test]
     fn contains_different_value_types() {
-        let err = read_expr(":[1, 2, 3].contains(true)").err();
+        let err = read_expr("[1, 2, 3].contains(true)").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn contains_no_item() {
-        let err = read_expr(":[1, 2, 3].contains()").err();
+        let err = read_expr("[1, 2, 3].contains()").err();
         assert!(err.is_some())
     }
 }

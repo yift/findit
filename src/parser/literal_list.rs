@@ -50,14 +50,14 @@ mod tests {
 
     #[test]
     fn test_list_never_ends() {
-        let source = ":[10, 20";
+        let source = "[10, 20";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
     }
     #[test]
     fn test_list_no_commas() {
-        let source = ":[10 20]";
+        let source = "[10 20]";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_list_simple() {
-        let source = ":[10, 20]";
+        let source = "[10, 20]";
         let expr = parse_expression(source).unwrap();
 
         assert_eq!(

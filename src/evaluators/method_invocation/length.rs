@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_simple_len() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].len()")?;
+        let expr = read_expr("[1, 2, 3].len()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(3));

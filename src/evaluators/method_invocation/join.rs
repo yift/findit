@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_join_no_arg() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].join()")?;
+        let expr = read_expr("[1, 2, 4, 5].join()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn test_join_with_arg() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].join(\";\")")?;
+        let expr = read_expr("[1, 2, 4, 5].join(\";\")")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn join_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].join(\";\")")?;
+        let expr = read_expr("[1, 2, 4, 5].join(\";\")")?;
 
         assert_eq!(expr.expected_type(), ValueType::String);
 
@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_join_with_empty_arg() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].join(content)")?;
+        let expr = read_expr("[1, 2, 4, 5].join(content)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn join_no_string() {
-        let err = read_expr(":[1, 2, 3].join(123)").err();
+        let err = read_expr("[1, 2, 3].join(123)").err();
         assert!(err.is_some())
     }
 }

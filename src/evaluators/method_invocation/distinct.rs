@@ -95,7 +95,7 @@ mod tests {
     };
     #[test]
     fn test_simple_distinct() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 10, 10, 1, 2].distinct()")?;
+        let expr = read_expr("[1, 10, 10, 1, 2].distinct()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_simple_distinct_by() -> Result<(), FindItError> {
-        let expr = read_expr(":[\"abcd\", \"1234\", \"z\", \"-\"].distinctBy($str $str.len())")?;
+        let expr = read_expr("[\"abcd\", \"1234\", \"z\", \"-\"].distinctBy($str $str.len())")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -127,7 +127,7 @@ mod tests {
 
     #[test]
     fn test_distinct_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].distinct()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].distinct()")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_distinct_by_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].distinctBy($f $f)")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].distinctBy($f $f)")?;
 
         assert_eq!(
             expr.expected_type(),

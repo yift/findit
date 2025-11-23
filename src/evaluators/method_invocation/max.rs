@@ -45,7 +45,7 @@ mod tests {
 
     #[test]
     fn test_simple_max() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 1].max()")?;
+        let expr = read_expr("[1, 2, 3, 1].max()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(3));
@@ -55,7 +55,7 @@ mod tests {
 
     #[test]
     fn test_max_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].max()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].max()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_max_empty_list_return_nothing() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3, 4].filter($n $n > 10).max()")?;
+        let expr = read_expr("[1, 3, 4].filter($n $n > 10).max()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

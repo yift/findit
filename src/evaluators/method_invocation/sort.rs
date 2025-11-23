@@ -96,7 +96,7 @@ mod tests {
     };
     #[test]
     fn test_simple_sort() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 14, 10].sort()")?;
+        let expr = read_expr("[1, 14, 10].sort()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn test_simple_sort_by() -> Result<(), FindItError> {
-        let expr = read_expr(":[\"abcd\", \"gq\", \"z\", \"12345\"].sortBy($str $str.len())")?;
+        let expr = read_expr("[\"abcd\", \"gq\", \"z\", \"12345\"].sortBy($str $str.len())")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_sort_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].sort()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].sort()")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_sort_by_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].sort_by($f $f)")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].sort_by($f $f)")?;
 
         assert_eq!(
             expr.expected_type(),

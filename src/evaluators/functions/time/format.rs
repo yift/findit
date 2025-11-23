@@ -68,20 +68,20 @@ mod tests {
 
     #[test]
     fn format_no_format() {
-        let err = read_expr("format([2021-12-21] as false)").err();
+        let err = read_expr("format(@(2021-12-21) as false)").err();
         assert!(err.is_some())
     }
 
     #[test]
     fn format_expected_type() {
-        let expr = read_expr("format([2021-12-21] as \"%Y\")").unwrap();
+        let expr = read_expr("format(@(2021-12-21) as \"%Y\")").unwrap();
 
         assert_eq!(expr.expected_type(), ValueType::String);
     }
 
     #[test]
     fn format_return_value() {
-        let expr = read_expr("format([2021-12-21] as \"%Y\")").unwrap();
+        let expr = read_expr("format(@(2021-12-21) as \"%Y\")").unwrap();
         let wrapper = FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(&wrapper), Value::String("2021".into()));
@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn format_date_return_value() {
-        let expr = read_expr("formatDate([2021-12-21] as \"%d\")").unwrap();
+        let expr = read_expr("formatDate(@(2021-12-21) as \"%d\")").unwrap();
         let wrapper = FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(&wrapper), Value::String("21".into()));
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn format_return_nothing_for_invalid_format() {
-        let expr = read_expr("format([2021-12-21] as \"%\")").unwrap();
+        let expr = read_expr("format(@(2021-12-21) as \"%\")").unwrap();
         let wrapper = FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(&wrapper), Value::Empty);
@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn format_return_nothing_for_no_format() {
-        let expr = read_expr("format([2021-12-21] as content)").unwrap();
+        let expr = read_expr("format(@(2021-12-21) as content)").unwrap();
         let wrapper = FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(&wrapper), Value::Empty);

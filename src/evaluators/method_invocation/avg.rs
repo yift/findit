@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn test_simple_avg() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 50, 30, 40].avg()")?;
+        let expr = read_expr("[10, 20, 50, 30, 40].avg()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(30));
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_empty_avg() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 50, 30, 40].filter($n $n < 5).avg()")?;
+        let expr = read_expr("[10, 20, 50, 30, 40].filter($n $n < 5).avg()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Empty);
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_avg_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].avg()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].avg()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     fn length_no_number_avg() {
-        let err = read_expr(":[\"a\", \"b\"].avg()").err();
+        let err = read_expr("[\"a\", \"b\"].avg()").err();
         assert!(err.is_some())
     }
 }

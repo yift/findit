@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn test_simple_list() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 30]")?;
+        let expr = read_expr("[10, 20, 30]")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_empty_list() -> Result<(), FindItError> {
-        let expr = read_expr(":[]")?;
+        let expr = read_expr("[]")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(
@@ -91,14 +91,14 @@ mod tests {
 
     #[test]
     fn test_two_types_list() {
-        let err = read_expr(":[10, 20, name]").err();
+        let err = read_expr("[10, 20, name]").err();
 
         assert!(err.is_some());
     }
 
     #[test]
     fn test_list_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 20, 30]")?;
+        let expr = read_expr("[10, 20, 30]")?;
 
         assert_eq!(
             expr.expected_type(),

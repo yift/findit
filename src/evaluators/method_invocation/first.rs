@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_first_empty() -> Result<(), FindItError> {
-        let expr = read_expr(":[].first()")?;
+        let expr = read_expr("[].first()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_first_non_empty() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].skip(2).first()")?;
+        let expr = read_expr("[1, 2, 4, 5].skip(2).first()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn first_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].first()")?;
+        let expr = read_expr("[1, 2, 4, 5].first()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 

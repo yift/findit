@@ -155,7 +155,7 @@ mod tests {
 
     #[test]
     fn test_skip_list() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].skip(2)")?;
+        let expr = read_expr("[1, 2, 4, 5].skip(2)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -172,7 +172,7 @@ mod tests {
 
     #[test]
     fn test_skip_list_large_number() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].skip(100)")?;
+        let expr = read_expr("[1, 2, 4, 5].skip(100)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -189,7 +189,7 @@ mod tests {
 
     #[test]
     fn skip_list_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 4, 5].skip(2)")?;
+        let expr = read_expr("[1, 2, 4, 5].skip(2)")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -201,7 +201,7 @@ mod tests {
 
     #[test]
     fn skip_list_nan() {
-        let err = read_expr(":[1, 2, 4, 5].skip(\"a\")").err();
+        let err = read_expr("[1, 2, 4, 5].skip(\"a\")").err();
         assert!(err.is_some())
     }
 
@@ -218,7 +218,7 @@ mod tests {
 
     #[test]
     fn test_skip_list_empty_number() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3].skip(size)")?;
+        let expr = read_expr("[1, 3].skip(size)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

@@ -153,7 +153,7 @@ mod tests {
     }
     #[test]
     fn test_simple_take_list() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].take(2)")?;
+        let expr = read_expr("[1, 2, 3].take(2)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -170,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_take_list_large_number() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].take(100)")?;
+        let expr = read_expr("[1, 2, 3].take(100)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 
@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn take_list_return_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].take(2)")?;
+        let expr = read_expr("[1, 2, 3].take(2)")?;
 
         assert_eq!(
             expr.expected_type(),
@@ -199,7 +199,7 @@ mod tests {
 
     #[test]
     fn take_list_nan_error() {
-        let err = read_expr(":[1, 2, 3].take(\"a\")").err();
+        let err = read_expr("[1, 2, 3].take(\"a\")").err();
         assert!(err.is_some())
     }
 
@@ -216,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_take_list_empty_number() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3].take(size)")?;
+        let expr = read_expr("[1, 3].take(size)")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

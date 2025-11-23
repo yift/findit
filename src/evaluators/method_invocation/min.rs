@@ -45,7 +45,7 @@ mod tests {
 
     #[test]
     fn test_simple_min() -> Result<(), FindItError> {
-        let expr = read_expr(":[10, 2, 3, 10].min()")?;
+        let expr = read_expr("[10, 2, 3, 10].min()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(2));
@@ -55,7 +55,7 @@ mod tests {
 
     #[test]
     fn test_min_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].min()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].min()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_min_empty_list_return_nothing() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 3, 4].filter($n $n > 10).min()")?;
+        let expr = read_expr("[1, 3, 4].filter($n $n > 10).min()")?;
         let path = Path::new("no/such/file");
         let file = &FileWrapper::new(path.to_path_buf(), 1);
 

@@ -91,9 +91,8 @@ impl Token {
         match chr {
             '0'..='9' => Ok(Some(Token::Value(Value::Number(read_number(chars))))),
             '"' => Ok(Some(Token::Value(Value::String(read_string(chars)?)))),
-            '[' => Ok(Some(Token::Value(Value::Date(read_date(chars)?)))),
             '$' => Ok(Some(Token::BindingName(read_binding_name(chars)?))),
-            '@' => Ok(Some(Token::Value(Value::Path(read_path(chars)?)))),
+            '@' => Ok(Some(read_path_or_file(chars)?)),
             '(' => {
                 chars.next();
                 Ok(Some(Token::OpenBrackets))
@@ -160,7 +159,10 @@ impl Token {
             }
             'A'..='Z' | 'a'..='z' => Ok(Some(read_reserved_word(chars)?)),
             '=' | '!' | '<' | '>' => Ok(Some(read_symbol(chars)?)),
-            ':' => Ok(Some(read_complex_literal(chars)?)),
+            '[' => {
+                chars.next();
+                Ok(Some(Token::ListStart))
+            }
             ']' => {
                 chars.next();
                 Ok(Some(Token::ListEnds))
@@ -169,23 +171,6 @@ impl Token {
                 cause: format!("Unknown character: {}", chr),
             }),
         }
-    }
-}
-
-fn read_complex_literal(
-    chars: &mut impl Iterator<Item = (usize, char)>,
-) -> Result<Token, TokenError> {
-    chars.next();
-    let Some((_, next)) = chars.next() else {
-        return Err(TokenError {
-            cause: "Unexpected EOF".into(),
-        });
-    };
-    match next {
-        '[' => Ok(Token::ListStart),
-        _ => Err(TokenError {
-            cause: format!("Unexpected '{next}'"),
-        }),
     }
 }
 
@@ -313,11 +298,24 @@ fn read_reserved_word(
     }
 }
 
+fn read_path_or_file(
+    chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
+) -> Result<Token, TokenError> {
+    // eat the open @
+    chars.next();
+
+    if let Some((_, '(')) = chars.peek() {
+        let date = read_date(chars)?;
+        Ok(Token::Value(Value::Date(date)))
+    } else {
+        let path = read_path(chars)?;
+        Ok(Token::Value(Value::Path(path)))
+    }
+}
+
 fn read_path(
     chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
 ) -> Result<PathBuf, TokenError> {
-    // eat the open @
-    chars.next();
     if let Some((_, '"')) = chars.peek() {
         return read_quoted_path(chars);
     };
@@ -361,7 +359,7 @@ fn read_quoted_path(
 fn read_date(
     chars: &mut impl Iterator<Item = (usize, char)>,
 ) -> Result<DateTime<Local>, TokenError> {
-    // eat the square_brackets
+    // eat the brackets
     chars.next();
     let mut str = String::new();
     loop {
@@ -371,7 +369,7 @@ fn read_date(
             });
         };
         match chr {
-            ']' => break,
+            ')' => break,
             _ => str.push(chr),
         }
     }
@@ -821,7 +819,7 @@ mod tests {
             panic!("Invalid date");
         };
         let expected_date = expected_date.with_timezone(&Local);
-        let str = format!("[{date_as_text}]");
+        let str = format!("@({date_as_text})");
 
         let mut chars = str.chars().enumerate().peekable();
 
@@ -996,7 +994,7 @@ mod tests {
 
     #[test]
     fn invalid_date_format() {
-        let str = "[2024-71-41]".to_string();
+        let str = "@(2024-71-41)".to_string();
 
         let mut chars = str.chars().enumerate().peekable();
 
@@ -1007,7 +1005,7 @@ mod tests {
 
     #[test]
     fn never_ending_date() {
-        let str = "[2025-02-12 14:31:12.40 +0100".to_string();
+        let str = "@(2025-02-12 14:31:12.40 +0100".to_string();
 
         let mut chars = str.chars().enumerate().peekable();
 

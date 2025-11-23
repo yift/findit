@@ -646,7 +646,7 @@ mod tests {
 
     #[test]
     fn plus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("[2025-04-19 08:42:00] + parent.length()").unwrap();
+        let eval = read_expr("@(2025-04-19 08:42:00) + parent.length()").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -655,7 +655,7 @@ mod tests {
 
     #[test]
     fn plus_date_return_empty_if_number_is_too_large() {
-        let eval = read_expr("[2025-04-19 08:42:00] + 18446744073709551613").unwrap();
+        let eval = read_expr("@(2025-04-19 08:42:00) + 18446744073709551613").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -673,7 +673,7 @@ mod tests {
 
     #[test]
     fn minus_date_return_empty_if_not_a_number() {
-        let eval = read_expr("[2025-04-19 08:42:00] - parent.length()").unwrap();
+        let eval = read_expr("@(2025-04-19 08:42:00) - parent.length()").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);
@@ -682,7 +682,7 @@ mod tests {
 
     #[test]
     fn minus_date_return_empty_if_number_is_too_large() {
-        let eval = read_expr("[2025-04-19 08:42:00] - 18446744073709551613").unwrap();
+        let eval = read_expr("@(2025-04-19 08:42:00) - 18446744073709551613").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

@@ -75,7 +75,7 @@ mod tests {
             panic!("Invalid date");
         };
         let expected_date = expected_date.with_timezone(&Local);
-        let eval = read_expr(&format!("[{date_as_text}]")).unwrap();
+        let eval = read_expr(&format!("@({date_as_text})")).unwrap();
         let path = Path::new(".");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

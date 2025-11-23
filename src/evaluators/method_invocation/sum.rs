@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn test_simple_sum() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3].sum()")?;
+        let expr = read_expr("[1, 2, 3].sum()")?;
         let file = &FileWrapper::new(PathBuf::new(), 1);
 
         assert_eq!(expr.eval(file), Value::Number(6));
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn test_sum_expected_type() -> Result<(), FindItError> {
-        let expr = read_expr(":[1, 2, 3, 4, 5, 6].sum()")?;
+        let expr = read_expr("[1, 2, 3, 4, 5, 6].sum()")?;
 
         assert_eq!(expr.expected_type(), ValueType::Number);
 
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn length_no_number_sum() {
-        let err = read_expr(":[\"a\", \"b\"].sum()").err();
+        let err = read_expr("[\"a\", \"b\"].sum()").err();
         assert!(err.is_some())
     }
 }
