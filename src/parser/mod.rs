@@ -13,6 +13,7 @@ mod between;
 mod binary_expression;
 mod case;
 mod cast;
+mod define_class;
 mod execute;
 mod expression;
 mod format;

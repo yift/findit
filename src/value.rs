@@ -8,7 +8,10 @@ use std::{
 
 use chrono::{DateTime, Local};
 
-use crate::lazy_list::LazyList;
+use crate::{
+    class_type::{Class, ClassType},
+    lazy_list::LazyList,
+};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub(crate) enum Value {
@@ -18,6 +21,7 @@ pub(crate) enum Value {
     Bool(bool),
     Date(DateTime<Local>),
     List(List),
+    Class(Class),
     Empty,
 }
 
@@ -143,6 +147,7 @@ impl Display for Value {
             Value::String(s) => write!(f, "{s}"),
             Value::Date(dt) => write!(f, "{}", dt.format("%d/%b/%Y %H:%M:%S")),
             Value::List(lst) => write!(f, "{}", lst.items),
+            Value::Class(cls) => write!(f, "{}", cls),
         }
     }
 }
@@ -155,6 +160,7 @@ pub(crate) enum ValueType {
     String,
     Date,
     List(Rc<ValueType>),
+    Class(Rc<ClassType>),
     Empty,
 }
 
@@ -168,6 +174,7 @@ impl Display for ValueType {
             ValueType::Path => "path".fmt(f),
             ValueType::String => "string".fmt(f),
             ValueType::List(tp) => write!(f, "list<{tp}>"),
+            ValueType::Class(tp) => tp.fmt(f),
         }
     }
 }

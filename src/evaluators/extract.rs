@@ -215,6 +215,7 @@ impl Evaluator for OwnerExtractor {
             return Value::Empty;
         };
         match get_user_by_uid(m.uid()) {
+            // No coverage for this.
             None => Value::Empty,
             Some(u) => u.name().into(),
         }
@@ -230,6 +231,7 @@ impl Evaluator for GroupExtractor {
             return Value::Empty;
         };
         match get_group_by_gid(m.gid()) {
+            // No coverage for this.
             None => Value::Empty,
             Some(u) => u.name().into(),
         }

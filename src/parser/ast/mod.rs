@@ -4,6 +4,7 @@ pub(crate) mod between;
 pub(crate) mod binary_expression;
 pub(crate) mod binding;
 pub(crate) mod case;
+pub(crate) mod class;
 pub(crate) mod execute;
 pub(crate) mod expression;
 pub(crate) mod format;

@@ -1,5 +1,6 @@
 #![deny(warnings)]
 
+mod class_type;
 pub mod cli_args;
 pub mod errors;
 mod evaluators;

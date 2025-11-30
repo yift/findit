@@ -67,6 +67,8 @@ impl EvaluatorFactory for Expression {
             Expression::With(w) => w.build(bindings),
             Expression::List(l) => l.build(bindings),
             Expression::MethodInvocation(l) => l.build(bindings),
+            Expression::ClassDefinition(d) => d.build(bindings),
+            Expression::ClassAccess(a) => a.build(bindings),
         }
     }
 }

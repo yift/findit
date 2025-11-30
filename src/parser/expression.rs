@@ -6,6 +6,7 @@ use crate::parser::{
         as_cast::{As, CastType},
         binary_expression::BinaryExpression,
         binding::Binding,
+        class::ClassAccess,
         expression::Expression,
         is_check::{IsCheck, IsType},
         methods::MethodInvocation,
@@ -15,6 +16,7 @@ use crate::parser::{
     },
     between::build_between,
     case::build_case,
+    define_class::build_class_definition,
     execute::build_spawn_or_exec,
     format::build_format,
     function::build_function,
@@ -57,6 +59,7 @@ pub(super) fn build_expression_with_priority(
             Token::With => build_with(lex)?,
             Token::FunctionName(name) => build_function(name, lex)?,
             Token::ListStart => build_literal_list(lex)?,
+            Token::ClassStarts => build_class_definition(lex)?,
             Token::Not => {
                 let expression = build_expression_with_priority(lex, 30, end_condition)?;
                 Expression::Negate(Negate::new(expression))
@@ -91,11 +94,12 @@ pub(super) fn build_expression_with_priority(
 
         let operator = match next {
             None => return Err(ParserError::UnexpectedEof),
-            Some(item) => match item.token {
-                Token::BinaryOperator(operator) => Operator::Binary(operator),
+            Some(item) => match &item.token {
+                Token::BinaryOperator(operator) => Operator::Binary(*operator),
                 Token::Is => Operator::PostIs,
                 Token::As => Operator::As,
                 Token::Between => Operator::Between,
+                Token::ClassFieldAccess(name) => Operator::ClassAccess(name.clone()),
                 _ => return Err(ParserError::UnexpectedToken(item.span)),
             },
         };
@@ -118,6 +122,13 @@ pub(super) fn build_expression_with_priority(
                     left = Expression::Binary(BinaryExpression::new(left, operator, right));
                 }
             }
+            Operator::ClassAccess(field_name) => {
+                left = Expression::ClassAccess(ClassAccess {
+                    target: Box::new(left),
+                    field: field_name,
+                });
+                lex.next();
+            }
             Operator::PostIs => {
                 left = read_postfix_is(left, lex)?;
             }
@@ -138,6 +149,7 @@ enum Operator {
     PostIs,
     Between,
     As,
+    ClassAccess(String),
 }
 
 impl Operator {
@@ -158,6 +170,7 @@ impl Operator {
             Operator::Binary(BinaryOperator::Arithmetic(ArithmeticOperator::Multiply)) => 80,
             Operator::Binary(BinaryOperator::Arithmetic(ArithmeticOperator::Divide)) => 80,
             Operator::Binary(BinaryOperator::Arithmetic(ArithmeticOperator::Module)) => 80,
+            Operator::ClassAccess(_) => 100,
             Operator::Binary(BinaryOperator::Dot) => 110,
         }
     }

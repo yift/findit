@@ -2,6 +2,8 @@ mod between;
 mod binary_operator;
 mod binding;
 mod cast;
+mod class_access;
+mod class_definition;
 pub(crate) mod expr;
 mod extract;
 pub(crate) mod functions;

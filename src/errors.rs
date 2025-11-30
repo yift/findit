@@ -21,4 +21,6 @@ pub enum FindItError {
     DisplayParserError(String, String),
     #[error("Expression parse error: `{0}`")]
     ParserError(#[from] ParserError),
+    #[error("Cannot find field name: `{0}`")]
+    NoSuchField(String),
 }

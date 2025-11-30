@@ -66,6 +66,10 @@ pub(crate) enum Token {
     MethodName(MethodName),
     With,
     Do,
+    ClassStarts,
+    ClassEnds,
+    ClassFieldName(String),
+    ClassFieldAccess(String),
 }
 
 #[derive(Debug)]
@@ -167,6 +171,15 @@ impl Token {
                 chars.next();
                 Ok(Some(Token::ListEnds))
             }
+            '{' => {
+                chars.next();
+                Ok(Some(Token::ClassStarts))
+            }
+            '}' => {
+                chars.next();
+                Ok(Some(Token::ClassEnds))
+            }
+            ':' => Ok(Some(read_field_access_or_definition(chars)?)),
             _ => Err(TokenError {
                 cause: format!("Unknown character: {}", chr),
             }),
@@ -295,6 +308,40 @@ fn read_reserved_word(
                 })
             }
         }
+    }
+}
+
+fn read_field_access_or_definition(
+    chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
+) -> Result<Token, TokenError> {
+    // eat the open :
+    chars.next();
+    let access = if let Some((_, ':')) = chars.peek() {
+        chars.next();
+        true
+    } else {
+        false
+    };
+    let mut str = String::new();
+    loop {
+        let chr = chars.peek();
+        match chr {
+            Some((_, ch)) if ch.is_alphanumeric() => {
+                str.push(*ch);
+                chars.next();
+            }
+            _ => break,
+        };
+    }
+    if str.is_empty() {
+        return Err(TokenError {
+            cause: "Empty Field name".into(),
+        });
+    }
+    if access {
+        Ok(Token::ClassFieldAccess(str))
+    } else {
+        Ok(Token::ClassFieldName(str))
     }
 }
 

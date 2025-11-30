@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn new_with_err() {
-        let err = lex("10 + } - 2").err();
+        let err = lex("10 + ~ - 2").err();
 
         let span = err.map(|f| f.span);
 

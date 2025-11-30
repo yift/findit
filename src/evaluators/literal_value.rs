@@ -29,11 +29,16 @@ impl Evaluator for Value {
 #[cfg(test)]
 mod tests {
 
-    use std::path::Path;
+    use std::{path::Path, rc::Rc};
 
     use chrono::{FixedOffset, Local, MappedLocalTime, NaiveDate, NaiveTime, TimeZone, Utc};
 
-    use crate::{evaluators::expr::read_expr, file_wrapper::FileWrapper, value::Value};
+    use crate::{
+        class_type::{Class, ClassType},
+        evaluators::expr::{Evaluator, read_expr},
+        file_wrapper::FileWrapper,
+        value::{Value, ValueType},
+    };
 
     #[test]
     fn numeric_literal() {
@@ -238,5 +243,25 @@ mod tests {
             NaiveTime::from_hms_milli_opt(23, 20, 50, 520).unwrap(),
             Utc,
         );
+    }
+
+    #[test]
+    fn test_complex_data() {
+        let fields = vec![
+            ("one".into(), ValueType::String),
+            ("a2".into(), ValueType::Bool),
+            ("a0".into(), ValueType::Number),
+        ];
+        let cls = ClassType::new(&fields);
+        let details = vec![
+            Value::String("test".into()),
+            Value::Bool(true),
+            Value::Number(1),
+        ];
+        let inst = Class::new(&Rc::new(cls), details);
+        let value = Value::Class(inst);
+        let eval: Box<dyn Evaluator> = (&value).into();
+
+        assert_eq!(eval.expected_type(), ValueType::Empty);
     }
 }

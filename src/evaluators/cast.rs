@@ -34,6 +34,7 @@ impl Evaluator for CastToBool {
             Value::Number(n) => (n != 0).into(),
             Value::Path(p) => p.exists().into(),
             Value::List(l) => l.has_items().into(),
+            Value::Class(c) => (!c.is_empty()).into(),
         }
     }
 }
@@ -72,6 +73,7 @@ impl Evaluator for CastToNumber {
             },
             Value::Number(n) => Value::Number(n),
             Value::List(l) => l.count().into(),
+            Value::Class(c) => c.len().into(),
             Value::Path(_) => Value::Empty,
         }
     }
@@ -95,6 +97,7 @@ impl Evaluator for CastToDate {
             Value::Number(n) => match n.try_into() {
                 Ok(secs) => match DateTime::from_timestamp(secs, 0) {
                     Some(dt) => Value::Date(dt.into()),
+                    // No test coverage here
                     None => Value::Empty,
                 },
                 Err(_) => Value::Empty,
@@ -102,11 +105,12 @@ impl Evaluator for CastToDate {
             Value::Path(p) => match p.metadata() {
                 Ok(m) => match m.accessed() {
                     Ok(tm) => Value::Date(tm.into()),
+                    // No test coverage here
                     Err(_) => Value::Empty,
                 },
                 Err(_) => Value::Empty,
             },
-            Value::List(_) => Value::Empty,
+            Value::List(_) | Value::Class(_) => Value::Empty,
         }
     }
 }
@@ -120,9 +124,12 @@ impl Evaluator for CastToPath {
     }
     fn eval(&self, file: &FileWrapper) -> Value {
         match self.expr.eval(file) {
-            Value::Bool(_) | Value::Empty | Value::Date(_) | Value::Number(_) | Value::List(_) => {
-                Value::Empty
-            }
+            Value::Bool(_)
+            | Value::Empty
+            | Value::Date(_)
+            | Value::Number(_)
+            | Value::List(_)
+            | Value::Class(_) => Value::Empty,
             Value::Path(p) => Value::Path(p),
             Value::String(s) => Value::Path(Path::new(&s).to_path_buf()),
         }
@@ -281,6 +288,30 @@ mod tests {
     }
 
     #[test]
+    fn empty_class_cast_to_bool_false() -> Result<(), FindItError> {
+        let sql = "{} as bool";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(false));
+        Ok(())
+    }
+
+    #[test]
+    fn non_empty_class_cast_to_bool_true() -> Result<(), FindItError> {
+        let sql = "{:key 1} as bool";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Bool(true));
+        Ok(())
+    }
+
+    #[test]
     fn bool_cast_to_string() -> Result<(), FindItError> {
         let sql = "true as text";
         let eval = read_expr(sql)?;
@@ -409,6 +440,18 @@ mod tests {
         let value = eval.eval(&wrapper);
 
         assert_eq!(value, Value::Number(3));
+        Ok(())
+    }
+
+    #[test]
+    fn class_cast_to_number() -> Result<(), FindItError> {
+        let sql = "{:1 1, :2 2} as number";
+        let eval = read_expr(sql)?;
+        let file = Path::new("/no/such/file").to_path_buf();
+        let wrapper = FileWrapper::new(file, 1);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Number(2));
         Ok(())
     }
 
