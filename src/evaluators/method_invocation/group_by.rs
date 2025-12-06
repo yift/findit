@@ -59,7 +59,7 @@ pub(super) fn new_group_by(
 ) -> Result<Box<dyn Evaluator>, FindItError> {
     let ValueType::List(item_type) = target.expected_type() else {
         return Err(FindItError::BadExpression(
-            "Map method can only be applied to List type".to_string(),
+            "GroupBy method can only be applied to List type".to_string(),
         ));
     };
     let lambda = lambda.build(bindings, &item_type)?;

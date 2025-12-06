@@ -39,6 +39,7 @@ pub(crate) enum Method {
     All(LambdaFunction),
     Any(LambdaFunction),
     GroupBy(LambdaFunction),
+    Enumerate,
 }
 
 #[derive(Debug, PartialEq)]

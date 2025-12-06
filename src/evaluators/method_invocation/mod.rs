@@ -41,6 +41,7 @@ mod any;
 mod avg;
 mod contains;
 mod distinct;
+mod enumerate;
 mod filter;
 mod first;
 mod flat_map;
@@ -103,6 +104,7 @@ impl EvaluatorFactory for MethodInvocation {
             Method::All(lambda) => new_all(target, lambda, bindings),
             Method::Any(lambda) => new_any(target, lambda, bindings),
             Method::GroupBy(lambda) => new_group_by(target, lambda, bindings),
+            Method::Enumerate => enumerate::new_enumerate(target),
         }
     }
 }

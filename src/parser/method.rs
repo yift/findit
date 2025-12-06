@@ -43,6 +43,7 @@ pub(super) enum MethodName {
     All,
     Any,
     GroupBy,
+    Enumerate,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -78,6 +79,7 @@ impl MethodName {
             "DISTINCT" | "UNIQUE" => Some(MethodName::Distinct),
             "DISTINCT_BY" | "DISTINCTBY" | "UNIQUE_BY" | "UNIQUEBY" => Some(MethodName::DistinctBy),
             "GROUPBY" | "GROUP_BY" => Some(MethodName::GroupBy),
+            "ENUMERATE" => Some(MethodName::Enumerate),
             _ => None,
         }
     }
@@ -203,6 +205,7 @@ pub(super) fn build_method(
             let lambda = build_lambda(lex)?;
             Ok(Method::GroupBy(lambda))
         }
+        MethodName::Enumerate => Ok(Method::Enumerate),
     };
     let Some(close) = lex.next() else {
         return Err(ParserError::UnexpectedEof);
