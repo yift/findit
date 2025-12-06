@@ -12,6 +12,7 @@ use crate::{
             filter::new_filter,
             first::new_first,
             flat_map::new_flat_map,
+            group_by::new_group_by,
             index_of::new_index_of,
             join::new_join,
             last::new_last,
@@ -43,6 +44,7 @@ mod distinct;
 mod filter;
 mod first;
 mod flat_map;
+mod group_by;
 mod index_of;
 mod join;
 mod lambda_builder;
@@ -100,6 +102,7 @@ impl EvaluatorFactory for MethodInvocation {
             Method::FlatMap(lambda) => new_flat_map(target, lambda, bindings),
             Method::All(lambda) => new_all(target, lambda, bindings),
             Method::Any(lambda) => new_any(target, lambda, bindings),
+            Method::GroupBy(lambda) => new_group_by(target, lambda, bindings),
         }
     }
 }

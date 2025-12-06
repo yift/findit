@@ -42,6 +42,7 @@ pub(super) enum MethodName {
     FlatMap,
     All,
     Any,
+    GroupBy,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -76,6 +77,7 @@ impl MethodName {
             "ANY" => Some(MethodName::Any),
             "DISTINCT" | "UNIQUE" => Some(MethodName::Distinct),
             "DISTINCT_BY" | "DISTINCTBY" | "UNIQUE_BY" | "UNIQUEBY" => Some(MethodName::DistinctBy),
+            "GROUPBY" | "GROUP_BY" => Some(MethodName::GroupBy),
             _ => None,
         }
     }
@@ -196,6 +198,10 @@ pub(super) fn build_method(
         MethodName::Any => {
             let lambda = build_lambda(lex)?;
             Ok(Method::Any(lambda))
+        }
+        MethodName::GroupBy => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::GroupBy(lambda))
         }
     };
     let Some(close) = lex.next() else {

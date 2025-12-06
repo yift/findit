@@ -38,6 +38,7 @@ pub(crate) enum Method {
     FlatMap(LambdaFunction),
     All(LambdaFunction),
     Any(LambdaFunction),
+    GroupBy(LambdaFunction),
 }
 
 #[derive(Debug, PartialEq)]
