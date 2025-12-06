@@ -64,6 +64,7 @@ mod take;
 mod to_lower;
 mod to_upper;
 mod trim;
+mod walk;
 mod words;
 
 impl EvaluatorFactory for MethodInvocation {
@@ -105,6 +106,7 @@ impl EvaluatorFactory for MethodInvocation {
             Method::Any(lambda) => new_any(target, lambda, bindings),
             Method::GroupBy(lambda) => new_group_by(target, lambda, bindings),
             Method::Enumerate => enumerate::new_enumerate(target),
+            Method::Walk => walk::new_walker(target),
         }
     }
 }
