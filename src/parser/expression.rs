@@ -26,7 +26,6 @@ use crate::parser::{
     method::build_method,
     parse_date::build_parse_date,
     parser_error::ParserError,
-    position::build_position,
     replace::build_replace,
     tokens::Token,
     with::build_with,
@@ -52,7 +51,6 @@ pub(super) fn build_expression_with_priority(
             Token::OpenBrackets => build_brackets(lex)?,
             Token::If => build_if(lex)?,
             Token::Case => build_case(lex, &item.span)?,
-            Token::Position => build_position(lex)?,
             Token::Parse => build_parse_date(lex)?,
             Token::Format => build_format(lex)?,
             Token::Replace => build_replace(lex)?,
@@ -266,7 +264,6 @@ mod tests {
                 function_name::{EnvFunctionName, FunctionName},
                 if_expression::If,
                 operator::ComparisonOperator,
-                position::Position,
             },
             parse_expression,
         },
@@ -324,9 +321,7 @@ mod tests {
     fn between(reference: Expression, lower: Expression, upper: Expression) -> Expression {
         Expression::Between(Between::new(reference, lower, upper))
     }
-    fn position(sub_string: Expression, super_string: Expression) -> Expression {
-        Expression::Position(Position::new(sub_string, super_string))
-    }
+
     fn format(timestamp: Expression, format: Expression) -> Expression {
         Expression::Format(Format::new(timestamp, format))
     }
@@ -844,16 +839,6 @@ mod tests {
         let exp = parse_expression(str)?;
 
         assert_eq!(exp, between(lit_u64(20), lit_u64(10), lit_u64(50)));
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_position() -> Result<(), ParserError> {
-        let str = "position(\"str\" in \"string\")";
-        let exp = parse_expression(str)?;
-
-        assert_eq!(exp, position(lit_s("str"), lit_s("string")));
 
         Ok(())
     }

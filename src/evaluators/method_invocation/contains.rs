@@ -27,27 +27,59 @@ impl Evaluator for Contains {
         target_value.items().into_iter().contains(&item).into()
     }
 }
+
+struct ContainsString {
+    target: Box<dyn Evaluator>,
+    item_to_find: Box<dyn Evaluator>,
+}
+impl Evaluator for ContainsString {
+    fn expected_type(&self) -> ValueType {
+        ValueType::Bool
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::String(target_value), Value::String(item)) =
+            (self.target.eval(file), self.item_to_find.eval(file))
+        else {
+            return Value::Empty;
+        };
+        target_value.contains(&item).into()
+    }
+}
+
 pub(super) fn new_contains(
     target: Box<dyn Evaluator>,
     item_to_find: &Expression,
     bindings: &BindingsTypes,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
-    let ValueType::List(items_type) = target.expected_type() else {
-        return Err(FindItError::BadExpression(
-            "Contains method can only be applied to List type".to_string(),
-        ));
-    };
-
-    let item_to_find = item_to_find.build(bindings)?;
-    if &item_to_find.expected_type() != items_type.deref() {
-        return Err(FindItError::BadExpression(
-            "Contains item must be the same as the list items".to_string(),
-        ));
+    match target.expected_type() {
+        ValueType::List(items_type) => {
+            let item_to_find = item_to_find.build(bindings)?;
+            if &item_to_find.expected_type() != items_type.deref() {
+                return Err(FindItError::BadExpression(
+                    "Contains item must be the same as the list items".to_string(),
+                ));
+            }
+            Ok(Box::new(Contains {
+                target,
+                item_to_find,
+            }))
+        }
+        ValueType::String => {
+            let item_to_find = item_to_find.build(bindings)?;
+            if item_to_find.expected_type() != ValueType::String {
+                return Err(FindItError::BadExpression(
+                    "Contains item must be a string".to_string(),
+                ));
+            }
+            Ok(Box::new(ContainsString {
+                target,
+                item_to_find,
+            }))
+        }
+        _ => Err(FindItError::BadExpression(
+            "Contains method can only be applied to List or String type".to_string(),
+        )),
     }
-    Ok(Box::new(Contains {
-        target,
-        item_to_find,
-    }))
 }
 
 #[cfg(test)]
@@ -118,6 +150,53 @@ mod tests {
     #[test]
     fn contains_no_item() {
         let err = read_expr("[1, 2, 3].contains()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn contains_string_returns_true_when_needed() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".contains(\"wor\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Bool(true));
+
+        Ok(())
+    }
+    #[test]
+    fn contains_string_returns_false_when_needed() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".contains(\"xyz\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Bool(false));
+
+        Ok(())
+    }
+
+    #[test]
+    fn contains_string_returns_empty_when_needed() -> Result<(), FindItError> {
+        let expr = read_expr("content.contains(\"text\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn contains_string_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".contains(\"wor\")")?;
+
+        assert_eq!(expr.expected_type(), ValueType::Bool);
+
+        Ok(())
+    }
+
+    #[test]
+    fn contains_string_different_value_types() {
+        let err = read_expr("\"hello world\".contains(true)").err();
         assert!(err.is_some())
     }
 }

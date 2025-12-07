@@ -28,7 +28,6 @@ mod negate;
 mod order_by;
 mod parse_date;
 pub(crate) mod parser_error;
-mod position;
 mod replace;
 mod self_divide;
 mod span;

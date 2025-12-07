@@ -4,10 +4,7 @@ use crate::{
     errors::FindItError,
     evaluators::expr::{BindingsTypes, Evaluator, EvaluatorFactory},
     file_wrapper::FileWrapper,
-    parser::ast::{
-        position::Position as PositionExpression,
-        replace::{Replace, ReplaceWhat},
-    },
+    parser::ast::replace::{Replace, ReplaceWhat},
     value::{Value, ValueType},
 };
 
@@ -47,21 +44,6 @@ impl Evaluator for Regexp {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Bool
-    }
-}
-
-impl EvaluatorFactory for PositionExpression {
-    fn build(&self, bindings: &BindingsTypes) -> Result<Box<dyn Evaluator>, FindItError> {
-        let str = self.super_string.build(bindings)?;
-        let sub_str = self.sub_string.build(bindings)?;
-
-        if (str.expected_type(), sub_str.expected_type()) != (ValueType::String, ValueType::String)
-        {
-            return Err(FindItError::BadExpression(
-                "POSITION can only work with strings".into(),
-            ));
-        }
-        Ok(Box::new(Position { str, sub_str }))
     }
 }
 
@@ -149,25 +131,6 @@ impl EvaluatorFactory for Replace {
     }
 }
 
-struct Position {
-    str: Box<dyn Evaluator>,
-    sub_str: Box<dyn Evaluator>,
-}
-impl Evaluator for Position {
-    fn eval(&self, file: &FileWrapper) -> Value {
-        let Value::String(str) = self.str.eval(file) else {
-            return Value::Empty;
-        };
-        let Value::String(sub_str) = self.sub_str.eval(file) else {
-            return Value::Empty;
-        };
-        str.find(&sub_str).map(|i| i + 1).unwrap_or_default().into()
-    }
-    fn expected_type(&self) -> ValueType {
-        ValueType::Number
-    }
-}
-
 #[cfg(test)]
 mod tests {
 
@@ -212,42 +175,6 @@ mod tests {
     #[test]
     fn regex_bad_pattern_return_empty() {
         let eval = read_expr("\"abc\" MATCHES \"[\"").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn position_no_string_expr() {
-        let err = read_expr("POSITION(\"txt\" IN 12)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn position_no_string_str() {
-        let err = read_expr("POSITION(12 IN path)").err();
-        assert!(err.is_some())
-    }
-
-    #[test]
-    fn position_expect_number() {
-        let expr = read_expr("POSITION(\"a\" IN path)").unwrap();
-        assert_eq!(expr.expected_type(), ValueType::Number);
-    }
-
-    #[test]
-    fn position_null_expr_return_empty() {
-        let eval = read_expr("POSITION(content IN \"abc\")").unwrap();
-        let path = Path::new("no/such/file");
-        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
-        let value = eval.eval(&wrapper);
-        assert_eq!(value, Value::Empty)
-    }
-
-    #[test]
-    fn position_null_str_return_empty() {
-        let eval = read_expr("POSITION(\"abc\" IN content)").unwrap();
         let path = Path::new("no/such/file");
         let wrapper = FileWrapper::new(path.to_path_buf(), 2);
         let value = eval.eval(&wrapper);

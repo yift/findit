@@ -33,27 +33,59 @@ impl Evaluator for IndexOf {
             .unwrap_or(Value::Empty)
     }
 }
+
+struct IndexOfString {
+    target: Box<dyn Evaluator>,
+    item_to_find: Box<dyn Evaluator>,
+}
+impl Evaluator for IndexOfString {
+    fn expected_type(&self) -> ValueType {
+        ValueType::Number
+    }
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::String(target_value), Value::String(item)) =
+            (self.target.eval(file), self.item_to_find.eval(file))
+        else {
+            return Value::Empty;
+        };
+        target_value.find(&item).into()
+    }
+}
+
 pub(super) fn new_index_of(
     target: Box<dyn Evaluator>,
     item_to_find: &Expression,
     bindings: &BindingsTypes,
 ) -> Result<Box<dyn Evaluator>, FindItError> {
-    let ValueType::List(items_type) = target.expected_type() else {
-        return Err(FindItError::BadExpression(
-            "IndexOf method can only be applied to List type".to_string(),
-        ));
-    };
-
-    let item_to_find = item_to_find.build(bindings)?;
-    if &item_to_find.expected_type() != items_type.deref() {
-        return Err(FindItError::BadExpression(
-            "IndexOf item must be the same as the list items".to_string(),
-        ));
+    match target.expected_type() {
+        ValueType::List(items_type) => {
+            let item_to_find = item_to_find.build(bindings)?;
+            if &item_to_find.expected_type() != items_type.deref() {
+                return Err(FindItError::BadExpression(
+                    "IndexOf item must be the same as the list items".to_string(),
+                ));
+            }
+            Ok(Box::new(IndexOf {
+                target,
+                item_to_find,
+            }))
+        }
+        ValueType::String => {
+            let item_to_find = item_to_find.build(bindings)?;
+            if item_to_find.expected_type() != ValueType::String {
+                return Err(FindItError::BadExpression(
+                    "IndexOf item must be a string".to_string(),
+                ));
+            }
+            Ok(Box::new(IndexOfString {
+                target,
+                item_to_find,
+            }))
+        }
+        _ => Err(FindItError::BadExpression(
+            "IndexOf method can only be applied to List or String type".to_string(),
+        )),
     }
-    Ok(Box::new(IndexOf {
-        target,
-        item_to_find,
-    }))
 }
 
 #[cfg(test)]
@@ -135,6 +167,53 @@ mod tests {
     #[test]
     fn index_of_no_item() {
         let err = read_expr("[1, 2, 3].index_of()").err();
+        assert!(err.is_some())
+    }
+
+    #[test]
+    fn index_of_string_returns_the_index() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".index_of(\"wor\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Number(6));
+
+        Ok(())
+    }
+
+    #[test]
+    fn index_of_string_return_empty_when_needed() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".index_of(\"xyz\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+    #[test]
+    fn index_of_string_return_type() -> Result<(), FindItError> {
+        let expr = read_expr("\"hello world\".index_of(\"wor\")")?;
+
+        assert_eq!(expr.expected_type(), ValueType::Number);
+
+        Ok(())
+    }
+
+    #[test]
+    fn index_of_string_returns_empty_when_needed() -> Result<(), FindItError> {
+        let expr = read_expr("content.index_of(\"one\")")?;
+        let path = Path::new("no/such/file");
+        let file = &FileWrapper::new(path.to_path_buf(), 1);
+
+        assert_eq!(expr.eval(file), Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn index_of_string_different_value_types() {
+        let err = read_expr("\"test\".index_of(true)").err();
         assert!(err.is_some())
     }
 }

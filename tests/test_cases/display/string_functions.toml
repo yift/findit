@@ -1,5 +1,5 @@
 [position]
-arguments = ["tests/test_cases/display/test_files", "-d", "`path` - position or txt `POSITION(\"txt\" IN path)`"]
+arguments = ["tests/test_cases/display/test_files", "-d", "`path` - position or txt `(path as TEXT).indexOf(\"txt\") + 1`"]
 order = false
 
 [sub_string_for]
