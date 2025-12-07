@@ -8,7 +8,7 @@ clap = { version = "4.5", features = ["derive"] }
 thiserror = "2.0"
 chrono = "0.4"
 itertools = "0.14"
-regex = "1.11"
+regex = "1.12"
 uzers  = "0.12"
 rand = "0.9"
 ordermap = "1.0"
