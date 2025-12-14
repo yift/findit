@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, io::Write};
+use std::{cmp::Ordering, collections::HashMap, io::Write};
 
 use crate::{
     cli_args::CliArgs,
@@ -18,19 +18,6 @@ pub(crate) struct OrderItem {
     pub(crate) evaluator: Box<dyn Evaluator>,
 }
 
-impl OrderItem {
-    fn compare(&self, left: &FileWrapper, right: &FileWrapper) -> Ordering {
-        let left = self.evaluator.eval(left);
-        let right = self.evaluator.eval(right);
-
-        let ret = left.cmp(&right);
-        match self.direction {
-            OrderDirection::Asc => ret,
-            OrderDirection::Desc => ret.reverse(),
-        }
-    }
-}
-
 struct OrderBy {
     next: Box<dyn Walk>,
     order: Vec<OrderItem>,
@@ -47,9 +34,22 @@ impl Walk for OrderBy {
 }
 impl Drop for OrderBy {
     fn drop(&mut self) {
+        let mut cache = HashMap::new();
         self.items.sort_by(|left, right| {
-            for item in &self.order {
-                let order = item.compare(left, right);
+            for (index, item) in self.order.iter().enumerate() {
+                let left = cache
+                    .entry((index, left.path().to_path_buf()))
+                    .or_insert_with(|| item.evaluator.eval(left))
+                    .clone();
+                let right = cache
+                    .entry((index, right.path().to_path_buf()))
+                    .or_insert_with(|| item.evaluator.eval(right))
+                    .clone();
+                let cmp = left.cmp(&right);
+                let order = match item.direction {
+                    OrderDirection::Asc => cmp,
+                    OrderDirection::Desc => cmp.reverse(),
+                };
                 if order != Ordering::Equal {
                     return order;
                 }
