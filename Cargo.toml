@@ -1,5 +1,5 @@
 [package]
-name = "findit"
+name = "findit-cli"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
@@ -29,3 +29,7 @@ files.extend-exclude = [
     "tests/test_cases/**/*.txt",
     "tests/test_cases/**/*.bash",
 ]
+
+[[bin]]
+name = "findit"
+path = "src/main.rs"

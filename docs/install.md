@@ -11,7 +11,7 @@ To install `findit` from source, make sure you have the Rust toolchain installed
 To install `findit` using Cargo, you can simply run:
 
 ```bash
-cargo install findit
+cargo install findit-cli
 ```
 
 ### From the repository

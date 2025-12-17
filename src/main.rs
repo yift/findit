@@ -3,7 +3,7 @@
 use std::io::stdout;
 
 use clap::Parser;
-use findit::{cli_args::CliArgs, run_func::run};
+use findit_cli::{cli_args::CliArgs, run_func::run};
 
 fn main() {
     let args = CliArgs::parse();

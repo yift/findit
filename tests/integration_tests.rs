@@ -10,7 +10,7 @@ use std::{
 };
 
 use clap::Parser;
-use findit::{cli_args::CliArgs, errors::FindItError, run_func::run};
+use findit_cli::{cli_args::CliArgs, errors::FindItError, run_func::run};
 use itertools::Itertools;
 use toml::{Table, Value, map::Map};
 
