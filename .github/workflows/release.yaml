@@ -29,11 +29,11 @@ jobs:
       - name: zip
         uses: vimtor/action-zip@v1.2
         with:
-          files: ./target/release/csvsql
+          files: ./target/release/findit
           dest: ./target/zip/x86_64-unknown-linux-gnu.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: csvsql-x86_64-unknown-linux-gnu
+          name: findit-x86_64-unknown-linux-gnu
           path: ./target/zip/x86_64-unknown-linux-gnu.zip
           retention-days: 1
   build-musl-and-docker:
@@ -55,7 +55,7 @@ jobs:
         run: |
           rm -rf ./docker/target
           mkdir -p ./docker/target
-          cp ./target/x86_64-unknown-linux-musl/release/csvsql ./docker/target/csvsql
+          cp ./target/x86_64-unknown-linux-musl/release/findit ./docker/target/findit
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
