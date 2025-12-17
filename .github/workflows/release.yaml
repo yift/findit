@@ -1,0 +1,114 @@
+name: Release
+
+on:  
+  push:
+    tags:
+      - '*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Cache Cargo registry and Git dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}        
+      - name: build
+        run: cargo build --release
+      - name: zip
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: ./target/release/csvsql
+          dest: ./target/zip/x86_64-unknown-linux-gnu.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: csvsql-x86_64-unknown-linux-gnu
+          path: ./target/zip/x86_64-unknown-linux-gnu.zip
+          retention-days: 1
+  build-musl-and-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Cache Cargo registry and Git dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}        
+      - name: Build-musl
+        uses: gmiam/rust-musl-action@master
+        with:
+          args: cargo build --target x86_64-unknown-linux-musl --release
+      - name: Copy binary
+        run: |
+          rm -rf ./docker/target
+          mkdir -p ./docker/target
+          cp ./target/x86_64-unknown-linux-musl/release/csvsql ./docker/target/csvsql
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: docker
+          push: true
+          tags: yiftach/findit:latest,yiftach/findit:0.1
+      - name: zip
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: ./docker/target/findit
+          dest: ./docker/target/zip/x86_64-unknown-linux-musl.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: findit-x86_64-unknown-linux-musl
+          path: ./docker/target/zip/x86_64-unknown-linux-musl.zip
+          retention-days: 1
+  create-release:
+    name: Create Release
+    needs: [build, build-musl-and-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "artifacts/**"
+          allowUpdates: true,
+          makeLatest: true,
+  cargo-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Cache Cargo registry and Git dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}        
+      - uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+        

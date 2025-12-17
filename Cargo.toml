@@ -2,6 +2,13 @@
 name = "findit"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "A simple and powerful command line utility that can be used to search for files in a directory hierarchy as an alternative to `find`."
+homepage = "https://github.com/yift/findit"
+repository = "https://github.com/yift/findit"
+documentation = "https://github.com/yift/findit/blob/main/README.md"
+readme = "README.md"
+exclude = ["/.github/*", "/.gitignore"]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
@@ -15,7 +22,7 @@ ordermap = "1.0"
 
 [dev-dependencies]
 toml = "0.9"
-tempfile = "3.21"
+tempfile = "3.23"
 
 [workspace.metadata.typos]
 files.extend-exclude = [
