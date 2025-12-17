@@ -1,5 +1,7 @@
 # Dates Literals
+
 To use a date literal in an expression, use the `@(<date>)`syntax where date can be
+
 * [RFC-3339](https://datatracker.ietf.org/doc/html/rfc3339) for example: `@(2025-10-24T00:11:22.00Z)`
 * `dd/MMM/yyyy` for example: `@(24/Oct/2025)`
 * `yyyy-mm-dd` for example: `@(2025-10-24)`
@@ -17,7 +19,9 @@ To use a date literal in an expression, use the `@(<date>)`syntax where date can
 * `yyyy-mm-dd hh:mm:ss.ms zz` for example: `@(2025-10-24 00:11:22.00+0400)`
 
 . For example:
+
 ```bash
 findit -w 'modified < @(20/Aug/2025)'
 ```
+
 will find all the files that have been modified before August 20 2025.
