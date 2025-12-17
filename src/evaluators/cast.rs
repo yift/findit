@@ -151,6 +151,8 @@ impl EvaluatorFactory for As {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{Local, TimeZone};
+
     use crate::evaluators::expr::read_expr;
 
     use super::*;
@@ -391,7 +393,15 @@ mod tests {
         let wrapper = FileWrapper::new(file, 1);
         let value = eval.eval(&wrapper);
 
-        assert_eq!(value, Value::Number(82800));
+        assert_eq!(
+            value,
+            Value::Number(
+                Local
+                    .with_ymd_and_hms(1970, 1, 2, 0, 0, 0)
+                    .unwrap()
+                    .timestamp() as u64
+            )
+        );
         Ok(())
     }
 
@@ -489,7 +499,7 @@ mod tests {
 
         assert_eq!(
             value,
-            Value::Date(DateTime::from_timestamp(82800, 0).unwrap().into())
+            Value::Date(Local.with_ymd_and_hms(1970, 1, 2, 0, 0, 0).unwrap())
         );
         Ok(())
     }
@@ -504,7 +514,7 @@ mod tests {
 
         assert_eq!(
             value,
-            Value::Date(DateTime::from_timestamp(82800, 0).unwrap().into())
+            Value::Date(Local.with_ymd_and_hms(1970, 1, 2, 0, 0, 0).unwrap())
         );
         Ok(())
     }
