@@ -40,3 +40,5 @@ jobs:
       uses: tcort/github-action-markdown-link-check@v1
     - name: Markdown lint
       uses: DavidAnson/markdownlint-cli2-action@v22
+      with:
+        globs: '**/*.md'
