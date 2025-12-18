@@ -44,6 +44,7 @@ mod all;
 mod any;
 mod avg;
 mod contains;
+mod debug;
 mod distinct;
 mod enumerate;
 mod filter;
@@ -119,6 +120,7 @@ impl EvaluatorFactory for MethodInvocation {
             Method::HasSuffix(suffix) => new_has_suffix(target, suffix, bindings),
             Method::RemovePrefix(prefix) => new_remove_prefix(target, prefix, bindings),
             Method::RemoveSuffix(suffix) => new_remove_suffix(target, suffix, bindings),
+            Method::Debug(lambda) => debug::new_debug(target, lambda, bindings),
         }
     }
 }

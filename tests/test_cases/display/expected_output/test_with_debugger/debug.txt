@@ -1,0 +1,322 @@
+	Evaluating file: [tests/test_cases/display/test_files/thing] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing] at depth: 0
+	Evaluating file: [tests/test_cases/display/test_files/thing/number] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/number] at depth: 1
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/next-428.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/number/next-428.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/few-15.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/ava-365.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/number/ava-365.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/logan-461.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/number/logan-461.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/next-117.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/number/next-117.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/number/james-301.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/number/james-301.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/link-1.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/link-1.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/isabella-236.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/isabella-236.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/way-386.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/way-386.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/logan-234.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/logan-234.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/liam-217.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/liam-217.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/group] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/group] at depth: 1
+	Evaluating file: [tests/test_cases/display/test_files/thing/group/ava-146.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/group/ava-146.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/group/person-11.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/group/sophia-191.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/group/sophia-191.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/group/own-25.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/group/big-27.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/first-473.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/first-473.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/public-555.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/public-555.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/young-501.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/young-501.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/mason-421.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/mason-421.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/jackson-325.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/jackson-325.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early] at depth: 1
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/life-325.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/life-325.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/day] at depth: 2
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/high-541.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/high-541.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/aria-29.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/other-433.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/other-433.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/charlotte-376.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/charlotte-376.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/amelia-399.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/amelia-399.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/oliver-538.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/oliver-538.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/different-396.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/different-396.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/oliver-570.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/oliver-570.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/day/eye] at depth: 3
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/thing-296.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/thing-296.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/good-234.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/good-234.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/long-378.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/long-378.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/problem-308.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/problem-308.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/charlotte-225.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/charlotte-225.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/way-324.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/way-324.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/oliver-567.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/oliver-567.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/child-188.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/child-188.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/able-137.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/able-137.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/old-15.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/sophia-204.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/sophia-204.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/eye-152.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/eye-152.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/harper-236.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/harper-236.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/eye/emma-202.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/eye/emma-202.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/big-463.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/big-463.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/day/point-385.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/day/point-385.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/noah] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/noah] at depth: 2
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/noah/person-103.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/noah/person-103.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/noah/case-263.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/noah/case-263.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/noah/different-218.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/noah/different-218.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/noah/aria-428.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/noah/aria-428.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/next] at depth: 2
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/same-11.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/next/able] at depth: 3
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/liam-400.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/liam-400.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/good-362.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/good-362.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/mia-560.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/mia-560.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/long-250.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/long-250.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/right-465.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/right-465.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/next-473.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/next-473.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/oliver-18.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/james-390.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/james-390.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/able/ethan-364.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/able/ethan-364.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/next/government-167.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/next/government-167.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/new-22.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/year-376.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/year-376.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/sophia] at depth: 2
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/way] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/sophia/way] at depth: 3
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/way/place-349.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/way/place-349.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/way/part-26.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/way/large-283.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/way/large-283.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/way/bad-366.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/way/bad-366.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/life-293.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/life-293.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/aria-244.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/aria-244.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/lucas-362.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/lucas-362.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/noah-484.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/noah-484.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/life-162.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/life-162.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/logan-25.bash] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: bash
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/sophia/big-434.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/sophia/big-434.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/right-269.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/right-269.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/harper] at depth: 2
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/liam-438.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/liam-438.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/last-364.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/last-364.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/elijah-500.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/elijah-500.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/eye-585.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/eye-585.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/james-219.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/james-219.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/time-111.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/time-111.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/liam-431.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/liam-431.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/thing-449.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/thing-449.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: 
+Walking into directory: [tests/test_cases/display/test_files/thing/early/harper/place] at depth: 3
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/able-355.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/able-355.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/noah-402.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/noah-402.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/company-263.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/company-263.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/other-447.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/other-447.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/year-368.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/year-368.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/large-249.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/large-249.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/emma-375.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/emma-375.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/able-134.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/able-134.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/company-246.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/company-246.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/harper/place/elijah-452.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/harper/place/elijah-452.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/james-547.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/james-547.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/emma-313.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/emma-313.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/mason-227.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/mason-227.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/early/high-163.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/early/high-163.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`
+	Evaluating file: [tests/test_cases/display/test_files/thing/good-581.txt] with filter: `extension.dbg($e "ext: " + $e) = "txt"`
+ext: txt
+		 File: [tests/test_cases/display/test_files/thing/good-581.txt] passed filter: `extension.dbg($e "ext: " + $e) = "txt"`

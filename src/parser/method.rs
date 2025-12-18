@@ -49,6 +49,7 @@ pub(super) enum MethodName {
     HasSuffix,
     RemovePrefix,
     RemoveSuffix,
+    Debug,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -92,6 +93,7 @@ impl MethodName {
             "HAS_SUFFIX" | "HASSUFFIX" | "ENDS_WITH" | "ENDSWITH" => Some(MethodName::HasSuffix),
             "REMOVE_PREFIX" | "REMOVEPREFIX" => Some(MethodName::RemovePrefix),
             "REMOVE_SUFFIX" | "REMOVESUFFIX" => Some(MethodName::RemoveSuffix),
+            "DEBUG" | "DBG" => Some(MethodName::Debug),
             _ => None,
         }
     }
@@ -135,6 +137,7 @@ impl MethodName {
             MethodName::GroupBy => true,
             MethodName::Enumerate => false,
             MethodName::Walk => false,
+            MethodName::Debug => true,
         }
     }
 }
@@ -292,6 +295,10 @@ pub(super) fn build_method(
         }
         MethodName::Enumerate => Ok(Method::Enumerate),
         MethodName::Walk => Ok(Method::Walk),
+        MethodName::Debug => {
+            let lambda = build_lambda(lex)?;
+            Ok(Method::Debug(lambda))
+        }
     };
     if open {
         let Some(close) = lex.next() else {

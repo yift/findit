@@ -2,6 +2,7 @@
 
 mod class_type;
 pub mod cli_args;
+mod debugger;
 pub mod errors;
 mod evaluators;
 mod file_wrapper;

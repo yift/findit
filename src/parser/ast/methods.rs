@@ -45,6 +45,7 @@ pub(crate) enum Method {
     GroupBy(LambdaFunction),
     Enumerate,
     Walk,
+    Debug(LambdaFunction),
 }
 
 #[derive(Debug, PartialEq)]

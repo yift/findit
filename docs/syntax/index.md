@@ -210,3 +210,7 @@ is, one can use `me.lines.length` instead of `me.lines().length()`.
 * [lines](method/path/lines.md)
 * [words](method/path/words.md)
 * [walk](method/path/walk.md)
+
+### Any type methods
+
+* [debug](method/debug.md)

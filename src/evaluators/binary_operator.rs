@@ -565,7 +565,7 @@ impl Evaluator for Of {
         let Value::Path(path) = self.of.eval(file) else {
             return Value::Empty;
         };
-        let wrapper = FileWrapper::new(path, file.dept() + 1);
+        let wrapper = file.with_file(path);
         self.access.eval(&wrapper)
     }
 }

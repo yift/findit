@@ -57,6 +57,34 @@ impl Display for TestWriterFactory {
 }
 
 #[test]
+fn test_with_debugger() -> Result<(), FindItError> {
+    let temp_dir = tempfile::tempdir()?;
+    let log_path = temp_dir
+        .path()
+        .join("integration_tests/debug/directory")
+        .join("debug.log");
+
+    let args = CliArgs::parse_from(vec![
+        "findit",
+        "--debug-output-file",
+        log_path.to_str().unwrap(),
+        "--where",
+        "extension.dbg($e \"ext: \" + $e) = \"txt\"",
+        "tests/test_cases/display/test_files/thing",
+    ]);
+
+    run(&args, std::io::sink())?;
+
+    let log_contents = fs::read_to_string(&log_path)?;
+
+    let fl = PathBuf::from("tests/test_cases/display/expected_output/test_with_debugger/debug.txt");
+    let expected_contents = fs::read_to_string(&fl)?;
+    assert_eq!(log_contents, expected_contents);
+
+    Ok(())
+}
+
+#[test]
 fn integration_tests() -> Result<(), FindItError> {
     let tests_files = find_integration_tests_files("tests/test_cases")?;
     let dir = env::current_dir()?;

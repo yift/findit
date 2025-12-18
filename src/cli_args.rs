@@ -44,4 +44,8 @@ pub struct CliArgs {
     /// Consider nodes before their parent
     #[arg(long, default_value_t = false)]
     pub(crate) node_first: bool,
+
+    /// Debug process into
+    #[arg(long)]
+    pub(crate) debug_output_file: Option<PathBuf>,
 }

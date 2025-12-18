@@ -6,20 +6,35 @@ use std::{
     rc::Rc,
 };
 
-use crate::{errors::FindItError, value::Value};
+use crate::{debugger::Debugger, errors::FindItError, value::Value};
 
 #[derive(Debug, Clone)]
 pub(crate) struct FileWrapper {
     path: PathBuf,
     depth: usize,
     bindings: Vec<Rc<Value>>,
+    debugger: Rc<Box<dyn Debugger>>,
 }
 impl FileWrapper {
-    pub(crate) fn new(path: PathBuf, depth: usize) -> Self {
+    pub(crate) fn new_with_debugger(
+        path: PathBuf,
+        depth: usize,
+        debugger: &Rc<Box<dyn Debugger>>,
+    ) -> Self {
         Self {
             path,
             depth,
             bindings: Vec::new(),
+            debugger: debugger.clone(),
+        }
+    }
+
+    pub(crate) fn with_file(&self, path: PathBuf) -> Self {
+        Self {
+            path,
+            depth: self.depth + 1,
+            bindings: self.bindings.clone(),
+            debugger: self.debugger.clone(),
         }
     }
 
@@ -30,6 +45,7 @@ impl FileWrapper {
             path: self.path.to_path_buf(),
             depth: self.depth,
             bindings: new_binding,
+            debugger: self.debugger.clone(),
         }
     }
 
@@ -63,9 +79,28 @@ impl FileWrapper {
         let paths = fs::read_dir(&self.path)?;
         Ok(paths.count())
     }
+
+    pub(crate) fn debugger(&self) -> &Rc<Box<dyn Debugger>> {
+        &self.debugger
+    }
 }
 impl Display for FileWrapper {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.path.as_os_str().to_str().unwrap_or_default())
+    }
+}
+
+#[cfg(test)]
+impl FileWrapper {
+    pub(crate) fn new(path: PathBuf, depth: usize) -> Self {
+        use crate::debugger;
+
+        let debugger = debugger::create_debugger(None).unwrap();
+        Self {
+            path,
+            depth,
+            bindings: Vec::new(),
+            debugger: Rc::new(debugger),
+        }
     }
 }

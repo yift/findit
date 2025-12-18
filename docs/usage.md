@@ -112,3 +112,7 @@ findit -d 'file name: <-name->, size: <-size->bytes, was created at <-created->'
 ```
 
 To see more details on the available syntax, see [syntax language docs](syntax/index.md)
+
+## Debugging the process
+
+One can see which files `findit` considered, which directories it viewed, when it applied the limit or the outputs of the `Debug` method (see [the `Debug` method](syntax/method/debug.md))
