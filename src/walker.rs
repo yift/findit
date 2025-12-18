@@ -1,4 +1,4 @@
-use std::{env, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 use crate::{cli_args::CliArgs, errors::FindItError, file_wrapper::FileWrapper};
 
@@ -48,7 +48,7 @@ impl TryFrom<&CliArgs> for Walker {
     fn try_from(value: &CliArgs) -> Result<Self, Self::Error> {
         let root = match &value.root {
             Some(path) => path.clone(),
-            None => env::current_dir()?,
+            None => PathBuf::from("."),
         };
         if root.exists() {
             Ok(Walker {

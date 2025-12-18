@@ -38,16 +38,16 @@ run_after = ["rm -rf /tmp/findit/tests/absolute"]
 arguments = ["/usr/bin/bash", "-d", "`name`; `owner`, `group`; `permissions & 0o222 != 0`"]
 
 [writeable_two]
-run_before = ["rm -rf /tmp/findit/tests/writeable_two", "mkdir -p /tmp/findit/tests/writeable_two", "touch /tmp/findit/tests/writeable_two/file1", "chmod -w /tmp/findit/tests/writeable_two/file1","touch /tmp/findit/tests/writeable_two/file2", "chmod +w /tmp/findit/tests/writeable_two/file2"]
+run_before = ["rm -rf /tmp/findit/tests/writeable_two", "mkdir -p /tmp/findit/tests/writeable_two/writeable_two", "touch /tmp/findit/tests/writeable_two/writeable_two/file1", "chmod -w /tmp/findit/tests/writeable_two/writeable_two/file1","touch /tmp/findit/tests/writeable_two/writeable_two/file2", "chmod +w /tmp/findit/tests/writeable_two/writeable_two/file2"]
 root = "/tmp/findit/tests/writeable_two"
-arguments = ["-d", "`name`; `permissions & 0o222 != 0`"]
+arguments = ["-d", "`name`; `permissions & 0o222 != 0`", "-n" , "1"]
 run_after = ["rm -rf /tmp/findit/tests/writeable_two"]
 order = false
 
 [readable]
-run_before = ["rm -rf /tmp/findit/tests/readable", "mkdir -p /tmp/findit/tests/readable", "touch /tmp/findit/tests/readable/file1", "chmod -r /tmp/findit/tests/readable/file1","touch /tmp/findit/tests/readable/file2", "chmod +r /tmp/findit/tests/readable/file2"]
+run_before = ["rm -rf /tmp/findit/tests/readable", "mkdir -p /tmp/findit/tests/readable/readable", "touch /tmp/findit/tests/readable/readable/file1", "chmod -r /tmp/findit/tests/readable/readable/file1","touch /tmp/findit/tests/readable/readable/file2", "chmod +r /tmp/findit/tests/readable/readable/file2"]
 root = "/tmp/findit/tests/readable"
-arguments = ["-d", "`name`; `permissions & 0o444 != 0`"]
+arguments = ["-d", "`name`; `permissions & 0o444 != 0`", "-n" , "1"]
 run_after = ["rm -rf /tmp/findit/tests/readable"]
 order = false
 
