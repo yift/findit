@@ -13,6 +13,8 @@ use crate::{
             first::new_first,
             flat_map::new_flat_map,
             group_by::new_group_by,
+            has_prefix::new_has_prefix,
+            has_suffix::new_has_suffix,
             index_of::new_index_of,
             join::new_join,
             last::new_last,
@@ -21,6 +23,8 @@ use crate::{
             map::new_map,
             max::new_max,
             min::new_min,
+            remove_prefix::new_remove_prefix,
+            remove_suffix::new_remove_suffix,
             reverse::new_reverse,
             skip::new_skip,
             sort::{new_sort, new_sort_by},
@@ -46,6 +50,8 @@ mod filter;
 mod first;
 mod flat_map;
 mod group_by;
+mod has_prefix;
+mod has_suffix;
 mod index_of;
 mod join;
 mod lambda_builder;
@@ -55,6 +61,8 @@ mod lines;
 mod map;
 mod max;
 mod min;
+mod remove_prefix;
+mod remove_suffix;
 mod reverse;
 mod skip;
 mod sort;
@@ -107,6 +115,10 @@ impl EvaluatorFactory for MethodInvocation {
             Method::GroupBy(lambda) => new_group_by(target, lambda, bindings),
             Method::Enumerate => enumerate::new_enumerate(target),
             Method::Walk => walk::new_walker(target),
+            Method::HasPrefix(prefix) => new_has_prefix(target, prefix, bindings),
+            Method::HasSuffix(suffix) => new_has_suffix(target, suffix, bindings),
+            Method::RemovePrefix(prefix) => new_remove_prefix(target, prefix, bindings),
+            Method::RemoveSuffix(suffix) => new_remove_suffix(target, suffix, bindings),
         }
     }
 }

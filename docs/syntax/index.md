@@ -170,6 +170,10 @@ Methods are functions over a specific operand. They can be invoke using the [dot
 * [words](method/string/words.md)
 * [contains](method/string/contains.md)
 * [indexOf](method/string/index_of.md)
+* [hasPrefix](method/string/has_prefix.md)
+* [hasSuffix}](method/string/has_suffix.md)
+* [removePrefix](method/string/remove_prefix.md)
+* [removeSuffix](method/string/remove_suffix.md)
 
 ### List methods
 

@@ -45,6 +45,10 @@ pub(super) enum MethodName {
     GroupBy,
     Enumerate,
     Walk,
+    HasPrefix,
+    HasSuffix,
+    RemovePrefix,
+    RemoveSuffix,
 }
 impl MethodName {
     pub(super) fn from_str(name: &str) -> Option<Self> {
@@ -82,6 +86,12 @@ impl MethodName {
             "GROUPBY" | "GROUP_BY" => Some(MethodName::GroupBy),
             "ENUMERATE" => Some(MethodName::Enumerate),
             "WALK" => Some(MethodName::Walk),
+            "HAS_PREFIX" | "HASPREFIX" | "STARTS_WITH" | "STARTSWITH" => {
+                Some(MethodName::HasPrefix)
+            }
+            "HAS_SUFFIX" | "HASSUFFIX" | "ENDS_WITH" | "ENDSWITH" => Some(MethodName::HasSuffix),
+            "REMOVE_PREFIX" | "REMOVEPREFIX" => Some(MethodName::RemovePrefix),
+            "REMOVE_SUFFIX" | "REMOVESUFFIX" => Some(MethodName::RemoveSuffix),
             _ => None,
         }
     }
@@ -176,6 +186,26 @@ pub(super) fn build_method(
             let expr =
                 build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
             Ok(Method::Split(Box::new(expr)))
+        }
+        MethodName::HasPrefix => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::HasPrefix(Box::new(expr)))
+        }
+        MethodName::HasSuffix => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::HasSuffix(Box::new(expr)))
+        }
+        MethodName::RemovePrefix => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::RemovePrefix(Box::new(expr)))
+        }
+        MethodName::RemoveSuffix => {
+            let expr =
+                build_expression_with_priority(lex, 0, |f| f == Some(&Token::CloseBrackets))?;
+            Ok(Method::RemoveSuffix(Box::new(expr)))
         }
         MethodName::Lines => Ok(Method::Lines),
         MethodName::Words => Ok(Method::Words),
