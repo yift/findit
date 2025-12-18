@@ -20,6 +20,7 @@ impl From<&Access> for Box<dyn Evaluator> {
             Access::Extension => Box::new(ExtensionExtractor {}),
             Access::Absolute => Box::new(AbsoluteExtractor {}),
             Access::Me => Box::new(MeExtractor {}),
+            Access::Stem => Box::new(StemExtractor {}),
 
             Access::Content => Box::new(ContentExtractor {}),
             Access::Depth => Box::new(DepthExtractor {}),
@@ -58,6 +59,16 @@ struct NameExtractor {}
 impl Evaluator for NameExtractor {
     fn eval(&self, file: &FileWrapper) -> Value {
         file.path().file_name().into()
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
+    }
+}
+
+struct StemExtractor {}
+impl Evaluator for StemExtractor {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        file.path().file_stem().into()
     }
     fn expected_type(&self) -> ValueType {
         ValueType::String
@@ -276,7 +287,10 @@ impl Evaluator for FilesExtractor {
 
 #[cfg(test)]
 mod tests {
-    use std::{env, path::Path};
+    use std::{
+        env,
+        path::{Path, PathBuf},
+    };
 
     use crate::{errors::FindItError, evaluators::expr::read_expr};
 
@@ -322,6 +336,11 @@ mod tests {
     #[test]
     fn test_name_expected_type() -> Result<(), FindItError> {
         test_expected_type("name", ValueType::String)
+    }
+
+    #[test]
+    fn test_stem_expected_type() -> Result<(), FindItError> {
+        test_expected_type("stem", ValueType::String)
     }
 
     #[test]
@@ -447,6 +466,20 @@ mod tests {
         let value = expr.eval(&wrapper);
 
         assert_eq!(value, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_stem() -> Result<(), FindItError> {
+        let expr = read_expr("stem")?;
+
+        let file = PathBuf::from("/tmp/hello/world.txt");
+        let wrapper = FileWrapper::new(file.clone(), 1);
+
+        let value = expr.eval(&wrapper);
+
+        assert_eq!(value, "world".into());
 
         Ok(())
     }

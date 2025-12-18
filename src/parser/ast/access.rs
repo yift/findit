@@ -2,6 +2,7 @@
 pub(crate) enum Access {
     Parent,
     Name,
+    Stem,
     Path,
     Absolute,
     Me,

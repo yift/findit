@@ -5,6 +5,7 @@ impl Access {
         match name {
             "PARENT" => Some(Access::Parent),
             "NAME" => Some(Access::Name),
+            "STEM" => Some(Access::Stem),
             "PATH" => Some(Access::Path),
             "EXTENSION" => Some(Access::Extension),
             "CONTENT" => Some(Access::Content),

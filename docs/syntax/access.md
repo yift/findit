@@ -9,6 +9,7 @@ The list of properties are:
 * `name` - Return the name of the file (with extension, without parent path).
 * `path` - Return the path of the file as a string.
 * `extension` - Return the file extension.
+* `stem` - Return the name of the file (without extension, without parent path).
 * `absolute` - Return the file absolute path.
 * `me` - Return the current file (useful for the `/` operator - see [sub operator](operators/paths/sub.md)). Can be replaced with `this` or `self`.
 * `content` Return the file content as a string. If the file can not be read (not exists, a directory, no read permission...) or the content is not a string (UTF8), return empty value.
