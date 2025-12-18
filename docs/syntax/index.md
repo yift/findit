@@ -152,7 +152,10 @@ Functions can be used to invoke a function. For example, `now()` to give the cur
 
 ## Methods
 
-Methods are functions over a specific operand. They can be invoke using the [dot](operators/access/dot.md) (or [of](operators/access/of.md)) operator. They can also be used without an operand to refer to the current file (i.e. `lines()` is the same as `me.lines()`).
+Methods are functions over a specific operand. They can be invoke using the [dot](operators/access/dot.md) (or [of](operators/access/of.md)) operator. They can also be
+used without an operand to refer to the current file (i.e. `lines()` is the same as `me.lines()`). Methods without any arguments can be used without the open and closed parenthesis. That
+is, one can use `me.lines.length` instead of `me.lines().length()`.
+
 
 ### String methods
 

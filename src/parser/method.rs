@@ -95,6 +95,48 @@ impl MethodName {
             _ => None,
         }
     }
+
+    fn must_have_arguments(&self) -> bool {
+        match self {
+            MethodName::Length => false,
+            MethodName::ToUpper => false,
+            MethodName::ToLower => false,
+            MethodName::Trim => false,
+            MethodName::TrimHead => false,
+            MethodName::TrimTail => false,
+            MethodName::Reverse => false,
+            MethodName::Map => true,
+            MethodName::Filter => true,
+            MethodName::Sum => false,
+            MethodName::Max => false,
+            MethodName::Min => false,
+            MethodName::Avg => false,
+            MethodName::Sort => false,
+            MethodName::SortBy => true,
+            MethodName::Distinct => false,
+            MethodName::DistinctBy => true,
+            MethodName::Skip => true,
+            MethodName::Take => true,
+            MethodName::Join => true,
+            MethodName::Split => true,
+            MethodName::HasPrefix => true,
+            MethodName::HasSuffix => true,
+            MethodName::RemovePrefix => true,
+            MethodName::RemoveSuffix => true,
+            MethodName::Lines => false,
+            MethodName::Words => false,
+            MethodName::First => false,
+            MethodName::Last => false,
+            MethodName::Contains => true,
+            MethodName::IndexOf => true,
+            MethodName::FlatMap => true,
+            MethodName::All => true,
+            MethodName::Any => true,
+            MethodName::GroupBy => true,
+            MethodName::Enumerate => false,
+            MethodName::Walk => false,
+        }
+    }
 }
 
 impl LambdaFunction {
@@ -122,12 +164,23 @@ pub(super) fn build_method(
     name: &MethodName,
     lex: &mut Peekable<impl Iterator<Item = LexerItem>>,
 ) -> Result<Method, ParserError> {
-    let Some(open) = lex.next() else {
-        return Err(ParserError::UnexpectedEof);
+    let must_have_arguments = name.must_have_arguments();
+    let open = if let Some(next) = lex.peek() {
+        if next.token == Token::OpenBrackets {
+            lex.next();
+            true
+        } else {
+            if must_have_arguments {
+                return Err(ParserError::UnexpectedToken(next.span));
+            }
+            false
+        }
+    } else {
+        if must_have_arguments {
+            return Err(ParserError::UnexpectedEof);
+        }
+        false
     };
-    if open.token != Token::OpenBrackets {
-        return Err(ParserError::UnexpectedToken(open.span));
-    }
     let method = match name {
         MethodName::Length => Ok(Method::Length),
         MethodName::ToUpper => Ok(Method::ToUpper),
@@ -240,11 +293,13 @@ pub(super) fn build_method(
         MethodName::Enumerate => Ok(Method::Enumerate),
         MethodName::Walk => Ok(Method::Walk),
     };
-    let Some(close) = lex.next() else {
-        return Err(ParserError::UnexpectedEof);
-    };
-    if close.token != Token::CloseBrackets {
-        return Err(ParserError::UnexpectedToken(close.span));
+    if open {
+        let Some(close) = lex.next() else {
+            return Err(ParserError::UnexpectedEof);
+        };
+        if close.token != Token::CloseBrackets {
+            return Err(ParserError::UnexpectedToken(close.span));
+        }
     }
     method
 }
@@ -255,7 +310,7 @@ mod tests {
 
     #[test]
     fn test_method_just_name() {
-        let source = "trim";
+        let source = "map";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());
@@ -263,7 +318,7 @@ mod tests {
 
     #[test]
     fn test_method_no_open_brackets() {
-        let source = "trim +";
+        let source = "filter +";
         let err = parse_expression(source).err();
 
         assert!(err.is_some());

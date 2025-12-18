@@ -1,6 +1,7 @@
 use std::iter::Peekable;
 
 use crate::parser::{
+    access::read_access,
     ast::{
         access::Access,
         as_cast::{As, CastType},
@@ -66,7 +67,7 @@ pub(super) fn build_expression_with_priority(
                 let expression = build_expression_with_priority(lex, 30, end_condition)?;
                 Expression::SelfDivide(SelfDivide::new(expression))
             }
-            Token::SimpleAccess(access) => Expression::Access(access),
+            Token::SimpleAccess(access) => read_access(access, lex)?,
             Token::Is => {
                 let access = read_prefix_is(lex)?;
                 Expression::Access(access)

@@ -92,6 +92,17 @@ mod tests {
 
         assert_eq!(value, Value::Number(3))
     }
+
+    #[test]
+    fn length_as_property() {
+        let eval = read_expr("\"abcd\".len").unwrap();
+        let path = Path::new("no/such/file");
+        let wrapper = FileWrapper::new(path.to_path_buf(), 2);
+        let value = eval.eval(&wrapper);
+
+        assert_eq!(value, Value::Number(4))
+    }
+
     #[test]
     fn test_length_expected_type() -> Result<(), FindItError> {
         test_expected_type("length()", ValueType::Number)
