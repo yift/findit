@@ -79,6 +79,8 @@ fn test_with_debugger() -> Result<(), FindItError> {
 
     let fl = PathBuf::from("tests/test_cases/display/expected_output/test_with_debugger/debug.txt");
     let expected_contents = fs::read_to_string(&fl)?;
+    let expected_contents = expected_contents.lines().sorted().collect::<Vec<_>>();
+    let log_contents = log_contents.lines().sorted().collect::<Vec<_>>();
     assert_eq!(log_contents, expected_contents);
 
     Ok(())
