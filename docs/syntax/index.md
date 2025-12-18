@@ -156,7 +156,6 @@ Methods are functions over a specific operand. They can be invoke using the [dot
 used without an operand to refer to the current file (i.e. `lines()` is the same as `me.lines()`). Methods without any arguments can be used without the open and closed parenthesis. That
 is, one can use `me.lines.length` instead of `me.lines().length()`.
 
-
 ### String methods
 
 * [length](method/string/length.md)

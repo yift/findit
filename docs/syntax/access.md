@@ -45,6 +45,7 @@ findit -w '(parent / "build").is dir'
 Will show all the directories that have a sibling directory named `"build"`.
 
 One can also use a method syntax to access the same properties. That is:
+
 ```bash
 findit -w 'content().contains("import ")'
 ```
