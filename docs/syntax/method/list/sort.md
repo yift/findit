@@ -1,6 +1,8 @@
 # Sort list method
 
-The `sort` (also `order`) method is used to sort the arguments in a list.
+**Aliases:** `order()`
+
+The `sort` method is used to sort the arguments in a list.
 
 For example:
 

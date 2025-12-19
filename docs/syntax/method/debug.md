@@ -1,6 +1,8 @@
 # Debug method
 
-The `debug` (also `dbg`)  method is used to print text into the debug file if enabled (using the `--debug-output-file` argument). If the flag is not enabled, the method will be ignored.
+**Aliases:** `dbg()`
+
+The `debug`  method is used to print text into the debug file if enabled (using the `--debug-output-file` argument). If the flag is not enabled, the method will be ignored.
 The method will take a single argument that is a function that accept the method target, and will print that output to the debug file.
 The return value of the method is the target (regardless whether the flag is enabled).
 

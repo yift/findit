@@ -1,6 +1,8 @@
 # Length list method
 
-The `length`  method (also `len`, `count` or `size`) is used to get the number of items in a list.
+**Aliases:** `len()`, `count()`, `size()`
+
+The `length`  method is used to get the number of items in a list.
 
 For example:
 

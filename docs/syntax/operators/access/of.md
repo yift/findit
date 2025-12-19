@@ -8,7 +8,7 @@ For example:
 findit -w 'name = (name OF parent)'
 ```
 
-Will display only the with the same name as their parent.
+Will display only the files with the same name as their parent.
 
 ```bash
 findit -w '(length() OF me) > 1024'

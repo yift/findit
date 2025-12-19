@@ -1,6 +1,8 @@
 # Max list method
 
-The `max` (also `maximum`) method is used to find the maximal value within a list.
+**Aliases:** `maximum()`
+
+The `max` method is used to find the maximal value within a list.
 
 For example:
 

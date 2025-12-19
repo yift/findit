@@ -6,9 +6,9 @@ To use a path literal in an expression, use the `@` sign before the name of the 
 findit -w 'parent = @src .absolute'
 ```
 
-will find all the files their parent have the same absolute path as the src (i.e. equivalent to `ls ./src`).
+will find all the files whose parents have the same absolute path as the src (i.e. equivalent to `ls ./src`).
 
-One can use quotes when the file name contains spaces or to avoid adding space after the file if one need to access it. For example:
+You can use quotes when the file name contains spaces or to avoid adding a space after the filename if you need to access it. For example:
 
 ```bash
 findit -w 'content = @"src/main.rs".content'

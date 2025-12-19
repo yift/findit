@@ -5,7 +5,7 @@ Depending on the type of operand, the casting will work as:
 
 | operand type | Rule |
 | --- | --- |
-| String | Will be true if the value is `yes`, `true,`y`, or`t` (case insensitive) |
+| String | Will be true if the value is `yes`, `true`, `y`, or`t` (case insensitive) |
 | Boolean | Will return the value as is. |
 | Date | Will return true. |
 | Number | Will return true if the number is not zero (0). |

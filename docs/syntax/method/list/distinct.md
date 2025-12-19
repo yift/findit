@@ -1,6 +1,8 @@
 # Distinct list method
 
-The `distinct` (also `unique`) method is used to remove duplicates from a list.
+**Aliases:** `unique()`
+
+The `distinct` method is used to remove duplicates from a list.
 
 For example:
 

@@ -24,7 +24,7 @@ impl Access {
             "EXISTS" => Some(Access::Exists),
             "OWNER" => Some(Access::Owner),
             "GROUP" => Some(Access::Group),
-            "PERMISSIONS" => Some(Access::Permissions),
+            "PERMISSIONS" | "PERMISSION" => Some(Access::Permissions),
             "ABSOLUTE" => Some(Access::Absolute),
             "FILES" => Some(Access::Files),
             "ME" | "SELF" | "THIS" => Some(Access::Me),

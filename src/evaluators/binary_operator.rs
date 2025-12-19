@@ -60,6 +60,7 @@ fn new_arithmetic_operator(
         },
         ArithmeticOperator::Multiply => match (left.expected_type(), right.expected_type()) {
             (ValueType::Number, ValueType::Number) => Ok(Box::new(TimesNumbers { left, right })),
+            (ValueType::String, ValueType::Number) => Ok(Box::new(RepeatString { left, right })),
             _ => Err(FindItError::BadExpression(
                 "Operator * only support two numbers".into(),
             )),
@@ -245,6 +246,24 @@ impl Evaluator for TimesNumbers {
     }
     fn expected_type(&self) -> ValueType {
         ValueType::Number
+    }
+}
+
+struct RepeatString {
+    left: Box<dyn Evaluator>,
+    right: Box<dyn Evaluator>,
+}
+impl Evaluator for RepeatString {
+    fn eval(&self, file: &FileWrapper) -> Value {
+        let (Value::String(left), Value::Number(right)) =
+            (self.left.eval(file), self.right.eval(file))
+        else {
+            return Value::Empty;
+        };
+        Value::String(left.repeat(right as usize))
+    }
+    fn expected_type(&self) -> ValueType {
+        ValueType::String
     }
 }
 
@@ -601,7 +620,7 @@ mod tests {
 
     #[test]
     fn unsupported_multiply_string() {
-        let err = read_expr("\"a\" * 3").err();
+        let err = read_expr("\"a\" * true").err();
         assert!(err.is_some())
     }
 
@@ -1035,5 +1054,50 @@ mod tests {
     fn of_of_number() {
         let err = read_expr("parent of 10").err();
         assert!(err.is_some())
+    }
+
+    #[test]
+    fn repeat_strings() -> Result<(), FindItError> {
+        let expr = read_expr("\"a\" * 3")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::String("aaa".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn repeat_strings_empty_left() -> Result<(), FindItError> {
+        let expr = read_expr("content * 3")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn repeat_strings_empty_right() -> Result<(), FindItError> {
+        let expr = read_expr("\"a\" * content.length()")?;
+        let file = FileWrapper::new(Path::new("/no/such/file").to_path_buf(), 1);
+
+        let val = expr.eval(&file);
+
+        assert_eq!(val, Value::Empty);
+
+        Ok(())
+    }
+
+    #[test]
+    fn repeat_strings_return_value() -> Result<(), FindItError> {
+        let expr = read_expr("\"a\" * 5")?;
+
+        assert_eq!(expr.expected_type(), ValueType::String);
+
+        Ok(())
     }
 }

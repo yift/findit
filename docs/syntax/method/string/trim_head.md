@@ -1,6 +1,8 @@
 # TrimHead string method
 
-The `trimHead` (also `trim_head`)  method is used to remove white spaces from a string head.
+**Aliases:** `trim_head()`, `lower()`, `lowercase()`
+
+The `trimHead`  method is used to remove white spaces from a string head.
 
 For example:
 

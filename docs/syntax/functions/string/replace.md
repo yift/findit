@@ -14,7 +14,7 @@ Where all arguments are strings.
 To replace all the matches of a regular expression within a string, use: `replace(<source> pattern <pattern> to <new_string>)`
 Where all arguments are strings.
 The regular expression syntax follow rust regex - see details in [the Rust regex docs](https://docs.rs/regex/latest/regex/#syntax).
-One can also refer to the groups in the regular expression using a `$n` syntax.
+You can also refer to the groups in the regular expression using a `$n` syntax.
 
 For example:
 

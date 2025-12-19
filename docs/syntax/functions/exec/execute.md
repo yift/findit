@@ -1,7 +1,7 @@
 # execute function
 
 The `execute` (or `exec`) function will execute an external process, will wait for it to complete and will return true if it was successful. The first argument should be a path (or a string) to the executable to run and the others are the arguments.
-One can add an `INTO files` at the end of the argument list to point the stdout to another file.
+You can add an `INTO <file>` clause at the end of the argument list to point the stdout to another file.
 
 For example:
 

@@ -1,6 +1,8 @@
 # SortBy list method
 
-The `sortBy` (also `orderBy`, `sort_by`, or `order_by`) method is used to sort the arguments in a list by a specific function.
+**Aliases:** `orderBy()`, `sort_by()`, `order_by()`
+
+The `sortBy` method is used to sort the arguments in a list by a specific function.
 
 The method takes a single argument that is the function to sort the items by. The format is `<list>.sortBy($<name> <action_with_$name>)`.
 

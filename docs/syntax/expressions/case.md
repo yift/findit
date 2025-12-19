@@ -1,7 +1,7 @@
 # Case expression
 
-A case expression can be used to choose between a few branches.
-The syntax to use an case expression is:
+A `CASE` expression can be used to choose between a few branches.
+The syntax to use a `CASE` expression is:
 
 ```sql
 CASE WHEN 

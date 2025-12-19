@@ -1,6 +1,8 @@
 # Min list method
 
-The `min` (also `minimum`) method is used to find the minimal value within a list.
+**Aliases:** `minimum()`
+
+The `min` method is used to find the minimal value within a list.
 
 For example:
 

@@ -18,7 +18,7 @@ To use a date literal in an expression, use the `@(<date>)`syntax where date can
 * `yyyy-mm-dd hh:mm:ss zz` for example: `@(2025-10-24 00:11:22 +0400)`
 * `yyyy-mm-dd hh:mm:ss.ms zz` for example: `@(2025-10-24 00:11:22.00+0400)`
 
-. For example:
+For example:
 
 ```bash
 findit -w 'modified < @(20/Aug/2025)'

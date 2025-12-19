@@ -1,3 +1,3 @@
 # Boolean Literals
 
-To use boolean literals in `findit`, one can use the `true` or `false` reserved keywords.
+To use boolean literals in `findit`, you can use the `true` or `false` reserved keywords.

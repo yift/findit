@@ -1,7 +1,7 @@
 # Between expression
 
-A between expression can be used to filter when a value is between two values.
-The syntax to use a between expression is:
+A `BETWEEN` expression can be used to filter when a value is between two values.
+The syntax to use a `BETWEEN` expression is:
 
 ```sql
 <operand> BETWEEN <min> AND <max>
@@ -15,4 +15,4 @@ For example:
 findit -w 'size BETWEEN 1024 AND 2048'
 ```
 
-Will list the files whose size is between 10-24 bytes and 2048 bytes.
+Will list the files whose size is between 1024 bytes and 2048 bytes.

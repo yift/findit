@@ -1,6 +1,8 @@
 # ToLower string method
 
-The `toLower`  method (also `to_lower`, `lower` or `lowerCase`) is used to convert a string to it's lower case form. This can e used for case insensitive comparisons
+**Aliases:** `to_lower()`, `lower()`, `lowercase()`
+
+The `toLower`  method is used to convert a string to it's lower case form. This can e used for case insensitive comparisons
 
 For example:
 

@@ -4,7 +4,7 @@ There are a few ways to install `findit`:
 
 ## From source
 
-To install `findit` from source, make sure you have the Rust toolchain installed. See details [Rust site](https://www.rust-lang.org/tools/install)
+To install `findit` from source, make sure you have the Rust toolchain installed. See details on the [Rust site](https://www.rust-lang.org/tools/install)
 
 ### Using Cargo
 
@@ -33,7 +33,7 @@ You can use the `findit` Docker container. Please note that this will allow you 
 docker run -it --rm -v $(pwd):/data yiftach/findit -m /data
 ```
 
-(To install Docker, see [docker site](https://docs.docker.com/engine/install/)).
+(To install Docker, see the [docker site](https://docs.docker.com/engine/install/)).
 
 ## From binary
 

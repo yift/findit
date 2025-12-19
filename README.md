@@ -4,7 +4,7 @@
 
 ## What can you use it for
 
-One can use this tool to find files within a directory using complex filters over the file properties, content or structure.
+You can use this tool to find files within a directory using complex filters over the file properties, content or structure.
 
 For example:
 
@@ -14,10 +14,37 @@ findit src --where 'extension == "rs" AND not content.contains("#[cfg(test)]")'
 
 Will find all the rust files under src without any test code.
 
-## Installation
+## Quick Examples
 
-See installation instructions [in this page](docs/install.md).
+### Find large files
 
-## User manuel
+```bash
+findit --where 'size > 1000000' --order-by 'size DESC' --limit 10
+```
 
-See more details on how to use `findit` [in the usage docs](docs/usage.md).
+### Find recent files
+
+```bash
+findit --where 'modified > now() - 86400'
+```
+
+### Find files by content
+
+```bash
+findit --where 'content.contains("TODO")'
+```
+
+### Find executable files
+
+```bash
+findit --where 'NOT IS DIR AND permissions & 0o111 != 0'
+```
+
+## Documentation
+
+- [Quick Start Guide](docs/quick-start.md)
+- [Installation](docs/install.md)
+- [Usage Guide](docs/usage.md)
+- [Syntax Reference](docs/syntax/index.md)
+- [Cookbook - Real-world Examples](docs/cookbook.md)
+- Quick syntax help: `findit --help-syntax`

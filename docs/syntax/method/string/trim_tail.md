@@ -1,6 +1,8 @@
 # TrimTail string method
 
-The `trimTail` (also `trim_tail`)  method is used to remove white spaces from a string end.
+**Aliases:** `trim_tail()`
+
+The `trimTail`  method is used to remove white spaces from a string end.
 
 For example:
 

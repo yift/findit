@@ -1,6 +1,6 @@
 # Env function
 
-The `env` (or `environment`) function will accept one string argument and will return the environment variable (or empty if not such variable exists).
+The `env` (or `environment`) function will accept one string argument and will return the environment variable (or empty if no such variable exists).
 
 For example:
 

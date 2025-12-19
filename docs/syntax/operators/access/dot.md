@@ -8,4 +8,4 @@ For example:
 findit -w 'me.name = parent.name'
 ```
 
-Will display only the with the same name as their parent. Note that `me.name` is equivalent to `name`.
+Will display only the files with the same name as their parent. Note that `me.name` is equivalent to `name`.

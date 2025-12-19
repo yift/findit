@@ -1,6 +1,8 @@
 # Avg list method
 
-The `avg` (also `average`) method is used to find the average value within a list of numbers.
+**Aliases:** `average()`
+
+The `avg` method is used to find the average value within a list of numbers.
 
 For example:
 

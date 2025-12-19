@@ -1,10 +1,9 @@
 # With expression
 
-A with expression can be used to save some values for future use. For example, the `content` will read the content the file, which might be large, so one might keep the value in order to read it only once.
+A `WITH` expression can be used to save some values and reuse them. For example, the `content` will read the content the file, which might be large, so you might want to keep the value in order to read it only once.
 This can also help to reduce code duplications.
 
-The syntax to use a with expression is:
-with $one 1, $two $one + $one, $one \"one\" do $one + $two as string end
+The syntax to use a `WITH` expression is:
 
 ```sql
 WITH $<name> [AS] <value> [, $<name_2> AS <value_2>...] DO <expression> END

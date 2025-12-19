@@ -1,6 +1,6 @@
 # List creation (`[]`)
 
-To create a list, one can use the `[<item>, <item>, ...]` syntax, where the items of the list must be the same type. The items can be dynamic.
+To create a list, you can use the `[<item>, <item>, ...]` syntax, where the items of the list must be the same type. The items can be dynamic.
 
 For example:
 

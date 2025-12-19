@@ -1,7 +1,7 @@
 # If expression
 
-An if expression can be used to choose between two branches.
-The syntax to use an if expression is:
+An `IF` expression can be used to choose between two branches.
+The syntax to use an `IF` expression is:
 
 ```sql
 IF <condition> THEN <true_branch> [ELSE <false_branch>] END

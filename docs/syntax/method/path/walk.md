@@ -8,4 +8,4 @@ For example:
 findit -w 'walk().filter($f $f.extension = "txt").length() > 100'
 ```
 
-will show all the directories that have more than 100 offsprings.
+will show all the directories that have more than 100 text files.

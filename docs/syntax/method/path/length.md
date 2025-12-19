@@ -1,6 +1,8 @@
 # Length path method
 
-The `length`  method (also `len`, `count` or `size`) is used to get the number of character in a file.
+**Aliases:** `len()`, `count()`, `size()`
+
+The `length`  method is used to get the number of character in a file.
 
 For example:
 

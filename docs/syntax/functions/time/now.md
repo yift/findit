@@ -8,4 +8,4 @@ For example:
 findit -w 'created > now() - 3600'
 ```
 
-Will show the latest created files
+Will show the most recently created files
