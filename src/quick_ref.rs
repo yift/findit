@@ -14,7 +14,7 @@ fn get_syntax_help(term: bool) -> String {
         ("", "", "")
     };
     format!(
-        r#"
+        r##"
 {bold}{blue}findit Expression Syntax - Quick Reference{reset}
 ===========================================
 
@@ -164,7 +164,7 @@ fn get_syntax_help(term: bool) -> String {
   NOT IS DIR AND permission & 0o111 != 0
   
   # Files without tests
-  IS FILE AND NOT content.contains("\#[cfg(test)]")
+  IS FILE AND NOT content.contains("#[cfg(test)]")
   
   # Count files by extension
   IS DIR AND files.filter($f $f.IS FILE).groupBy($f $f.extension)
@@ -179,7 +179,7 @@ fn get_syntax_help(term: bool) -> String {
 {bold}FULL DOCUMENTATION:{reset}
   https://github.com/yift/findit/blob/main/docs/syntax/index.md
   https://github.com/yift/findit/blob/main/docs/usage.md
-"#
+"##
     )
 }
 

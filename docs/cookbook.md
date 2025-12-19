@@ -88,10 +88,10 @@ findit --where 'IS FILE' --order-by 'size DESC' --limit 10
 ```bash
 findit --where 'IS FILE' \
   --display '`name`: `CASE 
-    WHEN size > 1073741824 THEN "" + (size / 1073741824) + "GB"
-    WHEN size > 1048576 THEN "" + (size / 1048576) + "MB" 
-    WHEN size > 1024 THEN "" + (size / 1024) + "KB"
-    ELSE "" + size + "B" 
+    WHEN size > 1073741824 THEN (size / 1073741824) AS STRING + "GB"
+    WHEN size > 1048576 THEN (size / 1048576)  AS STRING + "MB"
+    WHEN size > 1024 THEN (size / 1024)  AS STRING + "KB"
+    ELSE size AS STRING + "B"
   END`'
 ```
 

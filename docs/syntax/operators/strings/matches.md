@@ -1,7 +1,7 @@
 # Matches (`MATCHES`) string operator
 
 The Matches (`MATCHES`) string operator will return true if the left string operand will match the regular expression that is in the right string operand.
-If the right spring operand is not a valid regular expression, the result will be empty.
+If the right string operand is not a valid regular expression, the result will be empty.
 The regular expression syntax follow rust regex - see details in [Rust regex docs](https://docs.rs/regex/latest/regex/#syntax).
 
 For example:

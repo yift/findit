@@ -4,7 +4,7 @@ use clap::Parser;
 
 /// Find files using powerful filtering expressions
 #[derive(Parser, Debug)]
-#[command(version, about, version, long_about = None)]
+#[command(version, about, long_about = None )]
 pub struct CliArgs {
     /// Root directory to search (default: current directory)
     pub(crate) root: Option<PathBuf>,
