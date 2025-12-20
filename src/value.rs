@@ -178,3 +178,29 @@ impl Display for ValueType {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::errors::FindItError;
+
+    use super::*;
+
+    #[test]
+    fn test_display_value_type() -> Result<(), FindItError> {
+        assert_eq!(ValueType::Bool.to_string(), "boolean");
+        assert_eq!(ValueType::Number.to_string(), "number");
+        assert_eq!(ValueType::Path.to_string(), "path");
+        assert_eq!(ValueType::String.to_string(), "string");
+        assert_eq!(ValueType::Date.to_string(), "date");
+        assert_eq!(ValueType::Empty.to_string(), "empty");
+        assert_eq!(
+            ValueType::List(Rc::new(ValueType::Path)).to_string(),
+            "list<path>"
+        );
+        assert_eq!(
+            ValueType::Class(Rc::new(ClassType::new(&[]))).to_string(),
+            "class<>"
+        );
+        Ok(())
+    }
+}

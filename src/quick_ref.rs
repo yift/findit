@@ -183,25 +183,191 @@ fn get_syntax_help(term: bool) -> String {
     )
 }
 
-pub(crate) fn show_syntax_help() {
-    if !stdout().is_terminal() || show_with_pager().is_err() {
+pub(crate) trait Executor {
+    fn spawn(&self, program: &str, args: &[&str], input: &[u8]) -> Result<(), FindItError>;
+}
+pub(crate) trait Pager {
+    fn pager(&self) -> String;
+}
+
+struct DefaultExecutor;
+impl Executor for DefaultExecutor {
+    fn spawn(&self, program: &str, args: &[&str], input: &[u8]) -> Result<(), FindItError> {
+        let mut child = Command::new(program)
+            .args(args)
+            .stdin(Stdio::piped())
+            .spawn()?;
+
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(input)?;
+        }
+
+        let status = child.wait()?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(FindItError::PagerFailed(status))
+        }
+    }
+}
+struct DefaultPager;
+impl Pager for DefaultPager {
+    fn pager(&self) -> String {
+        env::var("PAGER").unwrap_or_else(|_| "less".to_string())
+    }
+}
+
+pub(crate) fn default_executor() -> impl Executor {
+    DefaultExecutor
+}
+pub(crate) fn default_pager() -> impl Pager {
+    DefaultPager
+}
+
+pub(crate) fn show_syntax_help(pager: impl Pager, executor: impl Executor) {
+    if !stdout().is_terminal() || show_with_pager(pager, executor).is_err() {
         print!("{}", get_syntax_help(false));
     }
 }
 
-fn show_with_pager() -> Result<(), FindItError> {
-    let pager_cmd = env::var("PAGER").unwrap_or_else(|_| "less".to_string());
+fn show_with_pager(pager: impl Pager, executor: impl Executor) -> Result<(), FindItError> {
+    let pager_cmd = pager.pager();
 
-    let mut child = Command::new(&pager_cmd)
-        .arg("-R")
-        .arg("-F")
-        .stdin(Stdio::piped())
-        .spawn()?;
+    executor.spawn(&pager_cmd, &["-R", "-F"], get_syntax_help(true).as_bytes())
+}
 
-    if let Some(mut stdin) = child.stdin.take() {
-        stdin.write_all(get_syntax_help(true).as_bytes())?;
+#[cfg(test)]
+mod tests {
+    use std::{
+        cell::RefCell,
+        fs::{self, File},
+        os::unix::fs::PermissionsExt,
+        rc::Rc,
+    };
+
+    use tempfile::tempdir;
+
+    use crate::errors::FindItError;
+
+    use super::*;
+
+    #[test]
+    fn get_syntax_help_no_format() -> Result<(), FindItError> {
+        let help = get_syntax_help(false);
+        assert!(help.contains("findit Expression Syntax - Quick Reference"));
+        assert!(!help.contains(RESET));
+        Ok(())
     }
 
-    child.wait()?;
-    Ok(())
+    #[test]
+    fn get_syntax_help_with_format() -> Result<(), FindItError> {
+        let help = get_syntax_help(true);
+        assert!(help.contains("findit Expression Syntax - Quick Reference"));
+        assert!(help.contains(RESET));
+        Ok(())
+    }
+
+    #[test]
+    fn test_default_pager() -> Result<(), FindItError> {
+        let cmd = default_pager().pager();
+
+        assert_eq!(cmd, "less".to_string());
+        Ok(())
+    }
+
+    #[test]
+    fn test_default_executor() -> Result<(), FindItError> {
+        let dir = tempdir()?;
+        let script_path = dir.path().join("capture.sh");
+        let output = dir.path().join("output.txt");
+
+        let mut file = File::create(&script_path)?;
+        writeln!(
+            file,
+            r#"#!/bin/bash
+cat - > "$1"
+"#
+        )?;
+        drop(file);
+        let mut perms = fs::metadata(&script_path)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&script_path, perms)?;
+
+        default_executor().spawn(
+            script_path.display().to_string().as_str(),
+            &[output.display().to_string().as_str()],
+            b"hello world",
+        )?;
+
+        let out = fs::read_to_string(&output)?;
+        assert_eq!(out, "hello world");
+        Ok(())
+    }
+
+    #[test]
+    fn test_default_executor_with_error() -> Result<(), FindItError> {
+        let dir = tempdir()?;
+        let script_path = dir.path().join("capture.sh");
+        let output = dir.path().join("output.txt");
+
+        let mut file = File::create(&script_path)?;
+        writeln!(
+            file,
+            r#"#!/bin/bash
+cat - > "$1"
+exit 1
+"#
+        )?;
+        drop(file);
+        let mut perms = fs::metadata(&script_path)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&script_path, perms)?;
+
+        let err = default_executor()
+            .spawn(
+                script_path.display().to_string().as_str(),
+                &[output.display().to_string().as_str()],
+                b"hello world",
+            )
+            .err();
+
+        let out = fs::read_to_string(&output)?;
+        assert_eq!(out, "hello world");
+        assert!(err.is_some());
+        Ok(())
+    }
+
+    #[test]
+    fn test_show_with_pager() -> Result<(), FindItError> {
+        struct TestPager;
+        impl Pager for TestPager {
+            fn pager(&self) -> String {
+                "cat".to_string()
+            }
+        }
+        struct TestExecutor {
+            called: Rc<RefCell<usize>>,
+        }
+        let called = Rc::new(RefCell::new(0));
+        impl Executor for TestExecutor {
+            fn spawn(&self, program: &str, args: &[&str], input: &[u8]) -> Result<(), FindItError> {
+                assert_eq!(program, "cat");
+                assert_eq!(args, &["-R", "-F"]);
+                assert!(input.starts_with(b"\n\x1b[1m\x1b[34mfindit Expression Syntax"));
+                *self.called.borrow_mut() += 1;
+                Ok(())
+            }
+        }
+
+        show_with_pager(
+            TestPager,
+            TestExecutor {
+                called: called.clone(),
+            },
+        )?;
+
+        assert_eq!(*called.borrow(), 1);
+        Ok(())
+    }
 }

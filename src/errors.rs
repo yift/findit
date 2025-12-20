@@ -1,4 +1,4 @@
-use std::{io::Error as IoError, num::ParseIntError, path::PathBuf};
+use std::{io::Error as IoError, num::ParseIntError, path::PathBuf, process::ExitStatus};
 use thiserror::Error;
 
 use crate::parser::parser_error::ParserError;
@@ -23,4 +23,6 @@ pub enum FindItError {
     ParserError(#[from] ParserError),
     #[error("Cannot find field name: `{0}`")]
     NoSuchField(String),
+    #[error("Pager failed: `{0}`")]
+    PagerFailed(ExitStatus),
 }

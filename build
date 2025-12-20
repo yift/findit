@@ -62,5 +62,13 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
+echo '  Coverage...'
+cargo tarpaulin --out Html --target-dir ./target/test2 --engine llvm --exclude-files src/main.rs --fail-under 100 > /tmp/out.txt 2>&1
+if [ $? -ne 0 ]; then
+    xdg-open ./tarpaulin-report.html
+    less /tmp/out.txt
+    exit -1
+fi
+
 
 echo 'OK'

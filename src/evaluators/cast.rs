@@ -94,22 +94,17 @@ impl Evaluator for CastToDate {
                 Ok(Expression::Literal(Value::Date(dt))) => Value::Date(dt),
                 _ => Value::Empty,
             },
-            Value::Number(n) => match n.try_into() {
-                Ok(secs) => match DateTime::from_timestamp(secs, 0) {
-                    Some(dt) => Value::Date(dt.into()),
-                    // No test coverage here
-                    None => Value::Empty,
-                },
-                Err(_) => Value::Empty,
-            },
-            Value::Path(p) => match p.metadata() {
-                Ok(m) => match m.accessed() {
-                    Ok(tm) => Value::Date(tm.into()),
-                    // No test coverage here
-                    Err(_) => Value::Empty,
-                },
-                Err(_) => Value::Empty,
-            },
+            Value::Number(n) => i64::try_from(n)
+                .ok()
+                .and_then(|secs| DateTime::from_timestamp(secs, 0))
+                .map(|dt| Value::Date(dt.into()))
+                .unwrap_or(Value::Empty),
+            Value::Path(p) => p
+                .metadata()
+                .ok()
+                .and_then(|m| m.accessed().ok())
+                .map(|tm| Value::Date(tm.into()))
+                .unwrap_or(Value::Empty),
             Value::List(_) | Value::Class(_) => Value::Empty,
         }
     }

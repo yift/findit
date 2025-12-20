@@ -1,0 +1,31 @@
+name: Coverage
+
+on:
+  push
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: install cargo-tarpaulin
+      run: cargo install cargo-tarpaulin
+
+    - name: Generate code coverage
+      run: |
+        cargo tarpaulin --all-features --workspace --timeout 120 --engine llvm --out Html --exclude-files src/main.rs --fail-under 100
+
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v6
+      with:
+        name: code-coverage-report
+        path: tarpaulin-report.html
+        retention-days: 7

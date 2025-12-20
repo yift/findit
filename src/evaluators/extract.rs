@@ -225,11 +225,9 @@ impl Evaluator for OwnerExtractor {
         let Ok(m) = fs::metadata(file.path()) else {
             return Value::Empty;
         };
-        match get_user_by_uid(m.uid()) {
-            // No coverage for this.
-            None => Value::Empty,
-            Some(u) => u.name().into(),
-        }
+        get_user_by_uid(m.uid())
+            .map(|u| u.name().into())
+            .unwrap_or(Value::Empty)
     }
     fn expected_type(&self) -> ValueType {
         ValueType::String
@@ -241,11 +239,9 @@ impl Evaluator for GroupExtractor {
         let Ok(m) = fs::metadata(file.path()) else {
             return Value::Empty;
         };
-        match get_group_by_gid(m.gid()) {
-            // No coverage for this.
-            None => Value::Empty,
-            Some(u) => u.name().into(),
-        }
+        get_group_by_gid(m.gid())
+            .map(|g| g.name().into())
+            .unwrap_or(Value::Empty)
     }
     fn expected_type(&self) -> ValueType {
         ValueType::String

@@ -27,8 +27,8 @@ impl Iterator for Walker {
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(top) = self.stack.last_mut() {
-            match top.next() {
-                Some(Ok(entry)) => {
+            match top.next().and_then(Result::ok) {
+                Some(entry) => {
                     let path = entry.path();
                     if path.is_dir() {
                         if let Ok(rd) = fs::read_dir(&path) {
@@ -38,7 +38,6 @@ impl Iterator for Walker {
                         return Some(Value::Path(path));
                     }
                 }
-                Some(Err(_)) => continue,
                 None => {
                     self.stack.pop();
                 }
