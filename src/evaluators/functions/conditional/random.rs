@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use rand::RngCore;
+use rand::Rng;
 
 use crate::{
     errors::FindItError,

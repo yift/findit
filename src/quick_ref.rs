@@ -202,12 +202,12 @@ impl Executor for DefaultExecutor {
             stdin.write_all(input)?;
         }
 
-        let status = child.wait()?;
+        let output = child.wait_with_output()?;
 
-        if status.success() {
+        if output.status.success() {
             Ok(())
         } else {
-            Err(FindItError::PagerFailed(status))
+            Err(FindItError::PagerFailed(output.status))
         }
     }
 }
