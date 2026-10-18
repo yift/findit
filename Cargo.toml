@@ -14,14 +14,14 @@ exclude = ["/.github/*", "/.gitignore"]
 clap = { version = "4.6", features = ["derive"] }
 thiserror = "2.0"
 chrono = "0.4"
-itertools = "0.14"
-regex = "1.12"
+itertools = "0.15"
+regex = "1.13"
 uzers  = "0.12"
 rand = "0.10"
-ordermap = "1.1"
+ordermap = "1.2"
 
 [dev-dependencies]
-toml = "1.0"
+toml = "1.1"
 tempfile = "3.27"
 
 [workspace.metadata.typos]
