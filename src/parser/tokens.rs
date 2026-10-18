@@ -188,10 +188,7 @@ fn read_symbol(
     chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
 ) -> Result<Token, TokenError> {
     let mut str = String::new();
-    loop {
-        let Some((_, chr)) = chars.peek() else {
-            break;
-        };
+    while let Some((_, chr)) = chars.peek() {
         let chr = *chr;
         match chr {
             '=' | '!' | '<' | '>' => {
@@ -230,10 +227,7 @@ fn read_reserved_word(
     chars: &mut Peekable<impl Iterator<Item = (usize, char)>>,
 ) -> Result<Token, TokenError> {
     let mut str = String::new();
-    loop {
-        let Some((_, chr)) = chars.peek() else {
-            break;
-        };
+    while let Some((_, chr)) = chars.peek() {
         let chr = *chr;
         if chr.is_ascii_alphabetic() || chr == '_' {
             chars.next();
@@ -526,10 +520,7 @@ fn read_hex_char(chars: &mut impl Iterator<Item = (usize, char)>) -> Result<char
 fn read_number(chars: &mut Peekable<impl Iterator<Item = (usize, char)>>) -> u64 {
     let mut number = 0;
     let mut index = 0;
-    loop {
-        let Some((_, char)) = chars.peek() else {
-            break;
-        };
+    while let Some((_, char)) = chars.peek() {
         let Some(digit) = char.to_digit(10) else {
             if index == 1 && number == 0 {
                 let radix = match char.to_ascii_uppercase() {
@@ -557,10 +548,7 @@ fn read_number_with_radix(
     radix: u32,
 ) -> u64 {
     let mut number = 0;
-    loop {
-        let Some((_, char)) = chars.peek() else {
-            break;
-        };
+    while let Some((_, char)) = chars.peek() {
         let Some(digit) = char.to_digit(radix) else {
             break;
         };

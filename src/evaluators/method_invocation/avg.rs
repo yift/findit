@@ -22,11 +22,7 @@ impl Add<u64> for AvgCalc {
 }
 impl From<AvgCalc> for Value {
     fn from(value: AvgCalc) -> Self {
-        if value.count == 0 {
-            Value::Empty
-        } else {
-            Value::Number(value.total / value.count)
-        }
+        value.total.checked_div(value.count).into()
     }
 }
 
